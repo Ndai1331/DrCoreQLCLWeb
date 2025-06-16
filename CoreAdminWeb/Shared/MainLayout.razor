@@ -73,7 +73,7 @@
             if (isAuthenticated)
             {
                 await Task.WhenAll(
-                    LoadSettings(),
+                    @* LoadSettings(), *@
                     LoadMenus()
                 );
             }
@@ -84,7 +84,7 @@
             NavigationManager.NavigateTo("/signin");
         }
     }
-
+@* 
     private async Task LoadSettings()
     {
         try
@@ -110,13 +110,13 @@
         {
             Console.WriteLine($"Error loading settings: {ex.Message}");
         }
-    }
+    } *@
 
     private async Task LoadMenus()
     {
         try
         {
-            var result = await MenuService.GetMenusAsync(1);
+            var result = await MenuService.GetMenusAsync(2);
             if (result?.Data?.Count > 0)
             {
                 Menus = MenuHelper.CreateSubMenus(result.Data);
@@ -174,7 +174,7 @@
         }
     }
 }
-
+@* 
 <style>
     .project-color {
         background-color: @ProjectColor !important;
@@ -184,4 +184,4 @@
         color: @ProjectTextColor !important;
     }
 
-</style>
+</style> *@
