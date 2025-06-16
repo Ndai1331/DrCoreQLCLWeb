@@ -43,9 +43,6 @@ namespace CoreAdminWeb.Services
                 ma_don_vi = model.ma_don_vi,
                 so_giay_phep_xuat_khau = model.so_giay_phep_xuat_khau,
                 dia_chi = model.dia_chi,
-                san_pham_san_xuat = model.san_pham_san_xuat?.id,
-                san_luong_xuat_khau = model.san_luong_xuat_khau,
-                gia_tri = model.gia_tri,
             };
         }
 
