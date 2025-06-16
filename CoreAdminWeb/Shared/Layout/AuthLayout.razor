@@ -1,0 +1,98 @@
+﻿@using CoreAdminWeb.Model
+@using CoreAdminWeb.Model.Settings
+@using CoreAdminWeb.Services
+@using CoreAdminWeb.Services.Files
+@using CoreAdminWeb.Services.Settings
+@inherits LayoutComponentBase
+
+<div style="background-color: #f9fbfd; color: black;
+ background-image: url( @(Background != null ? $"{Background.filename_disk}" : "assets/images/bg-shape.png") );
+  background-size: cover; background-repeat: no-repeat;">
+
+    <header>
+        <nav class="px-4 lg:px-7 py-4 max-w-[1440px] mx-auto">
+            <div class="flex flex-wrap items-center justify-between">
+                <a href="/" class="flex items-center">
+                    <img src="@(Logo != null ? $"{Logo.filename_disk}" : "assets/images/logo-dark.svg")" class="mx-auto dark-logo h-7 dark:hidden" alt="logo">
+                    <img src="@(Logo != null ? $"{Logo.filename_disk}" : "assets/images/logo-light.svg")" class="hidden mx-auto light-logo h-7 dark:block" alt="logo">
+                </a>
+            </div>
+        </nav>
+    </header> 
+    @Body
+    <footer class="py-5 text-center text-black dark:text-white/80 max-w-[1440px] mx-auto">
+        <div>
+            &copy;
+            <span> @FullYear</span>
+            Quản trị CDSL Tỉnh Quảng Trị.
+        </div>
+    </footer>
+</div>
+
+
+@code {
+
+    [Inject]
+    private ISettingService SettingService { get; set; }
+    [Inject]
+    private IFileService FileService { get; set; }
+
+
+    [Inject]
+    private AlertService AlertService { get; set; }
+
+    private SettingModel? Setting { get; set; }
+    private FileModel? Logo { get; set; }
+    private FileModel? Background { get; set; }
+    private string? ProjectColor { get; set; }
+    private string? ProjectTextColor { get; set; }
+    
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        var settingResults = await SettingService.GetCurrentSettingAsync();
+        if (settingResults.IsSuccess)
+        {
+            Setting = settingResults.Data;
+            ProjectColor = Setting.project_color;
+            ProjectTextColor = Setting.project_text_color;
+            // Load logo file
+            if (!string.IsNullOrEmpty(Setting.project_logo))
+            {
+                var logoRes = await FileService.GetPublicFileAsync(Setting.project_logo);
+                if (logoRes.IsSuccess)
+                {
+                    Logo = logoRes.Data;
+                }else {
+                    AlertService.ShowAlert($"Lỗi tải logo: {logoRes.Message}", "danger");
+                }
+            }
+
+            // Load background file
+            if (!string.IsNullOrEmpty(Setting.public_background))
+            {
+                var backgroundRes = await FileService.GetPublicFileAsync(Setting.public_background);
+                if (backgroundRes.IsSuccess)
+                {
+                    Background = backgroundRes.Data;
+                }else {
+                    AlertService.ShowAlert($"Lỗi tải background: {backgroundRes.Message}", "danger");
+                }
+            }
+        }else {
+            AlertService.ShowAlert($"Lỗi tải setting: {settingResults.Message}", "danger");
+        }
+    }
+
+    private string FullYear { get; set; } = DateTime.Now.Year.ToString();
+}
+
+<style>
+    .project-color {
+        background-color: @ProjectColor !important;
+    }
+    .project-text-color {
+        color: @ProjectTextColor !important;
+    }
+</style>

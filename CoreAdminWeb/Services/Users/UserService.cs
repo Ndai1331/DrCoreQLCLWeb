@@ -1,0 +1,169 @@
+using CoreAdminWeb.Model.RequestHttps;
+using CoreAdminWeb.Model.User;
+using CoreAdminWeb.RequestHttp;
+using LoginResponse = CoreAdminWeb.Model.User.LoginResponse;
+
+namespace CoreAdminWeb.Services.Users
+{
+    public interface IUserService
+    {
+        Task<RequestHttpResponse<LoginResponse>> LoginAsync(string email, string password);
+        Task<bool> LogoutAsync(string refreshToken);
+        Task<RequestHttpResponse<UserModel>> GetCurrentUserAsync();
+        Task<RequestHttpResponse<UserModel>> UpdateUserAsync(UserModel req);
+        Task<RequestHttpResponse<UserModel>> UpdateCurrentUserAsync(UserModel req);
+        string GetAccessTokenAsync();
+        string GetRefreshTokenAsync();
+    }
+
+    public class UserService : IUserService
+    {
+        private string _accessToken;
+        private string _refreshToken;
+
+        public async Task<RequestHttpResponse<LoginResponse>> LoginAsync(string email, string password)
+        {
+            var response = new RequestHttpResponse<LoginResponse>();
+            try
+            {
+                var result = await RequestClient.PostAPIAsync<RequestHttpResponse<LoginResponse>>("auth/login", new LoginRequest { email = email, password = password });
+                if (result.IsSuccess)
+                {
+                    response.Data = result.Data.Data;
+                    _accessToken = result.Data.Data.access_token;
+                    _refreshToken = result.Data.Data.refresh_token;
+                }else{
+                    response.Errors = result.Errors;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Errors = new List<ErrorResponse> { new ErrorResponse { Message = ex.Message } };
+            }
+            return response;
+        }
+
+        public async Task<bool> LogoutAsync(string refreshToken)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(_accessToken))
+                    return true;
+
+                await RequestClient.PostAPIAsync("auth/logout", new LogoutRequest { refresh_token = refreshToken });
+                _accessToken = null;
+                _refreshToken = null;
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<RequestHttpResponse<UserModel>> GetCurrentUserAsync()
+        {
+            var response = new RequestHttpResponse<UserModel>();
+            try
+            {
+                var result = await RequestClient.GetAPIAsync<RequestHttpResponse<UserModel>>("users/me");
+                if (result.IsSuccess)
+                {
+                    response.Data = result.Data.Data;
+                }
+                else
+                {
+                    response.Errors = result.Errors;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Errors = new List<ErrorResponse> { new ErrorResponse { Message = ex.Message } };
+            }
+            return response;
+        }
+
+        public async Task<RequestHttpResponse<UserModel>> UpdateUserAsync(UserModel req)
+        {
+            var response = new RequestHttpResponse<UserModel>();
+            try
+            {
+                var request = new
+                {
+                    req.first_name,
+                    req.last_name,
+                    req.email,
+                    req.location,
+                    req.title,
+                    req.description,
+                    req.avatar,
+                    req.language
+                };
+
+                var result = await RequestClient.PatchAPIAsync<RequestHttpResponse<UserModel>>($"users/{req.id}", request);
+                if (result.IsSuccess)
+                {
+                    response.Data = result.Data.Data;
+                }
+                else
+                {
+                    response.Errors = result.Errors;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Errors = new List<ErrorResponse> { new ErrorResponse { Message = ex.Message } };
+            }
+            return response;
+        }
+
+        public async Task<RequestHttpResponse<UserModel>> UpdateCurrentUserAsync(UserModel req)
+        {
+            var response = new RequestHttpResponse<UserModel>();
+            try
+            {
+                dynamic request;
+
+                if (!string.IsNullOrEmpty(req.password))
+                    request = new { req.password };
+                else
+                    request = new
+                    {
+                        req.id,
+                        req.first_name,
+                        req.last_name,
+                        req.email,
+                        req.location,
+                        req.title,
+                        req.description,
+                        req.avatar,
+                        req.language
+                    };
+
+                var result = await RequestClient.PatchAPIAsync<RequestHttpResponse<UserModel>>("users/me", request);
+                if (result.IsSuccess)
+                {
+                    response.Data = result.Data.Data;
+                }
+                else
+                {
+                    response.Errors = result.Errors;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Errors = new List<ErrorResponse> { new ErrorResponse { Message = ex.Message } };
+            }
+            return response;
+        }
+
+        public string GetAccessTokenAsync()
+        {
+            return _accessToken;
+        }
+        public string GetRefreshTokenAsync()
+        {
+            return _refreshToken;
+        }
+    }
+}

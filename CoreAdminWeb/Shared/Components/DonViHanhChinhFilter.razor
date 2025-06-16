@@ -1,0 +1,70 @@
+@using CoreAdminWeb.Model
+
+<div class="flex items-center gap-2 sm:gap-4">
+    <div class="w-full">
+        <MudText Typo="Typo.h2" Class="mb-4 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Tỉnh thành</MudText>
+        <select class="form-select" @onchange="OnTinhChanged">
+            <option>Chọn tỉnh thành...</option>
+            @foreach (var tinh in TinhThanhList)
+            {
+                <option value="@tinh.id" selected="@(tinh.id == SelectedTinhId)">@tinh.name</option>
+            }
+        </select>
+    </div>
+    <div class="w-full">
+        <MudText Typo="Typo.h2" Class="mb-4 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Xã phường</MudText>
+        <select class="form-select" @onchange="OnXaChanged">
+            <option>Chọn xã phường...</option>
+            @foreach (var xa in XaPhuongList)
+            {
+                <option value="@xa.id" selected="@(xa.id == SelectedXaId)">@xa.name</option>
+            }
+        </select>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public List<TinhModel> TinhThanhList { get; set; } = new();
+
+    [Parameter]
+    public List<XaPhuongModel> XaPhuongList { get; set; } = new();
+
+    [Parameter]
+    public int? SelectedTinhId { get; set; }
+
+    [Parameter]
+    public int? SelectedXaId { get; set; }
+
+    [Parameter]
+    public EventCallback<int?> OnTinhSelected { get; set; }
+
+    [Parameter]
+    public EventCallback<int?> OnXaSelected { get; set; }
+
+    private async Task OnTinhChanged(ChangeEventArgs e)
+    {
+        var value = e.Value?.ToString();
+        if (int.TryParse(value, out int tinhId))
+        {
+            await OnTinhSelected.InvokeAsync(tinhId);
+        }
+        else
+        {
+            await OnTinhSelected.InvokeAsync(null);
+        }
+    }
+
+    private async Task OnXaChanged(ChangeEventArgs e)
+    {
+        var value = e.Value?.ToString();
+        if (int.TryParse(value, out int xaId))
+        {
+            await OnXaSelected.InvokeAsync(xaId);
+        }
+        else
+        {
+            await OnXaSelected.InvokeAsync(null);
+        }
+    }
+} 

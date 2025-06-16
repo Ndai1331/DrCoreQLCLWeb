@@ -1,0 +1,187 @@
+﻿@using CoreAdminWeb.Model.Menus
+@using CoreAdminWeb.Model.User
+@using CoreAdminWeb.Services.Auth
+@using CoreAdminWeb.Helpers
+@using CoreAdminWeb.Model
+@using CoreAdminWeb.Model.Settings
+@using CoreAdminWeb.Services.Files
+@using CoreAdminWeb.Services.Menus
+@using CoreAdminWeb.Services.Settings
+@inherits LayoutComponentBase
+@inject IJSRuntime JsRuntime
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
+@inject IMenuService MenuService
+
+<div class="bg-[#f9fbfd] dark:bg-dark">
+    <div class="bg-black min-h-[220px] sm:min-h-[250px] bg-bottom fixed hidden w-full -z-50 detached-img" style="background-image: url('assets/images/bg-main.png');"></div>
+
+    <div x-cloak class="fixed inset-0 bg-black/60 dark:bg-dark/90 z-[999] lg:hidden" :class="{'hidden' : !$store.app.sidebar}" @click="ToggleSidebar">
+    </div>
+
+    <div class="flex mx-auto main-container">
+        <Sidebar Menus="Menus" Logo="Logo" Setting="Setting"></Sidebar>
+
+        <div class="flex-1 main-content">
+            <Topbar OnLogout="Logout" CurrentUser="currentUser"></Topbar>
+            <div class="h-[calc(100vh-60px)] relative overflow-y-auto overflow-x-hidden p-4 space-y-4 detached-content">
+                @if (isLoading)
+                {
+                    <div class="flex items-center justify-center h-full">
+                        <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+                    </div>
+                }
+                else if (!isAuthenticated)
+                {
+                    <MudAlert Severity="Severity.Warning" Class="my-4">
+                        Please sign in to continue
+                    </MudAlert>
+                }
+                else
+                {
+                    @Body
+                }
+
+                <Footer></Footer>
+            </div>
+        </div>
+    </div>
+</div>
+<MudPopoverProvider />
+@code {
+    private List<MenuResponse> Menus = new List<MenuResponse>();
+    private bool isLoading = true;
+    private bool isAuthenticated = false;
+    private UserModel currentUser;
+
+    [Inject]
+    private ISettingService SettingService { get; set; }
+    [Inject]
+    private IFileService FileService { get; set; }
+
+    private SettingModel? Setting { get; set; }
+    private FileModel? Logo { get; set; }
+    private string? ProjectColor { get; set; }
+    private string? ProjectTextColor { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await base.OnInitializedAsync();
+            await CheckAuth();
+            if (isAuthenticated)
+            {
+                await Task.WhenAll(
+                    LoadSettings(),
+                    LoadMenus()
+                );
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in initialization: {ex.Message}");
+            NavigationManager.NavigateTo("/signin");
+        }
+    }
+
+    private async Task LoadSettings()
+    {
+        try
+        {
+            var settingResults = await SettingService.GetCurrentSettingAsync();
+            if (settingResults.IsSuccess)
+            {
+                Setting = settingResults.Data;
+                ProjectColor = Setting.project_color;
+                ProjectTextColor = Setting.project_text_color;
+
+                if (!string.IsNullOrEmpty(Setting.project_logo))
+                {
+                    var logoRes = await FileService.GetFileAsync(Setting.project_logo);
+                    if (logoRes.IsSuccess)
+                    {
+                        Logo = logoRes.Data;
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading settings: {ex.Message}");
+        }
+    }
+
+    private async Task LoadMenus()
+    {
+        try
+        {
+            var result = await MenuService.GetMenusAsync(1);
+            if (result?.Data?.Count > 0)
+            {
+                Menus = MenuHelper.CreateSubMenus(result.Data);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading menus: {ex.Message}");
+        }
+    }
+
+    private async Task CheckAuth()
+    {
+        try
+        {
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            isAuthenticated = authState.User.Identity?.IsAuthenticated ?? false;
+
+            if (isAuthenticated)
+            {
+                currentUser = await ((AuthStateProvider)AuthStateProvider).GetCurrentUserAsync();
+                if (currentUser == null)
+                {
+                    isAuthenticated = false;
+                    NavigationManager.NavigateTo("/signin");
+                }
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/signin");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error checking auth: {ex.Message}");
+            isAuthenticated = false;
+            NavigationManager.NavigateTo("/signin");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task Logout()
+    {
+        try
+        {
+            await ((AuthStateProvider)AuthStateProvider).LogoutAsync();
+            NavigationManager.NavigateTo("/signin");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error logging out: {ex.Message}");
+        }
+    }
+}
+
+<style>
+    .project-color {
+        background-color: @ProjectColor !important;
+    }
+
+    .project-text-color {
+        color: @ProjectTextColor !important;
+    }
+
+</style>
