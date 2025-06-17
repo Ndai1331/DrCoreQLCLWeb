@@ -53,7 +53,7 @@ namespace CoreAdminWeb.Pages.Folder
 
         private async Task LoadFolders()
         {
-            var result = await MainService.GetAllAsync("filter[system][_eq]=1");
+            var result = await MainService.GetAllAsync("filter[system][_eq]=2");
             if (result.IsSuccess)
             {
                 MainModels = FolderHelper.CreateSubMenus(result.Data ?? new List<FolderModel>());

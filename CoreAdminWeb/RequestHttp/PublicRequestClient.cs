@@ -92,6 +92,32 @@ namespace CoreAdminWeb.RequestHttp
             }
         }
 
+
+
+        public static async Task PostAPIAsync([Required] string URL, object input)
+        {
+            try
+            {
+                EnsureClientInitialized();
+                var content = new StringContent(
+                    JsonConvert.SerializeObject(input),
+                    Encoding.UTF8,
+                    "application/json"
+                );
+
+                var response = await _client!.PostAsync(URL, content, _tokenSource.Token);
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorResponse = await response.Content.ReadAsStringAsync();
+                    throw new HttpRequestException($"Request failed with status code {response.StatusCode}: {errorResponse}");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new HttpRequestException($"Request failed: {ex.Message}", ex);
+            }
+        }
+
         /// <summary>
         /// Make a POST request with a file
         /// </summary>

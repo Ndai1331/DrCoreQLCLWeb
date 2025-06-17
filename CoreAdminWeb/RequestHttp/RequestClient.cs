@@ -5,6 +5,9 @@ using System.Net.Http.Headers;
 using System.Text;
 using CoreAdminWeb.Model;
 using CoreAdminWeb.Model.RequestHttps;
+using CoreAdminWeb.Model.User;
+using CoreAdminWeb.Services.Users;
+using LoginResponse = CoreAdminWeb.Model.User.LoginResponse;
 
 namespace CoreAdminWeb.RequestHttp
 {
@@ -17,6 +20,10 @@ namespace CoreAdminWeb.RequestHttp
         private static readonly CancellationTokenSource _tokenSource = new();
         private const long UploadLimit = 25214400; // ~24MB
         private static string? _accessToken;
+        private static IUserService? _userService;
+
+        // Event để thông báo khi cần logout
+        public static event EventHandler? OnLogoutRequired;
 
         /// <summary>
         /// Initialize the client with a new HttpClient instance
@@ -57,6 +64,15 @@ namespace CoreAdminWeb.RequestHttp
             EnsureClientInitialized();
             _client!.DefaultRequestHeaders.Clear();
             _client.DefaultRequestHeaders.Authorization = null;
+        }
+
+        /// <summary>
+        /// Trigger logout event and remove token
+        /// </summary>
+        private static void TriggerLogout()
+        {
+            RemoveToken();
+            OnLogoutRequired?.Invoke(null, EventArgs.Empty);
         }
 
         /// <summary>
@@ -359,7 +375,7 @@ namespace CoreAdminWeb.RequestHttp
             };
         }
 
-        private static async Task<RequestHttpResponse<T>> ReturnApiResponse<T>(HttpResponseMessage response)
+        private static async Task<RequestHttpResponse<T>> ReturnApiResponse<T>(HttpResponseMessage response, int retryCount = 0)
         {
             var result = new RequestHttpResponse<T>();
             
@@ -374,6 +390,51 @@ namespace CoreAdminWeb.RequestHttp
                 }
 
                 var errorResponse = JsonConvert.DeserializeObject<GraphQLErrorResponse>(jsonResponse);
+                
+                // Check if token is expired
+                if (errorResponse?.errors?.Any(e => e.extensions?.code == "TOKEN_EXPIRED") == true)
+                {
+                    // Prevent infinite loop
+                    if (retryCount >= 1)
+                    {
+                        TriggerLogout();
+                        result.Errors = new List<ErrorResponse>
+                        {
+                            new()
+                            {
+                                Message = "Refresh token thất bại. Vui lòng đăng nhập lại.",
+                                Code = "REFRESH_TOKEN_FAILED"
+                            }
+                        };
+                        return result;
+                    }
+
+                    // Try to refresh token
+                    if (_userService != null && await _userService.RefreshTokenAsync())
+                    {
+                        // Retry the original request
+                        var originalRequest = response.RequestMessage;
+                        if (originalRequest != null)
+                        {
+                            var newResponse = await _client!.SendAsync(originalRequest, _tokenSource.Token);
+                            return await ReturnApiResponse<T>(newResponse, retryCount + 1);
+                        }
+                    }
+                    else
+                    {
+                        TriggerLogout();
+                        result.Errors = new List<ErrorResponse>
+                        {
+                            new()
+                            {
+                                Message = "Refresh token thất bại. Vui lòng đăng nhập lại.",
+                                Code = "REFRESH_TOKEN_FAILED"
+                            }
+                        };
+                        return result;
+                    }
+                }
+
                 result.Errors = errorResponse?.errors?.Select(e => new ErrorResponse
                 {
                     Message = e.message,

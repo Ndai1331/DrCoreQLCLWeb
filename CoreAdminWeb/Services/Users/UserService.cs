@@ -14,6 +14,7 @@ namespace CoreAdminWeb.Services.Users
         Task<RequestHttpResponse<UserModel>> UpdateCurrentUserAsync(UserModel req);
         string GetAccessTokenAsync();
         string GetRefreshTokenAsync();
+        Task<bool> RefreshTokenAsync();
     }
 
     public class UserService : IUserService
@@ -26,7 +27,7 @@ namespace CoreAdminWeb.Services.Users
             var response = new RequestHttpResponse<LoginResponse>();
             try
             {
-                var result = await RequestClient.PostAPIAsync<RequestHttpResponse<LoginResponse>>("auth/login", new LoginRequest { email = email, password = password });
+                var result = await PublicRequestClient.PostAPIAsync<RequestHttpResponse<LoginResponse>>("auth/login", new LoginRequest { email = email, password = password });
                 if (result.IsSuccess)
                 {
                     response.Data = result.Data.Data;
@@ -50,7 +51,7 @@ namespace CoreAdminWeb.Services.Users
                 if (string.IsNullOrEmpty(_accessToken))
                     return true;
 
-                await RequestClient.PostAPIAsync("auth/logout", new LogoutRequest { refresh_token = refreshToken });
+                await PublicRequestClient.PostAPIAsync("auth/logout", new LogoutRequest { refresh_token = refreshToken });
                 _accessToken = null;
                 _refreshToken = null;
                 return true;
@@ -164,6 +165,37 @@ namespace CoreAdminWeb.Services.Users
         public string GetRefreshTokenAsync()
         {
             return _refreshToken;
+        }
+
+        public async Task<bool> RefreshTokenAsync()
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(_refreshToken))
+                    return false;
+
+                // Call refresh token endpoint
+                var response = await PublicRequestClient.PostAPIAsync<RequestHttpResponse<LoginResponse>>(
+                    "auth/refresh",
+                    new { refresh_token = _refreshToken }
+                );
+
+                if (response.IsSuccess && response.Data?.Data != null)
+                {
+                    // Update tokens
+                    _accessToken = response.Data.Data.access_token;
+                    _refreshToken = response.Data.Data.refresh_token;
+                    
+                    // Update token in RequestClient
+                    RequestClient.AttachToken(_accessToken);
+                    return true;
+                }
+            }
+            catch
+            {
+                // Ignore refresh errors
+            }
+            return false;
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Components.Routing
-
+@using CoreAdminWeb.Components.Auth
 <Router AppAssembly="@typeof(App).Assembly">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
@@ -14,3 +14,4 @@
 </Router>
 
 <CoreAdminWeb.Shared.Components.AlertComponent />
+<AuthHandler />
