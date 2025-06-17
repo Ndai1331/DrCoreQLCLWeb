@@ -49,7 +49,7 @@
                         </MudForm>
                     </div>
                        <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
-                        <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Từ ngày cấp GCN</MudText>
+                        <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Từ ngày ghi nhận</MudText>
                          <input type="text" 
                                    class="form-input date-picker"
                                    placeholder="Từ ngày ghi nhận"
@@ -57,7 +57,7 @@
                                    @onchange="@(e => OnDateChanged(e, "fromDate"))" />
                     </div>
                     <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
-                        <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Đến ngày cấp GCN</MudText>
+                        <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Đến ngày ghi nhận</MudText>
                         <input type="text" 
                                class="form-input date-picker"
                                placeholder="Đến ngày ghi nhận"
@@ -65,7 +65,7 @@
                                @onchange="@(e => OnDateChanged(e, "toDate"))" />
                     </div>
 
-                    <div class="flex items-end md:w-1/5 justify-end py-2">
+                    <div class="flex items-end col-span-4 justify-end py-2">
                         <div>
                             <MudButton Class="xs:w-full sm:w-auto md:w-auto btn flex items-center gap-1.5
                             bg-success border-success text-white hover:bg-success/[0.85]
@@ -367,7 +367,7 @@
                                                                                     </BlazoredTypeahead>
                                                                                 </td>
                                                                                 <td>
-                                                                                    <input type="number" class="form-input" step="0.0001" @bind-value="@item.Data.khoi_luong_tan_suat" Label="Nhập khối lượng" />
+                                                                                    <input type="number" class="form-input" step="1" @bind-value="@item.Data.khoi_luong_tan" Label="Nhập khối lượng" />
                                                                                 </td>
                                                                                 <td class="flex items-center gap-2">
                                                                                     <MudButton Class="transition-all duration-300 border btn-crud rounded-md btn text-danger border-danger hover:bg-danger hover:text-white"
@@ -425,7 +425,7 @@
                                                                                     </BlazoredTypeahead>
                                                                                 </td>
                                                                                 <td>
-                                                                                    <input type="number" class="form-input" step="0.0001" @bind-value="@item.Data.san_luong_tan" Label="Nhập sản lượng" />
+                                                                                    <input type="number" class="form-input" step="1" @bind-value="@item.Data.san_luong_tan" Label="Nhập sản lượng" />
                                                                                 </td>
                                                                                 <td class="flex items-center gap-2">
                                                                                     <MudButton Class="transition-all duration-300 border btn-crud rounded-md btn text-danger border-danger hover:bg-danger hover:text-white"

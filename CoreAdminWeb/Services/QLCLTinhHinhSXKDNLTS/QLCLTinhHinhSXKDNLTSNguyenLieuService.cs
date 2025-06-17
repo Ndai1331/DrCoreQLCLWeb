@@ -46,8 +46,9 @@ namespace CoreAdminWeb.Services
             {
                 tinh_hinh_san_xuat_kinh_doanh_nlts = model.tinh_hinh_san_xuat_kinh_doanh_nlts?.id,
                 nguyen_lieu = model.nguyen_lieu?.id,
-                khoi_luong_tan_suat = model.khoi_luong_tan_suat,
+                khoi_luong_tan = model.khoi_luong_tan,
                 sort = model.sort,
+                deleted = false
             };
         }
 
@@ -127,7 +128,6 @@ namespace CoreAdminWeb.Services
                 {
                     Data = new()
                     {
-                        
                     }
                 };
             }

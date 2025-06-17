@@ -20,6 +20,7 @@ namespace CoreAdminWeb.Model
         public string? su_co_an_toan { get; set; }
         public string? bien_phap_xu_ly_chat_thai { get; set; }
         public bool? deleted { get; set; }
+        public int? sort { get; set; }
     }
 
     /// <summary>
@@ -34,6 +35,13 @@ namespace CoreAdminWeb.Model
         public string? su_co_an_toan { get; set; }
         public string? bien_phap_xu_ly_chat_thai { get; set; }
         public bool? deleted { get; set; }
+        public bool? sort { get; set; }
+
+    }
+
+    public class QLCLTinhHinhSXKDNLTSCRUDResponseModel
+    {
+        public int? id { get; set; }
     }
 
 }
