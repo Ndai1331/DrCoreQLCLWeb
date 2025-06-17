@@ -3,7 +3,7 @@
 @inject AlertService AlertService
 @implements IDisposable
 
-<div class="fixed top-4 right-4 z-[9999] flex flex-col gap-2">
+<div class="fixed top-4 right-4 z-[99999] flex flex-col gap-2">
     @foreach (var alert in _alerts)
     {
         <div class="flex items-center gap-2 p-3 border rounded transition-all duration-300 @alert.BorderColor @alert.BgColor text-white @alert.AnimationClass" style="display: @(alert.Visible ? "flex" : "none")">

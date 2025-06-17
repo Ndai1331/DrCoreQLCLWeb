@@ -3,6 +3,17 @@ using CoreAdminWeb.Model.Base;
 
 namespace CoreAdminWeb.Model
 {
+
+    public class QLCLLoaiSanPhamModel : BaseModel<int>
+    {
+    }
+    public class QLCLLoaiSanPhamCRUDModel : BaseDetailModel
+    {
+        public new string status { set; get; } = Status.active.ToString();
+    }
+
+
+
     public class QLCLLoaiHinhCoSoModel : BaseModel<int>
     {
     }
