@@ -1,4 +1,4 @@
-﻿@page "/danh-muc-san-pham-san-xuat"
+﻿@page "/danh-muc-san-pham"
 @using CoreAdminWeb.Commons.Utils
 @using CoreAdminWeb.Enums
 @using CoreAdminWeb.Exceptions
@@ -13,13 +13,13 @@
 @inherits BlazorCoreBase
 @layout MainLayout
 
-<PageHeader Title="Loại sản phẩm sản xuất" pTitle="Loại sản phẩm sản xuất"></PageHeader>
+<PageHeader Title="Danh mục sản phẩm" pTitle="Danh mục sản phẩm"></PageHeader>
 
 
 <!-- Start All Card -->
 <div class="flex flex-col gap-4 min-h-[calc(100vh-212px)]">
     <div class="grid grid-cols-1 gap-4">
-        <div class="card">
+        <div class="card scrollable">
             @if (IsLoading)
             {
                 <div class="flex flex-col items-center justify-center gap-3">
@@ -36,7 +36,7 @@
                 <div class="w-full grid grid-cols-1 gap-4 md:grid-cols-4 xl:grid-cols-4 sm:gap-4 md:w-4/5 pb-2">
                     <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
                         <MudForm class="flex-1">
-                            <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Tìm kiếm</MudText>
+                            <MudText Typo="Typo.h2" Class="mb-4 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Tìm kiếm</MudText>
                             <div class="relative">
                                 <input type="text" id="search"
                                        class="border-black/10 dark:text-white/80 dark:placeholder:text-white/30 dark:border-darkborder dark:bg-dark dark:focus:border-white/30 focus:border-black/30 placeholder:text-black/50 border text-black text-sm rounded block w-full ltr:pl-3 rtl:pr-3 ltr:pr-7 rtl:pl-7 h-10 bg-[#f9fbfd] focus:ring-0 focus:outline-0"
@@ -56,11 +56,12 @@
                     </div>
                     <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
                         <MudForm class="flex-1">
-                            <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Trạng thái</MudText>
+                            <MudText Typo="Typo.h2" Class="mb-4 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Trạng thái</MudText>
                             <select class="form-select" @bind="_searchStatusString" @bind:event="oninput" @onchange="OnStatusFilterChanged">
+                                <option value="" selected>Tất cả</option>
                                 @foreach (var item in StatusList)
                                 {
-                                    <option value="@item">@item.GetDescription()</option>
+                                    <option value="@item" selected="@(_searchStatusString == item.ToString())">@item.GetDescription()</option>
                                 }
                             </select>
                         </MudForm>
@@ -79,13 +80,16 @@
                 </div>
             </div>
 
-            <table id="example" class="display" style="width:100%">
-                <thead>
+            <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+                <table id="example" class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400" style="width:100%">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                     <tr>
                         <th>Mã</th>
                         <th>Tên</th>
                         <th>Tên tiếng anh</th>
                         <th>Loại sản phẩm sản xuất</th>
+                        <th>Tiêu chuẩn chất lượng</th>
+                        <th>Tiêu chuẩn kiểm dịch</th>
                         <th>Ghi chú</th>
                         <th>Trạng thái</th>
                         <th class="flex items-center gap-2">Tác vụ</th>
@@ -193,6 +197,7 @@
                     </tr>
                 </tfoot>
             </table>
+        </div>
         </div>
     </div>
 </div>
