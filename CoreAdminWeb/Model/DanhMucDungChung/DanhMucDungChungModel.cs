@@ -147,14 +147,14 @@ namespace CoreAdminWeb.Model
 
     public class SanPhamSanXuatModel : BaseModel<int>
     {
-        public LoaiSanPhamSanXuatModel? loai_san_pham_san_xuat_id { set; get; }
+        public LoaiSanPhamSanXuatModel? loai_sp { set; get; }
         public string? english_name { set; get; }
         public string? tieu_chuan_chat_luong { set; get; }
         public string? tieu_chuan_kiem_dich { set; get; }
     }
     public class SanPhamSanXuatCRUDModel : BaseDetailModel
     {
-        public int? loai_san_pham_san_xuat_id { set; get; }
+        public int? loai_sp { set; get; }
         public string? english_name { set; get; }
         public string? tieu_chuan_chat_luong { set; get; }
         public string? tieu_chuan_kiem_dich { set; get; }

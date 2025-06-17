@@ -102,7 +102,7 @@
                             <td>@item.code</td>
                             <td>@item.name</td>
                             <td>@item.english_name</td>
-                            <td>@item.loai_san_pham_san_xuat_id?.name</td>
+                            <td>@item.loai_sp?.name</td>
                             <td>@item.tieu_chuan_chat_luong</td>
                             <td>@item.tieu_chuan_kiem_dich</td>
                             <td>@item.description</td>
@@ -267,7 +267,7 @@
                                                        TItem="LoaiSanPhamSanXuatModel"
                                                        TValue="LoaiSanPhamSanXuatModel"
                                                        SearchMethod="LoadLoaiSanPhamSanXuat"
-                                                       @bind-Value="SelectedItem.loai_san_pham_san_xuat_id"
+                                                       @bind-Value="SelectedItem.loai_sp"
                                                        placeholder="Chọn loại sản phẩm sản xuất"
                                                        Class="form-select">
                                         <SelectedTemplate Context="item">

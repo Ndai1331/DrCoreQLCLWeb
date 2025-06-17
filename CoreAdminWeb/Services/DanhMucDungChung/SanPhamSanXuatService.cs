@@ -8,8 +8,8 @@ namespace CoreAdminWeb.Services
    
     public class SanPhamSanXuatService : IBaseService<SanPhamSanXuatModel>
     {
-        private readonly string _collection = "SanPhamSanXuat";
-        private readonly string Fields = "*,loai_san_pham_san_xuat_id.id,loai_san_pham_san_xuat_id.name,loai_san_pham_san_xuat_id.english_name, user_created.last_name,user_created.first_name,user_updated.last_name,user_updated.first_name";
+        private readonly string _collection = "QLCLSanPhamSanXuat";
+        private readonly string Fields = "*,loai_sp.id,loai_sp.name,loai_sp.english_name, user_created.last_name,user_created.first_name,user_updated.last_name,user_updated.first_name";
         
         public async Task<RequestHttpResponse<List<SanPhamSanXuatModel>>> GetAllAsync(string query)
         {
@@ -64,7 +64,7 @@ namespace CoreAdminWeb.Services
                 SanPhamSanXuatCRUDModel createModel = new SanPhamSanXuatCRUDModel(){
                     code = model.code,
                     name = model.name,
-                    loai_san_pham_san_xuat_id = model.loai_san_pham_san_xuat_id?.id,
+                    loai_sp = model.loai_sp?.id,
                     tieu_chuan_chat_luong = model.tieu_chuan_chat_luong,
                     tieu_chuan_kiem_dich = model.tieu_chuan_kiem_dich,
                     english_name = model.english_name,
@@ -102,7 +102,7 @@ namespace CoreAdminWeb.Services
                     code = model.code,
                     name = model.name,
                     english_name = model.english_name,
-                    loai_san_pham_san_xuat_id = model.loai_san_pham_san_xuat_id?.id,
+                    loai_sp = model.loai_sp?.id,
                     tieu_chuan_chat_luong = model.tieu_chuan_chat_luong,
                     tieu_chuan_kiem_dich = model.tieu_chuan_kiem_dich,
                     description = model.description,

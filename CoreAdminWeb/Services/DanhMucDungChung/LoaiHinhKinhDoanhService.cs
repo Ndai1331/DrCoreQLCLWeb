@@ -8,7 +8,7 @@ namespace CoreAdminWeb.Services
    
     public class LoaiHinhKinhDoanhService : IBaseService<LoaiHinhKinhDoanhModel>
     {
-        private readonly string _collection = "LoaiHinhKinhDoanh";
+        private readonly string _collection = "QLCLLoaiHinhKinhDoanh";
         private readonly string Fields = "*,user_created.last_name,user_created.first_name,user_updated.last_name,user_updated.first_name";
         
         public async Task<RequestHttpResponse<List<LoaiHinhKinhDoanhModel>>> GetAllAsync(string query)
