@@ -2,12 +2,12 @@
 using CoreAdminWeb.Model;
 using CoreAdminWeb.Model.CoSoBiDichBenh;
 using CoreAdminWeb.Model.CoSoTrongTrotSanXuat;
-using CoreAdminWeb.Services;
 using CoreAdminWeb.Services.BaseServices;
 using CoreAdminWeb.Services.CoSoBiDichBenh;
 using CoreAdminWeb.Shared.Base;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using CoreAdminWeb.Helpers;
 
 namespace CoreAdminWeb.Pages.CoSoBiDichBenh
 {
@@ -260,7 +260,7 @@ namespace CoreAdminWeb.Pages.CoSoBiDichBenh
         private async Task OpenAddOrUpdateModal(CoSoBiDichBenhModel? item)
         {
             _titleAddOrUpdate = item != null ? "Sửa" : "Thêm mới";
-            SelectedItem = item != null ? item : new CoSoBiDichBenhModel();
+            SelectedItem = item != null ? item.DeepClone() : new CoSoBiDichBenhModel();
             SelectedItemsDetail = new List<CoSoBiDichBenhChiTietModel>();
 
             if (SelectedItem.id > 0)
