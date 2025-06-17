@@ -20,6 +20,29 @@ namespace CoreAdminWeb.Model
     }
 
 
+    public class QLCLPhamViHoatDongModel : BaseModel<int>
+    {
+        public TinhModel? province { get; set; }
+        public XaPhuongModel? ward { get; set; }
+        public string? khu_vuc_hoat_dong { get; set; }
+        public string? thong_tin_vung_nguyen_lieu { get; set; }
+        public string? doi_tac_tieu_thu { get; set; }
+        public bool? pham_vi_noi_dia { get; set; }
+        public bool? pham_vi_xuat_khau { get; set; }
+    }
+    public class QLCLPhamViHoatDongCRUDModel : BaseDetailModel
+    {
+        public new string status { set; get; } = Status.active.ToString();
+        public int? province { get; set; }
+        public int? ward { get; set; }
+        public string? khu_vuc_hoat_dong { get; set; }
+        public string? thong_tin_vung_nguyen_lieu { get; set; }
+        public string? doi_tac_tieu_thu { get; set; }
+        public bool? pham_vi_noi_dia { get; set; }
+        public bool? pham_vi_xuat_khau { get; set; }
+    }
+
+
 
     
 
