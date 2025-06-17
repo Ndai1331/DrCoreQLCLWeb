@@ -8,7 +8,7 @@
 @inject NavigationManager NavigationManager
 
 <nav class="sidebar lg:z-[9] z-[10]">
-    <div class="h-full project-color bg-white dark:bg-darklight group-data-[sidebar=dark]/item:bg-darklight group-data-[sidebar=brand]/item:bg-sky-950">
+    <div class="h-full  bg-white dark:bg-darklight group-data-[sidebar=dark]/item:bg-darklight group-data-[sidebar=brand]/item:bg-sky-950">
         <div class="p-4">
             <a href="/dashboard" class="w-full main-logo">
                 <img src="@(Logo != null ? $"{Logo.filename_disk}" : "assets/images/logo-dark.svg")" class="mx-auto dark-logo h-7 logo dark:hidden group-data-[sidebar=dark]/item:hidden group-data-[sidebar=brand]/item:hidden" alt="logo" />
@@ -25,7 +25,7 @@
                         <li class="menu nav-item">
                             @if (menu.sub_menus != null && menu.sub_menus.Any())
                             {
-                                <a href="javascript:;" class="items-center justify-between text-black nav-link group project-text-color @(activeMenus.ContainsKey(1) && activeMenus[1] == menu.name ? "active" : "")" 
+                                <a href="javascript:;" class="items-center justify-between text-black nav-link group  @(activeMenus.ContainsKey(1) && activeMenus[1] == menu.name ? "active" : "")" 
                                    @onclick="() => ToggleMenu(menu.name)">
                                     <div class="flex items-center">
                                         <span class="material-symbols-outlined block">@menu.icon</span>
@@ -39,7 +39,7 @@
                                     </div>
                                 </a>
                                 <div class="@(activeMenus.ContainsKey(1) && activeMenus[1] == menu.name ? "block" : "hidden")">
-                                    <ul class="flex flex-col gap-1 text-black sub-menu dark:text-white/60 project-text-color">
+                                    <ul class="flex flex-col gap-1 text-black sub-menu dark:text-white/60 ">
                                         @foreach (var subMenu in menu.sub_menus)
                                         {
                                             <li>
@@ -53,7 +53,7 @@
                             }
                             else
                             {
-                                <a href="javascript:;" class="nav-link group project-text-color @(activeMenus.ContainsKey(2) && activeMenus[2] == menu.name ? "active" : "")" @onclick="@(() => HandleRouteChange(menu.url,menu.name,1))">
+                                <a href="javascript:;" class="nav-link group  @(activeMenus.ContainsKey(2) && activeMenus[2] == menu.name ? "active" : "")" @onclick="@(() => HandleRouteChange(menu.url,menu.name,1))">
                                     <div class="flex items-center">
                                         <span class="material-symbols-outlined block">@menu.icon</span>
                                         <span class="ltr:pl-1.5 rtl:pr-1.5">@menu.name</span>

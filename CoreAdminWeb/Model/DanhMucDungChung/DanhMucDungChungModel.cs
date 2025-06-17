@@ -3,6 +3,25 @@ using CoreAdminWeb.Model.Base;
 
 namespace CoreAdminWeb.Model
 {
+    public class QLCLLoaiHinhCoSoModel : BaseModel<int>
+    {
+    }
+    public class QLCLLoaiHinhCoSoCRUDModel : BaseDetailModel
+    {
+        public new string status { set; get; } = Status.active.ToString();
+    }
+
+    public class QLCLNguyenLieuCheBienModel : BaseModel<int>
+    {
+    }
+    public class QLCLNguyenLieuCheBienCRUDModel : BaseDetailModel
+    {
+        public new string status { set; get; } = Status.active.ToString();
+    }
+
+
+
+    
 
     public class CountryModel : BaseModel<int>
     {

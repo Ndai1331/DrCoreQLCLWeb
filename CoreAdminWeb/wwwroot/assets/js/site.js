@@ -1,12 +1,4 @@
-﻿function SetProjectColor(color) {
-    var projectColor = document.querySelector('.project-color');
-    projectColor.style.setProperty('background-color', color, 'important');
-}
-
-function SetProjectTextColor(color) {
-    var projectTextColor = document.querySelector('.project-text-color');
-    projectTextColor.style.setProperty('color', color, 'important');
-}
+﻿
 // Function to toggle the dropdown menu
 function ToggleDropdown() {
     var dropdown = document.getElementById("dropdownMenu");

@@ -166,7 +166,7 @@ namespace CoreAdminWeb.Shared.Base
 
         private string BuildBaseQuery(string searchText = "", bool isIgnoreCheck = false)
         {
-            var query = isIgnoreCheck ? "" : "filter[_and][][deleted][_eq]=false&sort=sort";
+            var query = "filter[_and][][deleted][_eq]=false&sort=sort";
             if (!string.IsNullOrEmpty(searchText))
             {
                 if (!string.IsNullOrEmpty(query))
@@ -175,6 +175,38 @@ namespace CoreAdminWeb.Shared.Base
             }
             return query;
         }
+
+
+        public async Task OnPageSizeChanged(Func<Task> loadData)
+        {
+            Page = 1;
+            await loadData();
+        }
+
+        public async Task PreviousPage(Func<Task> loadData)
+        {
+            if (Page > 1)
+            {
+                Page--;
+                await loadData();
+            }
+        }
+
+        public async Task SelectedPage(int page, Func<Task> loadData)
+        {
+            Page = page;
+            await loadData();
+        }
+
+        public async Task NextPage(Func<Task> loadData)
+        {
+            if (Page < TotalPages)
+            {
+                Page++;
+                await loadData();
+            }
+        }
+
 
     }
 }

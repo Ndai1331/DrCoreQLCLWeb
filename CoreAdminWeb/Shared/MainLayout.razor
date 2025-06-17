@@ -23,7 +23,7 @@
         <Sidebar Menus="Menus" Logo="Logo" Setting="Setting"></Sidebar>
 
         <div class="flex-1 main-content">
-            <Topbar OnLogout="Logout" CurrentUser="currentUser"></Topbar>
+            <Topbar OnLogout="Logout" CurrentUser="currentUser" Setting="Setting"></Topbar>
             <div class="h-[calc(100vh-60px)] relative overflow-y-auto overflow-x-hidden p-4 space-y-4 detached-content">
                 @if (isLoading)
                 {
@@ -53,16 +53,12 @@
     private bool isLoading = true;
     private bool isAuthenticated = false;
     private UserModel currentUser;
-
     [Inject]
     private ISettingService SettingService { get; set; }
     [Inject]
     private IFileService FileService { get; set; }
-
     private SettingModel? Setting { get; set; }
     private FileModel? Logo { get; set; }
-    private string? ProjectColor { get; set; }
-    private string? ProjectTextColor { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -73,7 +69,7 @@
             if (isAuthenticated)
             {
                 await Task.WhenAll(
-                    @* LoadSettings(), *@
+                    LoadSettings(),
                     LoadMenus()
                 );
             }
@@ -84,7 +80,6 @@
             NavigationManager.NavigateTo("/signin");
         }
     }
-@* 
     private async Task LoadSettings()
     {
         try
@@ -93,8 +88,6 @@
             if (settingResults.IsSuccess)
             {
                 Setting = settingResults.Data;
-                ProjectColor = Setting.project_color;
-                ProjectTextColor = Setting.project_text_color;
 
                 if (!string.IsNullOrEmpty(Setting.project_logo))
                 {
@@ -110,7 +103,7 @@
         {
             Console.WriteLine($"Error loading settings: {ex.Message}");
         }
-    } *@
+    } 
 
     private async Task LoadMenus()
     {
@@ -174,14 +167,3 @@
         }
     }
 }
-@* 
-<style>
-    .project-color {
-        background-color: @ProjectColor !important;
-    }
-
-    .project-text-color {
-        color: @ProjectTextColor !important;
-    }
-
-</style> *@
