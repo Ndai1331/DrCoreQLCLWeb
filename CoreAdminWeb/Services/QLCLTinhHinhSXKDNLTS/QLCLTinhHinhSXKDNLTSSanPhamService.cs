@@ -23,7 +23,7 @@ namespace CoreAdminWeb.Services
         private readonly string _collection = "QLCLTinhHinhSXKDNLTSSanPham";
         private const string Fields = "*,user_created.last_name,user_created.first_name,user_updated.last_name,user_updated.first_name"
             + ",tinh_hinh_san_xuat_kinh_doanh_nlts.id,"
-            + "nguyen_lieu.id, nguyen_lieu.name,nguyen_lieu.code";
+            + "san_pham.id, san_pham.name,san_pham.code";
 
         /// <summary>
         /// Creates a response with error handling
@@ -48,6 +48,7 @@ namespace CoreAdminWeb.Services
                 san_pham = model.san_pham?.id,
                 san_luong_tan = model.san_luong_tan,
                 sort = model.sort,
+                deleted = false
             };
         }
 
@@ -127,7 +128,6 @@ namespace CoreAdminWeb.Services
                 {
                     Data = new()
                     {
-                        
                     }
                 };
             }

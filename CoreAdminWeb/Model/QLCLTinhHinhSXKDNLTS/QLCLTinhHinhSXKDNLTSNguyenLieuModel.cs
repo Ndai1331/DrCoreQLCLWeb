@@ -15,7 +15,7 @@ namespace CoreAdminWeb.Model
         public DateTime? date_updated { get; set; }
         public QLCLTinhHinhSXKDNLTSModel? tinh_hinh_san_xuat_kinh_doanh_nlts { get; set; }
         public QLCLNguyenLieuCheBienModel? nguyen_lieu { get; set; }
-        public decimal? khoi_luong_tan_suat { get; set; } 
+        public decimal? khoi_luong_tan { get; set; } 
         public bool? deleted { get; set; } 
         public int? sort { get; set; } 
 
@@ -28,7 +28,7 @@ namespace CoreAdminWeb.Model
     {
         public int? tinh_hinh_san_xuat_kinh_doanh_nlts { get; set; }
         public int? nguyen_lieu { get; set; }
-        public decimal? khoi_luong_tan_suat { get; set; }
+        public decimal? khoi_luong_tan { get; set; }
         public bool? deleted { get; set; } 
         public int? sort { get; set; } 
 

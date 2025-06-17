@@ -100,7 +100,6 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
             var result = await NguyenLieuService.GetAllAsync(buildQuery);
             SelectedNguyenLieuItemsDetail = result.Data ?? new List<QLCLTinhHinhSXKDNLTSNguyenLieuModel>();
         }
-        
         private async Task LoadSanPhamDetailData()
         {
             var buildQuery = $"sort=-id";
@@ -187,7 +186,7 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
                     tinh_hinh_san_xuat_kinh_doanh_nlts = SelectedItem,
                     sort = (SelectedNguyenLieuItemsDetail.Max(c => c.sort) ?? 0) + 1,
                     nguyen_lieu = null,
-                    khoi_luong_tan_suat = 0,
+                    khoi_luong_tan = 0,
                     deleted = false,
                 });
             StateHasChanged();
@@ -209,7 +208,7 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
                 tinh_hinh_san_xuat_kinh_doanh_nlts = SelectedItem,
                 sort = (SelectedNguyenLieuItemsDetail.Max(c => c.sort) ?? 0) + 1,
                 nguyen_lieu = null,
-                khoi_luong_tan_suat = 0,
+                khoi_luong_tan = 0,
                 deleted = false,
             });
         }
@@ -281,9 +280,10 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
             SelectedItem = item != null ? item : new QLCLTinhHinhSXKDNLTSModel();
             SelectedNguyenLieuItemsDetail = new List<QLCLTinhHinhSXKDNLTSNguyenLieuModel>();
 
-            if (SelectedItem.id > 0)
+            if (SelectedItem.id is not null && SelectedItem.id > 0)
             {
                 await LoadNguyenLieuDetailData();
+                await LoadSanPhamDetailData();
             }
 
             if (!SelectedNguyenLieuItemsDetail.Any())
@@ -292,7 +292,7 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
                     tinh_hinh_san_xuat_kinh_doanh_nlts = SelectedItem,
                     sort = (SelectedNguyenLieuItemsDetail.Max(c => c.sort) ?? 0) + 1,
                     nguyen_lieu = null,
-                    khoi_luong_tan_suat = 0,
+                    khoi_luong_tan = 0,
                     deleted = false,
                 });
             
@@ -319,7 +319,7 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
 
         private async Task OnValidSubmit()
         {
-            if (SelectedItem.id == 0)
+            if (SelectedItem.id is null || SelectedItem.id <= 0)
             {
                 var result = await MainService.CreateAsync(SelectedItem);
                 if (result.IsSuccess)

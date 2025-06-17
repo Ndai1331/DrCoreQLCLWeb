@@ -105,7 +105,7 @@ namespace CoreAdminWeb.Services
             try
             {
                 var createModel = MapToCRUDModel(model);
-                var response = await RequestClient.PostAPIAsync<RequestHttpResponse<QLCLTinhHinhSXKDNLTSCRUDModel>>($"items/{_collection}", createModel);
+                var response = await RequestClient.PostAPIAsync<RequestHttpResponse<QLCLTinhHinhSXKDNLTSCRUDResponseModel>>($"items/{_collection}", createModel);
 
                 if (!response.IsSuccess)
                 {
@@ -116,9 +116,7 @@ namespace CoreAdminWeb.Services
                 {
                     Data = new()
                     {
-                        ngay_ghi_nhan = response.Data?.Data?.ngay_ghi_nhan,
-                        thoi_gian_bat_dau = response.Data?.Data?.thoi_gian_bat_dau,
-                        thoi_gian_ket_thuc = response.Data?.Data?.thoi_gian_ket_thuc,
+                        id = response.Data?.Data?.id,
                     }
                 };
             }
