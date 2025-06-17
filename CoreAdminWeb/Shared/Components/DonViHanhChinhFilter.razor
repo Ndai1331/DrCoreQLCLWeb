@@ -2,7 +2,7 @@
 
 <div class="flex items-center gap-2 sm:gap-4">
     <div class="w-full">
-        <MudText Typo="Typo.h2" Class="mb-4 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Tỉnh thành</MudText>
+        <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Tỉnh thành</MudText>
         <select class="form-select" @onchange="OnTinhChanged">
             <option>Chọn tỉnh thành...</option>
             @foreach (var tinh in TinhThanhList)
@@ -12,7 +12,7 @@
         </select>
     </div>
     <div class="w-full">
-        <MudText Typo="Typo.h2" Class="mb-4 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Xã phường</MudText>
+        <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Xã phường</MudText>
         <select class="form-select" @onchange="OnXaChanged">
             <option>Chọn xã phường...</option>
             @foreach (var xa in XaPhuongList)

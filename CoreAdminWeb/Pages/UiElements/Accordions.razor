@@ -6,7 +6,7 @@
 <div class="flex flex-col gap-4 min-h-[calc(100vh-212px)]">
     <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div class="card">
-            <MudText Typo="Typo.h2" Class="mb-4 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Basic Accordion</MudText>
+            <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Basic Accordion</MudText>
             <div class="space-y-2" x-data="{ current: 1 }">
                 <div class="border rounded border-black/10 dark:border-darkborder">
 
@@ -67,7 +67,7 @@
             </div>
         </div>
         <div class="card">
-            <MudText Typo="Typo.h2" Class="mb-4 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Accordion Without Spacing</MudText>
+            <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Accordion Without Spacing</MudText>
             <div class="border divide-y rounded border-black/10 dark:border-darkborder dark:divide-darkborder divide-black/10" x-data="{ current: 1 }">
                 <div class="">
                     <MudButton type="button" Class="flex items-center w-full p-4 text-muted" :class="{'!text-black dark:!text-white' : current === 1}" x-on:click="current === 1 ? current = null : current = 1">
@@ -126,7 +126,7 @@
             </div>
         </div>
         <div class="card">
-            <MudText Typo="Typo.h2" Class="mb-4 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Accordion With Color</MudText>
+            <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Accordion With Color</MudText>
             <div class="space-y-2" x-data="{ current: 1 }">
                 <div class="overflow-hidden border rounded border-black/10 dark:border-darkborder">
                     <MudButton type="button" Class="flex items-center w-full p-4 text-muted bg-black/5 dark:bg-white/5" :class="{'!text-purple !bg-purple/20' : current === 1}" x-on:click="current === 1 ? current = null : current = 1">
@@ -185,7 +185,7 @@
             </div>
         </div>
         <div class="card">
-            <MudText Typo="Typo.h2" Class="mb-4 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Accordion Without Arrow</MudText>
+            <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Accordion Without Arrow</MudText>
             <div class="space-y-2" x-data="{ current: 1 }">
                 <div class="border rounded border-black/10 dark:border-darkborder">
                     <MudButton type="button" Class="w-full p-4 text-start text-muted" :class="{'!text-black dark:!text-white' : current === 1}" x-on:click="current === 1 ? current = null : current = 1">

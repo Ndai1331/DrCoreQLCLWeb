@@ -6,7 +6,7 @@
 <div class="flex flex-col gap-4 min-h-[calc(100vh-212px)]">
     <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div class="card">
-            <MudText Typo="Typo.h2" Class="mb-4 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Basic Notification</MudText>
+            <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Basic Notification</MudText>
             <div x-data="{ toastVisible: false, toastTimer: null }">
                 <div x-clock x-show="toastVisible" class="bg-black text-white py-3 px-4 rounded-md max-w-[220px] fixed bottom-5 ltr:right-5 rtl:left-5 z-[99999]" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
                     <span>Hello, world! This is a toast message.</span>
@@ -26,7 +26,7 @@
             </div>
         </div>
         <div class="card">
-            <MudText Typo="Typo.h2" Class="mb-4 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Notification With Close</MudText>
+            <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Notification With Close</MudText>
             <div x-data="{ notificationOpen: false }">
                 <MudButton x-on:click="notificationOpen = true" Class="text-black transition-all duration-300 border rounded-md btn dark:text-white dark:hover:text-black border-light hover:bg-light hover:text-black">Click Me!</MudButton>
                 <div x-show="notificationOpen" class="bg-black flex items-start gap-3 text-white py-3 px-4 rounded-md max-w-[250px] fixed bottom-5 ltr:right-5 rtl:left-5 z-[99999]" x-cloak x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
@@ -40,7 +40,7 @@
             </div>
         </div>
         <div class="card">
-            <MudText Typo="Typo.h2" Class="mb-4 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Position Notification</MudText>
+            <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Position Notification</MudText>
             <div class="flex flex-wrap items-center gap-4">
                 <div x-data="{ toastVisible: false, toastTimer: null }">
                     <div x-clock x-show="toastVisible" class="bg-black text-white py-3 px-4 rounded-md max-w-[220px] fixed top-5 ltr:left-5 rtl:right-5 z-[99999]" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
@@ -147,7 +147,7 @@
             </div>
         </div>
         <div class="card">
-            <MudText Typo="Typo.h2" Class="mb-4 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Notification Color</MudText>
+            <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Notification Color</MudText>
             <div class="flex flex-wrap items-center gap-4">
                 <div x-data="{ toastVisible: false, toastTimer: null }">
                     <div x-clock x-show="toastVisible" class="bg-purple text-white py-3 px-4 rounded-md max-w-[220px] fixed bottom-5 ltr:right-5 rtl:left-5 z-[99999]" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
