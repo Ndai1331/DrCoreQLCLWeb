@@ -13,7 +13,7 @@ namespace CoreAdminWeb.Model
         public string? dai_dien { get; set; }
         public decimal? cong_suat_tan_nam { get; set; }
         public string? so_giay_phep { get; set; }
-        public LoaiHinhKinhDoanhModel? loai_hinh_kinh_doanh { get; set; }
+        public QLCLLoaiHinhKinhDoanhModel? loai_hinh_kinh_doanh { get; set; }
         public DateTime? ngay_cap { get; set; }
         public DateTime? thoi_han_den { get; set; }
         public string? co_quan_cap_phep { get; set; }

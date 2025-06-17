@@ -13,7 +13,7 @@ namespace CoreAdminWeb.Pages.QuanLyCoSoBuonBan
     public partial class QuanLyCoSoBuonBan(IBaseService<CoSoDuDieuKienBuonBanPhanBonModel> MainService,
                                            IBaseService<TinhModel> TinhThanhService,
                                            IBaseService<XaPhuongModel> XaPhuongService,
-                                           IBaseService<LoaiHinhKinhDoanhModel> LoaiHinhKinhDoanhService) : BlazorCoreBase
+                                           IBaseService<QLCLLoaiHinhKinhDoanhModel> QLCLLoaiHinhKinhDoanhService) : BlazorCoreBase
     {
         private static List<int> NhomCoSoList = new List<int>() { (int)NhomCoSo.toChuc, (int)NhomCoSo.caNhan, (int)NhomCoSo.khac };
 
@@ -100,9 +100,9 @@ namespace CoreAdminWeb.Pages.QuanLyCoSoBuonBan
             return await LoadBlazorTypeaheadData(searchText, XaPhuongService, isIgnoreCheck: true);
         }
 
-        private async Task<IEnumerable<LoaiHinhKinhDoanhModel>> LoadLoaiHinhKinhDoanhData(string searchText)
+        private async Task<IEnumerable<QLCLLoaiHinhKinhDoanhModel>> LoadQLCLLoaiHinhKinhDoanhData(string searchText)
         {
-            return await LoadBlazorTypeaheadData(searchText, LoaiHinhKinhDoanhService);
+            return await LoadBlazorTypeaheadData(searchText, QLCLLoaiHinhKinhDoanhService);
         }
 
         private async Task OnPageSizeChanged()
@@ -250,7 +250,7 @@ namespace CoreAdminWeb.Pages.QuanLyCoSoBuonBan
             SelectedItem.ward = selected;
         }
 
-        private void OnLoaihinhKinhDoanhChanged(LoaiHinhKinhDoanhModel? selected)
+        private void OnLoaihinhKinhDoanhChanged(QLCLLoaiHinhKinhDoanhModel? selected)
         {
             SelectedItem.loai_hinh_kinh_doanh = selected;
         }

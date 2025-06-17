@@ -8,8 +8,8 @@
 @using CoreAdminWeb.Services
 @using CoreAdminWeb.Services.BaseServices
 @using CoreAdminWeb.Shared.Base
-@inject IBaseService<SanPhamSanXuatModel> MainService
-@inject IBaseService<LoaiSanPhamSanXuatModel> LoaiSanPhamSanXuatService
+@inject IBaseService<QLCLSanPhamSanXuatModel> MainService
+@inject IBaseService<QLCLLoaiSanPhamModel> QLCLLoaiSanPhamService
 @inherits BlazorCoreBase
 @layout MainLayout
 
@@ -264,9 +264,9 @@
                                     <BlazoredTypeahead EnableDropDown="true"
                                                        ShowDropDownOnFocus="true"
                                                        MinimumLength="0"
-                                                       TItem="LoaiSanPhamSanXuatModel"
-                                                       TValue="LoaiSanPhamSanXuatModel"
-                                                       SearchMethod="LoadLoaiSanPhamSanXuat"
+                                                       TItem="QLCLLoaiSanPhamModel"
+                                                       TValue="QLCLLoaiSanPhamModel"
+                                                       SearchMethod="LoadQLCLLoaiSanPham"
                                                        @bind-Value="SelectedItem.loai_sp"
                                                        placeholder="Chọn loại sản phẩm sản xuất"
                                                        Class="form-select">
@@ -328,10 +328,10 @@
 
 @code {
     private IJSObjectReference _module;
-    private List<SanPhamSanXuatModel> MainModels { get; set; } = new();
+    private List<QLCLSanPhamSanXuatModel> MainModels { get; set; } = new();
     private bool openDeleteModal = false;
     private bool openAddOrUpdateModal = false;
-    private SanPhamSanXuatModel SelectedItem { get; set; } = new SanPhamSanXuatModel();
+    private QLCLSanPhamSanXuatModel SelectedItem { get; set; } = new QLCLSanPhamSanXuatModel();
     private string _searchString = "";
     private string _searchStatusString = "";
     private string _titleAddOrUpdate = "Thêm mới";
@@ -350,9 +350,9 @@
         }
     }
 
-    private async Task<IEnumerable<LoaiSanPhamSanXuatModel>> LoadLoaiSanPhamSanXuat(string searchString)
+    private async Task<IEnumerable<QLCLLoaiSanPhamModel>> LoadQLCLLoaiSanPham(string searchString)
     {
-        return await LoadBlazorTypeaheadData(searchString, LoaiSanPhamSanXuatService);
+        return await LoadBlazorTypeaheadData(searchString, QLCLLoaiSanPhamService);
     }
 
     private async Task LoadData()
@@ -372,7 +372,7 @@
         var result = await MainService.GetAllAsync(BuilderQuery);
         if (result.IsSuccess)
         {
-            MainModels = result.Data ?? new List<SanPhamSanXuatModel>();
+            MainModels = result.Data ?? new List<QLCLSanPhamSanXuatModel>();
             if (result.Meta != null)
             {
                 TotalItems = result.Meta.filter_count ?? 0;
@@ -381,7 +381,7 @@
         }
         else
         {
-            MainModels = new List<SanPhamSanXuatModel>();
+            MainModels = new List<QLCLSanPhamSanXuatModel>();
         }
         IsLoading = false;
     }
@@ -416,7 +416,7 @@
     }
 
 
-    private void OpenDeleteModal(SanPhamSanXuatModel item)
+    private void OpenDeleteModal(QLCLSanPhamSanXuatModel item)
     {
         SelectedItem = item;
         openDeleteModal = true;
@@ -439,14 +439,14 @@
 
     private void CloseDeleteModal()
     {
-        SelectedItem = new SanPhamSanXuatModel();
+        SelectedItem = new QLCLSanPhamSanXuatModel();
         openDeleteModal = false;
     }
 
-    private void OpenAddOrUpdateModal(SanPhamSanXuatModel? item)
+    private void OpenAddOrUpdateModal(QLCLSanPhamSanXuatModel? item)
     {
         _titleAddOrUpdate = item != null ? "Sửa" : "Thêm mới";
-        SelectedItem = item != null ? item.DeepClone() : new SanPhamSanXuatModel();
+        SelectedItem = item != null ? item.DeepClone() : new QLCLSanPhamSanXuatModel();
         openAddOrUpdateModal = true;
     }
 
@@ -484,7 +484,7 @@
 
     private void CloseAddOrUpdateModal()
     {
-        SelectedItem = new SanPhamSanXuatModel();
+        SelectedItem = new QLCLSanPhamSanXuatModel();
         openAddOrUpdateModal = false;
     }
 

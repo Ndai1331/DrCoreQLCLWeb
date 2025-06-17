@@ -22,7 +22,7 @@ namespace CoreAdminWeb.Model
         public DateTime? ngay_cap { get; set; }
         public DateTime? ngay_het_han { get; set; }
         public string co_quan_cap_phep { get; set; } = string.Empty;
-        public LoaiHinhKinhDoanhModel? loai_hinh_kinh_doanh { get; set; }
+        public QLCLLoaiHinhKinhDoanhModel? loai_hinh_kinh_doanh { get; set; }
     }
 
     /// <summary>

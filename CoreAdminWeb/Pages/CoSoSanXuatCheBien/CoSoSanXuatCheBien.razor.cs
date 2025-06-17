@@ -13,7 +13,7 @@ namespace CoreAdminWeb.Pages.CoSoSanXuatCheBien
         IBaseService<CoSoSanXuatCheBienModel> MainService,
         IBaseService<TinhModel> TinhService,
         IBaseService<XaPhuongModel> XaService,
-        IBaseService<LoaiHinhKinhDoanhModel> LoaiHinhKinhDoanhService) : BlazorCoreBase
+        IBaseService<QLCLLoaiHinhKinhDoanhModel> QLCLLoaiHinhKinhDoanhService) : BlazorCoreBase
     {
         private List<CoSoSanXuatCheBienModel> MainModels { get; set; } = new();
         private List<Enums.KetQuaKiemTraDinhKy> KetQuaKiemTraDinhKyList = new() { Enums.KetQuaKiemTraDinhKy.Dat, Enums.KetQuaKiemTraDinhKy.KhongDat };
@@ -26,15 +26,15 @@ namespace CoreAdminWeb.Pages.CoSoSanXuatCheBien
 
         private List<TinhModel> TinhList { get; set; } = new();
         private List<XaPhuongModel> XaList { get; set; } = new();
-        private List<LoaiHinhKinhDoanhModel> LoaiHinhKinhDoanhList { get; set; } = new();
+        private List<QLCLLoaiHinhKinhDoanhModel> QLCLLoaiHinhKinhDoanhList { get; set; } = new();
 
         private TinhModel? _selectedTinhFilter = null;
         private XaPhuongModel? _selectedXaFilter = null;
-        private LoaiHinhKinhDoanhModel? _selectedLoaiHinhKinhDoanhFilter = null;
+        private QLCLLoaiHinhKinhDoanhModel? _selectedQLCLLoaiHinhKinhDoanhFilter = null;
 
         private TinhModel? _selectedTinhCRUD = null;
         private XaPhuongModel? _selectedXaCRUD = null;
-        private LoaiHinhKinhDoanhModel? _selectedLoaiHinhKinhDoanhCRUD = null;
+        private QLCLLoaiHinhKinhDoanhModel? _selectedQLCLLoaiHinhKinhDoanhCRUD = null;
 
 
         private CoSoSanXuatCheBienModel SelectedItem { get; set; } = new CoSoSanXuatCheBienModel();
@@ -325,9 +325,9 @@ namespace CoreAdminWeb.Pages.CoSoSanXuatCheBien
             return await LoadBlazorTypeaheadData(searchText, XaService, query, isIgnoreCheck: true);
         }
 
-        private async Task<IEnumerable<LoaiHinhKinhDoanhModel>> LoadLoaiHinhKinhDoanhData(string searchText)
+        private async Task<IEnumerable<QLCLLoaiHinhKinhDoanhModel>> LoadQLCLLoaiHinhKinhDoanhData(string searchText)
         {
-            return await LoadBlazorTypeaheadData(searchText, LoaiHinhKinhDoanhService, isIgnoreCheck: true);
+            return await LoadBlazorTypeaheadData(searchText, QLCLLoaiHinhKinhDoanhService, isIgnoreCheck: true);
         }
 
         public async Task OnTinhFilterChanged(TinhModel? item)
@@ -342,9 +342,9 @@ namespace CoreAdminWeb.Pages.CoSoSanXuatCheBien
             await LoadData();
         }
 
-        public async Task OnLoaiHinhKinhDoanhFilterChanged(LoaiHinhKinhDoanhModel? item)
+        public async Task OnQLCLLoaiHinhKinhDoanhFilterChanged(QLCLLoaiHinhKinhDoanhModel? item)
         {
-            _selectedLoaiHinhKinhDoanhFilter = item;
+            _selectedQLCLLoaiHinhKinhDoanhFilter = item;
             await LoadData();
         }
 
@@ -360,9 +360,9 @@ namespace CoreAdminWeb.Pages.CoSoSanXuatCheBien
             SelectedItem.ward = item;
         }
 
-        public async Task OnLoaiHinhKinhDoanhCRUDChanged(LoaiHinhKinhDoanhModel? item)
+        public async Task OnQLCLLoaiHinhKinhDoanhCRUDChanged(QLCLLoaiHinhKinhDoanhModel? item)
         {
-            _selectedLoaiHinhKinhDoanhCRUD = item;
+            _selectedQLCLLoaiHinhKinhDoanhCRUD = item;
             SelectedItem.loai_hinh_kinh_doanh = item;
         }   
     }

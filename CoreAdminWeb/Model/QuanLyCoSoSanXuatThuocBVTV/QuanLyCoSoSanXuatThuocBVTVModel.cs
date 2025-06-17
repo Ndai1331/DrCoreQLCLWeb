@@ -12,7 +12,7 @@ namespace CoreAdminWeb.Model
 
         public XaPhuongModel? ward{ get; set; }
 
-        public LoaiHinhKinhDoanhModel? loai_hinh_kinh_doanh { get; set; }
+        public QLCLLoaiHinhKinhDoanhModel? loai_hinh_kinh_doanh { get; set; }
         public LoaiHinhSanXuat? loai_hinh_san_xuat { get; set; }
         public string dia_chi { get; set; } = string.Empty;
 

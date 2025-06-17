@@ -3,17 +3,6 @@ using CoreAdminWeb.Model.Base;
 
 namespace CoreAdminWeb.Model
 {
-
-    public class QLCLLoaiSanPhamModel : BaseModel<int>
-    {
-    }
-    public class QLCLLoaiSanPhamCRUDModel : BaseDetailModel
-    {
-        public new string status { set; get; } = Status.active.ToString();
-    }
-
-
-
     public class QLCLLoaiHinhCoSoModel : BaseModel<int>
     {
     }
@@ -64,10 +53,10 @@ namespace CoreAdminWeb.Model
     {
         public new string status { set; get; } = Status.active.ToString();
     }
-    public class LoaiHinhKinhDoanhModel : BaseModel<int>
+    public class QLCLLoaiHinhKinhDoanhModel : BaseModel<int>
     {
     }
-    public class LoaiHinhKinhDoanhCRUDModel : BaseDetailModel
+    public class QLCLLoaiHinhKinhDoanhCRUDModel : BaseDetailModel
     {
         public new string status { set; get; } = Status.active.ToString();
     }
@@ -146,24 +135,24 @@ namespace CoreAdminWeb.Model
     }
 
 
-    public class LoaiSanPhamSanXuatModel : BaseModel<int>
+    public class QLCLLoaiSanPhamModel : BaseModel<int>
     {
         public string? english_name { set; get; }
     }
-    public class LoaiSanPhamSanXuatCRUDModel : BaseDetailModel
+    public class QLCLLoaiSanPhamCRUDModel : BaseDetailModel
     {
         public string? english_name { set; get; }
         public new string status { set; get; } = Status.active.ToString();
     }
 
-    public class SanPhamSanXuatModel : BaseModel<int>
+    public class QLCLSanPhamSanXuatModel : BaseModel<int>
     {
-        public LoaiSanPhamSanXuatModel? loai_sp { set; get; }
+        public QLCLLoaiSanPhamModel? loai_sp { set; get; }
         public string? english_name { set; get; }
         public string? tieu_chuan_chat_luong { set; get; }
         public string? tieu_chuan_kiem_dich { set; get; }
     }
-    public class SanPhamSanXuatCRUDModel : BaseDetailModel
+    public class QLCLSanPhamSanXuatCRUDModel : BaseDetailModel
     {
         public int? loai_sp { set; get; }
         public string? english_name { set; get; }

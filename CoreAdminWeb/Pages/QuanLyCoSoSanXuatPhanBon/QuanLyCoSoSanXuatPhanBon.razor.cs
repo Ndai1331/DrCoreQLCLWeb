@@ -12,7 +12,7 @@ namespace CoreAdminWeb.Pages.QuanLyCoSoSanXuatPhanBon
     public partial class QuanLyCoSoSanXuatPhanBon(IBaseService<QuanLyCoSoSanXuatPhanBonModel> MainService,
                                            IBaseService<TinhModel> TinhThanhService,
                                            IBaseService<XaPhuongModel> XaPhuongService,
-                                           IBaseService<LoaiHinhKinhDoanhModel> LoaiHinhKinhDoanhService) : BlazorCoreBase
+                                           IBaseService<QLCLLoaiHinhKinhDoanhModel> QLCLLoaiHinhKinhDoanhService) : BlazorCoreBase
     {
         private TinhModel? _selectedTinhFilter { get; set; }
         private XaPhuongModel? _selectedXaFilter { get; set; }
@@ -32,9 +32,9 @@ namespace CoreAdminWeb.Pages.QuanLyCoSoSanXuatPhanBon
             }
         }
 
-        private async Task<IEnumerable<LoaiHinhKinhDoanhModel>> LoadLoaiHinhKinhDoanhData(string searchText)
+        private async Task<IEnumerable<QLCLLoaiHinhKinhDoanhModel>> LoadQLCLLoaiHinhKinhDoanhData(string searchText)
         {
-            return await LoadBlazorTypeaheadData(searchText, LoaiHinhKinhDoanhService, isIgnoreCheck: true);
+            return await LoadBlazorTypeaheadData(searchText, QLCLLoaiHinhKinhDoanhService, isIgnoreCheck: true);
         }
 
         private async Task<IEnumerable<TinhModel>> LoadTinhData(string searchText)

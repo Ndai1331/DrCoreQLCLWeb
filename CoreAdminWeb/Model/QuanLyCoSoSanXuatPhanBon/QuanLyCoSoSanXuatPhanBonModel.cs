@@ -13,7 +13,7 @@ namespace CoreAdminWeb.Model.QuanLyCoSoSanXuatPhanBon
 
         public XaPhuongModel? ward { get; set; }
 
-        public LoaiHinhKinhDoanhModel? loai_hinh_kinh_doanh { get; set; }
+        public QLCLLoaiHinhKinhDoanhModel? loai_hinh_kinh_doanh { get; set; }
         public string dia_chi { get; set; } = string.Empty;
 
         public string dien_thoai { get; set; } = string.Empty;

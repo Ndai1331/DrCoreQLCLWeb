@@ -8,7 +8,7 @@ namespace CoreAdminWeb.Pages.QuanLyCoSoKinhDoanhThuocBVTV
     public partial class QuanLyCoSoKinhDoanhThuocBVTV(
                                            IBaseService<TinhModel> TinhThanhService,
                                            IBaseService<XaPhuongModel> XaPhuongService,
-                                           IBaseService<LoaiHinhKinhDoanhModel> LoaiHinhKinhDoanhService) : BlazorCoreBase
+                                           IBaseService<QLCLLoaiHinhKinhDoanhModel> QLCLLoaiHinhKinhDoanhService) : BlazorCoreBase
     {
 
         protected override async Task OnInitializedAsync()
@@ -39,9 +39,9 @@ namespace CoreAdminWeb.Pages.QuanLyCoSoKinhDoanhThuocBVTV
             string buildQuery = $"filter[_and][][ProvinceId][_eq]={SelectedItem.province?.id ?? 0}";
             return await LoadBlazorTypeaheadData(stringSearch, XaPhuongService, otherQuery: buildQuery, isIgnoreCheck: true);
         }
-        private async Task<IEnumerable<LoaiHinhKinhDoanhModel>> LoadLoaiHinhKinhDoanhData(string stringSearch)
+        private async Task<IEnumerable<QLCLLoaiHinhKinhDoanhModel>> LoadQLCLLoaiHinhKinhDoanhData(string stringSearch)
         {
-            return await LoadBlazorTypeaheadData(stringSearch, LoaiHinhKinhDoanhService);
+            return await LoadBlazorTypeaheadData(stringSearch, QLCLLoaiHinhKinhDoanhService);
         }
 
         public async Task OnTinhFilterChanged(TinhModel? e)

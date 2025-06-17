@@ -34,7 +34,7 @@ namespace CoreAdminWeb.Model
         public UserModel? user_updated { get; set; } = new();
         public DateTime? date_updated { get; set; } = DateTime.Now;
         public ThiTruongXuatKhauModel? thi_truong_xuat_khau { get; set; }
-        public SanPhamSanXuatModel? san_pham { get; set; }
+        public QLCLSanPhamSanXuatModel? san_pham { get; set; }
         public decimal? san_luong_tan { get; set; }
         public decimal? gia_tri { get; set; }
     }

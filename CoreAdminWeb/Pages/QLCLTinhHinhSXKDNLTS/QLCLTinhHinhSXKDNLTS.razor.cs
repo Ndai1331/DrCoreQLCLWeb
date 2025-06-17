@@ -13,7 +13,7 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
     public partial class QLCLTinhHinhSXKDNLTS(IBaseService<QLCLTinhHinhSXKDNLTSModel> MainService,
                                               IQLCLTinhHinhSXKDNLTSNguyenLieuService NguyenLieuService,
                                               IQLCLTinhHinhSXKDNLTSSanPhamService SanPhamService,
-                                              IBaseService<QLCLSanPhamSanXuatModel> SanPhamSanXuatService,
+                                              IBaseService<QLCLSanPhamSanXuatModel> QLCLSanPhamSanXuatService,
                                               IBaseService<QLCLCoSoCheBienNLTSModel> QLCLCoSoCheBienNLTSService,
                                               IBaseService<QLCLNguyenLieuCheBienModel> NguyenLieuCheBienService) : BlazorCoreBase
     {
@@ -120,7 +120,7 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
         }
         private async Task<IEnumerable<QLCLSanPhamSanXuatModel>> LoadSanPhamData(string searchText)
         {
-            return await LoadBlazorTypeaheadData(searchText, SanPhamSanXuatService);
+            return await LoadBlazorTypeaheadData(searchText, QLCLSanPhamSanXuatService);
         }
 
         private void OpenDeleteModal(QLCLTinhHinhSXKDNLTSModel item)

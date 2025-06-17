@@ -16,7 +16,7 @@ namespace CoreAdminWeb.Model.CoSoBuonBan
 
         public TinhModel? province { get; set; }
         public XaPhuongModel? ward { get; set; }
-        public LoaiHinhKinhDoanhModel? loai_hinh_kinh_doanh { get; set; }
+        public QLCLLoaiHinhKinhDoanhModel? loai_hinh_kinh_doanh { get; set; }
     }
 
     public class CoSoDuDieuKienBuonBanPhanBonCRUDModel : BaseDetailModel

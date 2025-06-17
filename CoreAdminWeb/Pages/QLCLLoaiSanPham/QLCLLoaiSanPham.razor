@@ -1,5 +1,6 @@
-﻿@page "/danh-muc-loai-hinh-kinh-doanh"
+﻿@page "/danh-muc-loai-san-pham"
 @using CoreAdminWeb.Commons.Utils
+@using CoreAdminWeb.Enums
 @using CoreAdminWeb.Exceptions
 @using CoreAdminWeb.Extensions
 @using CoreAdminWeb.Helpers
@@ -7,11 +8,11 @@
 @using CoreAdminWeb.Services
 @using CoreAdminWeb.Services.BaseServices
 @using CoreAdminWeb.Shared.Base
-@inject IBaseService<LoaiHinhKinhDoanhModel> MainService
+@inject IBaseService<QLCLLoaiSanPhamModel> MainService
 @inherits BlazorCoreBase
 @layout MainLayout
 
-<PageHeader Title="Danh mục loại hình kinh doanh" pTitle="Danh mục loại hình kinh doanh"></PageHeader>
+<PageHeader Title="Danh mục loại sản phẩm" pTitle="Danh mục loại sản phẩm"></PageHeader>
 
 
 <!-- Start All Card -->
@@ -84,6 +85,7 @@
                     <tr>
                         <th>Mã</th>
                         <th>Tên</th>
+                        <th>Tên tiếng anh</th>
                         <th>Ghi chú</th>
                         <th>Trạng thái</th>
                         <th class="flex items-center gap-2">Tác vụ</th>
@@ -95,6 +97,7 @@
                         <tr>
                             <td>@item.code</td>
                             <td>@item.name</td>
+                            <td>@item.english_name</td>
                             <td>@item.description</td>
                             <td>@((MarkupString)item.status.GetTrangThai())</td>
                             <td class="flex items-center gap-2">
@@ -154,9 +157,9 @@
                                                         <li>
                                                             <a href="#"
                                                                class="px-3 py-2 text-black  border border-black/10
-                                                                    hover:bg-purple hover:text-white dark:bg-transparent
-                                                                    dark:text-white dark:border-darkborder dark:hover:bg-purple
-                                                                    dark:hover:text-white dark:hover:border-purple @(Page == i ? "bg-purple text-white" : "bg-white")"
+                                                                hover:bg-purple hover:text-white dark:bg-transparent
+                                                                dark:text-white dark:border-darkborder dark:hover:bg-purple
+                                                                dark:hover:text-white dark:hover:border-purple @(Page == i ? "bg-purple text-white" : "bg-white")"
                                                                @onclick="() => SelectedPage(i)">@i</a>
                                                         </li>
                                                     }
@@ -246,6 +249,10 @@
                                     <input type="text" class="form-input" @bind-value="@SelectedItem.name" Label="Tên" />
                                 </div>
                                 <div class="space-y-2 md:col-span-2">
+                                    <label>Tên tiếng anh</label>
+                                    <input type="text" class="form-input" @bind-value="@SelectedItem.english_name" Label="Tên tiếng anh" />
+                                </div>
+                                <div class="space-y-2 md:col-span-2">
                                     <label>Ghi chú</label>
                                     <input type="text" class="form-input" @bind-value="@SelectedItem.description" Label="Ghi chú" />
                                 </div>
@@ -284,12 +291,10 @@
 
 @code {
     private IJSObjectReference _module;
-    private List<LoaiHinhKinhDoanhModel> MainModels { get; set; } = new();
+    private List<QLCLLoaiSanPhamModel> MainModels { get; set; } = new();
     private bool openDeleteModal = false;
     private bool openAddOrUpdateModal = false;
-    private LoaiHinhKinhDoanhModel SelectedItem { get; set; } = new LoaiHinhKinhDoanhModel();
-    private LoaiHinhKinhDoanhModel EditItem { get; set; } = new LoaiHinhKinhDoanhModel();
-
+    private QLCLLoaiSanPhamModel SelectedItem { get; set; } = new QLCLLoaiSanPhamModel();
     private string _searchString = "";
     private string _searchStatusString = "";
     private string _titleAddOrUpdate = "Thêm mới";
@@ -325,7 +330,7 @@
         var result = await MainService.GetAllAsync(BuilderQuery);
         if (result.IsSuccess)
         {
-            MainModels = result.Data ?? new List<LoaiHinhKinhDoanhModel>();
+            MainModels = result.Data ?? new List<QLCLLoaiSanPhamModel>();
             if (result.Meta != null)
             {
                 TotalItems = result.Meta.filter_count ?? 0;
@@ -334,7 +339,7 @@
         }
         else
         {
-            MainModels = new List<LoaiHinhKinhDoanhModel>();
+            MainModels = new List<QLCLLoaiSanPhamModel>();
         }
         IsLoading = false;
     }
@@ -369,7 +374,7 @@
     }
 
 
-    private void OpenDeleteModal(LoaiHinhKinhDoanhModel item)
+    private void OpenDeleteModal(QLCLLoaiSanPhamModel item)
     {
         SelectedItem = item;
         openDeleteModal = true;
@@ -392,14 +397,14 @@
 
     private void CloseDeleteModal()
     {
-        SelectedItem = new LoaiHinhKinhDoanhModel();
+        SelectedItem = new QLCLLoaiSanPhamModel();
         openDeleteModal = false;
     }
 
-    private void OpenAddOrUpdateModal(LoaiHinhKinhDoanhModel? item)
+    private void OpenAddOrUpdateModal(QLCLLoaiSanPhamModel? item)
     {
         _titleAddOrUpdate = item != null ? "Sửa" : "Thêm mới";
-        SelectedItem = item != null ? item.DeepClone() : new LoaiHinhKinhDoanhModel();
+        SelectedItem = item != null ? item.DeepClone() : new QLCLLoaiSanPhamModel();
         openAddOrUpdateModal = true;
     }
 
@@ -437,7 +442,7 @@
 
     private void CloseAddOrUpdateModal()
     {
-        SelectedItem = new LoaiHinhKinhDoanhModel();
+        SelectedItem = new QLCLLoaiSanPhamModel();
         openAddOrUpdateModal = false;
     }
     private async Task OnStatusFilterChanged(ChangeEventArgs? selected)

@@ -68,7 +68,7 @@ namespace CoreAdminWeb.DIInjections
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IMenuService, MenuService>();
             services.AddScoped<ISettingService, SettingService>();
-            services.AddScoped<IBaseService<LoaiHinhKinhDoanhModel>, LoaiHinhKinhDoanhService>();
+            services.AddScoped<IBaseService<QLCLLoaiHinhKinhDoanhModel>, QLCLLoaiHinhKinhDoanhService>();
             services.AddScoped<IBaseService<LoaiHinhCanhTacModel>, LoaiHinhCanhTacService>();
             services.AddScoped<IBaseService<HinhThucCanhTacModel>, HinhThucCanhTacService>();
             services.AddScoped<IBaseService<LoaiHinhSanXuatModel>, LoaiHinhSanXuatService>();
@@ -77,8 +77,8 @@ namespace CoreAdminWeb.DIInjections
             services.AddScoped<IBaseService<LoaiPhanBonModel>, LoaiPhanBonService>();
             services.AddScoped<IBaseService<LoaiThuocBaoVeThucVatModel>, LoaiThuocBaoVeThucVatService>();
             services.AddScoped<IBaseService<NhomThuocBaoVeThucVatModel>, NhomThuocBaoVeThucVatService>();
-            services.AddScoped<IBaseService<LoaiSanPhamSanXuatModel>, LoaiSanPhamSanXuatService>();
-            services.AddScoped<IBaseService<SanPhamSanXuatModel>, SanPhamSanXuatService>();
+            services.AddScoped<IBaseService<QLCLLoaiSanPhamModel>, QLCLLoaiSanPhamService>();
+            services.AddScoped<IBaseService<QLCLSanPhamSanXuatModel>, QLCLSanPhamSanXuatService>();
             services.AddScoped<IBaseService<LoaiCayTrongModel>, LoaiCayTrongService>();
             services.AddScoped<IBaseService<TinhModel>, TinhService>();
             services.AddScoped<IBaseService<XaPhuongModel>, XaPhuongService>();
