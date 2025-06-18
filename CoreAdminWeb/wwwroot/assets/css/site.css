@@ -1,4 +1,4 @@
-@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
+﻿@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 
 
 h1:focus {
@@ -59,3 +59,25 @@ h1:focus {
     .blazor-error-boundary::after {
         content: "An error has occurred."
     }
+
+/* Mobile (480px - 768px) */
+@media (max-width: 768px) {
+    .project_name {
+        display:none;
+    }
+    .sidebar 
+    {
+        padding:5px;
+    }
+}
+
+/* Smartphone nhỏ (< 480px) */
+@media (max-width: 480px) {
+    .project_name {
+        display: none;
+    }
+
+    .sidebar {
+        padding: 5px;
+    }
+}
