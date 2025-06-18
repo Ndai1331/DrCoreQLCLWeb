@@ -49,6 +49,7 @@ namespace CoreAdminWeb.Services
                 tinh_hinh_vi_pham = model.tinh_hinh_vi_pham,
                 co_so = model.co_so?.id,
                 dot_kiem_tra = model.dot_kiem_tra?.id,
+                bien_phap_xu_ly = model.bien_phap_xu_ly,
                 deleted = false,
             };
         }

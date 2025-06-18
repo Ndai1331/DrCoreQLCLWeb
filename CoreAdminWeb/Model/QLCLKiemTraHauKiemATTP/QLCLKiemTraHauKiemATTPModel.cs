@@ -1,4 +1,5 @@
 ﻿using CoreAdminWeb.Model.Base;
+using System.Text.Json.Serialization;
 
 namespace CoreAdminWeb.Model
 {
@@ -14,8 +15,12 @@ namespace CoreAdminWeb.Model
         public DateTime? ngay_kiem_tra { get; set; }
         public string? co_quan_kiem_tra { get; set; }
         public string? noi_dung_kiem_tra { get; set; }
+        public string? bien_phap_xu_ly { get; set; }
         public Enums.KetQuaKiemTraDinhKy? ket_qua_kiem_tra { get; set; } = Enums.KetQuaKiemTraDinhKy.Dat;
         public Enums.TinhHinhViPham? tinh_hinh_vi_pham { get; set; } = Enums.TinhHinhViPham.Khong;
+
+        [JsonIgnore]
+        public Enums.LoaiCoSo? loai_co_so { get; set; } = Enums.LoaiCoSo.DuDieuKien;
     }
     public class QLCLKiemTraHauKiemATTPCRUDModel : BaseDetailModel
     {
@@ -32,6 +37,7 @@ namespace CoreAdminWeb.Model
         public string? noi_dung_kiem_tra { get; set; }
         public Enums.KetQuaKiemTraDinhKy? ket_qua_kiem_tra { get; set; } = Enums.KetQuaKiemTraDinhKy.Dat;
         public Enums.TinhHinhViPham? tinh_hinh_vi_pham { get; set; } = Enums.TinhHinhViPham.Khong;
+        public string? bien_phap_xu_ly { get; set; }
     }
 
 
