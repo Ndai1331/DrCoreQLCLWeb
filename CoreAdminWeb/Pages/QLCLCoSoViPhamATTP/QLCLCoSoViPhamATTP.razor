@@ -46,7 +46,7 @@
                                @onchange="@(e => OnDateChanged(e, "toDate"))" />
                     </div>
 
-                    <div class="xs:col-span-4 sm:col-span-4 md:col-span-4 xl:col-span-4">
+                    <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
                         <MudForm class="flex-1">
                             <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Tìm kiếm</MudText>
                             <div class="relative">
@@ -91,7 +91,7 @@
                             <th>Hướng xử lý</th>
                             <th>Phạt tiền (VNĐ)</th>
                             <th>Giá trị tang vật (VNĐ)</th>
-                            <th>Khắc phục hậu quả</th>
+                            <th>Ghi chú</th>
                             <th>Trạng thái</th>
                             <th>Tác vụ</th>
                         </tr>
@@ -115,7 +115,7 @@
                                 <td>@MainModels[i].huong_xu_ly</td>
                                 <td>@MainModels[i].phat_tien</td>
                                 <td>@MainModels[i].gia_tri_tang_vat</td>
-                                <td>@MainModels[i].khac_phuc</td>
+                                <td>@MainModels[i].description</td>
                                 <td>@((MarkupString)MainModels[i].status.GetDescription())</td>
                                 <td class="flex items-center gap-2">
                                     <MudButton Class="transition-all duration-300 border btn-crud rounded-md btn text-purple border-purple hover:bg-purple hover:text-white"
@@ -278,7 +278,7 @@
                                 <input type="text" class="form-input" @bind-value="@SelectedItem.co_quan_xu_ly" required />
                             </div>
                             <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
-                                <label>Loại cơ sở</label>
+                                <label>Loại cơ sở<span class="text-danger">*</span></label>
                                 <select class="form-select" @bind-value="@SelectedItem.loai_co_so" @bind-value:event="onchange">
                                     @foreach (var item in LoaiCoSoList)
                                     {
@@ -289,7 +289,7 @@
                             @if (SelectedItem.loai_co_so == LoaiCoSoNLTS.CoSoCheBien)
                             {
                                 <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
-                                    <label>Tên cơ sở</label>
+                                    <label>Tên cơ sở<span class="text-danger">*</span></label>
                                     <BlazoredTypeahead EnableDropDown="true"
                                                ShowDropDownOnFocus="true"
                                                MinimumLength="0"
@@ -316,7 +316,7 @@
                             @if (SelectedItem.loai_co_so == LoaiCoSoNLTS.CoSoXSKDDuDieuKien)
                             {
                                 <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
-                                    <label>Tên cơ sở</label>
+                                    <label>Tên cơ sở<span class="text-danger">*</span></label>
                                     <BlazoredTypeahead EnableDropDown="true"
                                                ShowDropDownOnFocus="true"
                                                MinimumLength="0"
@@ -343,7 +343,7 @@
                             @if (SelectedItem.loai_co_so == LoaiCoSoNLTS.CoSoXSKDKhongDuDieuKien)
                             {
                                 <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
-                                    <label>Tên cơ sở</label>
+                                    <label>Tên cơ sở<span class="text-danger">*</span></label>
                                     <BlazoredTypeahead EnableDropDown="true"
                                                ShowDropDownOnFocus="true"
                                                MinimumLength="0"
@@ -368,17 +368,17 @@
                                 </div>
                             }
 
-                            <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
+                            <div class="space-y-2 xs:col-span-2 sm:col-span-2 md:col-span-2 xl:col-span-2">
                                 <label>Nội dung vi phạm</label>
                                 <input type="text" class="form-input" @bind-value="@SelectedItem.noi_dung_vi_pham" />
                             </div>
 
-                            <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
+                            <div class="space-y-2 xs:col-span-2 sm:col-span-2 md:col-span-2 xl:col-span-2">
                                 <label>Sản phẩm vi phạm</label>
                                 <input type="text" class="form-input" @bind-value="@SelectedItem.san_pham_vi_pham" />
                             </div>
 
-                            <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
+                            <div class="space-y-2 xs:col-span-2 sm:col-span-2 md:col-span-2 xl:col-span-2">
                                 <label>Hành vi vi phạm</label>
                                 <BlazoredTypeahead EnableDropDown="true"
                                                ShowDropDownOnFocus="true"
@@ -403,7 +403,7 @@
                                 </BlazoredTypeahead>
                             </div>
                             
-                            <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
+                            <div class="space-y-2 xs:col-span-2 sm:col-span-2 md:col-span-2 xl:col-span-2">
                                 <label>Hướng xử lý</label>
                                 <input type="text" class="form-input" @bind-value="@SelectedItem.huong_xu_ly" />
                             </div>
@@ -490,7 +490,7 @@
                             </div>
 
                             <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
-                                <label>Trạng thái</label>
+                                <label>Trạng thái<span class="text-danger">*</span></label>
                                 <select class="form-select" @bind-value="@SelectedItem.status" @bind-value:event="onchange">
                                     @foreach (var item in TrangThaiXuLyList)
                                     {
