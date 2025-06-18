@@ -1,0 +1,341 @@
+﻿using CoreAdminWeb.Helpers;
+using CoreAdminWeb.Model;
+using CoreAdminWeb.Services.BaseServices;
+using CoreAdminWeb.Shared.Base;
+using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
+using CoreAdminWeb.Enums;
+
+namespace CoreAdminWeb.Pages.QLCLCoSoViPhamATTP
+{
+    public partial class QLCLCoSoViPhamATTP(
+        IBaseService<QLCLCoSoViPhamATTPModel> MainService,
+        IBaseService<QLCLCoSoCheBienNLTSModel> QLCLCoSoCheBienNLTSService,
+        IBaseService<QLCLCoSoNLTSDuDieuKienATTPModel> QLCLCoSoNLTSDuDieuKienATTPService,
+        IBaseService<QLCLHanhViViPhamModel> QLCLHanhViViPhamService,
+        IBaseService<QLCLHinhThucXuPhatModel> QLCLHinhThucXuPhatService,
+        IBaseService<DonViTinhModel> DonViTinhService) : BlazorCoreBase
+    {
+        private List<QLCLCoSoViPhamATTPModel> MainModels { get; set; } = new();
+        private List<LoaiCoSoNLTS> LoaiCoSoList = new() { LoaiCoSoNLTS.CoSoCheBien, LoaiCoSoNLTS.CoSoXSKDDuDieuKien, LoaiCoSoNLTS.CoSoXSKDKhongDuDieuKien };
+        private List<KhacPhuc> KhacPhucList = new() { KhacPhuc.BuocThuHoi, KhacPhuc.BuocTieuHuy, KhacPhuc.Khac };
+        private List<TrangThaiXuLyKhac> TrangThaiXuLyKhacList = new() { TrangThaiXuLyKhac.DinhChiLuuHanh, TrangThaiXuLyKhac.ChuyenCoQuanDieuTra };
+        private List<TrangThaiXuLy> TrangThaiXuLyList = new() { TrangThaiXuLy.ChuaXuLy, TrangThaiXuLy.DangXuLy, TrangThaiXuLy.DaXuLy };
+
+        private bool openDeleteModal = false;
+        private bool openAddOrUpdateModal = false;
+        private string _titleAddOrUpdate = "Thêm mới";
+        private string _searchString = "";
+        private DateTime? _fromDate = null;
+        private DateTime? _toDate = null;
+
+        private List<QLCLCoSoCheBienNLTSModel> QLCLCoSoCheBienNLTSList { get; set; } = new();
+        private List<QLCLCoSoNLTSDuDieuKienATTPModel> QLCLCoSoNLTSDuDieuKienATTPList { get; set; } = new();
+        private List<QLCLHanhViViPhamModel> QLCLHanhViViPhamList { get; set; } = new();
+        private List<QLCLHinhThucXuPhatModel> QLCLHinhThucXuPhatList { get; set; } = new();
+        private List<DonViTinhModel> DonViTinhList { get; set; } = new();
+
+        private QLCLCoSoViPhamATTPModel SelectedItem { get; set; } = new QLCLCoSoViPhamATTPModel();
+
+        protected override async Task OnInitializedAsync()
+        {
+            await base.OnInitializedAsync();
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                await LoadData();
+                await JsRuntime.InvokeAsync<IJSObjectReference>("import", "/assets/js/pages/flatpickr.js");
+                StateHasChanged();
+            }
+        }
+
+        private async Task LoadData()
+        {
+            try
+            {
+                IsLoading = true;
+                BuildPaginationQuery(Page, PageSize);
+                int intdex =1;
+
+                BuilderQuery += "filter[_and][0][deleted][_eq]=false&sort=sort";
+                if (!string.IsNullOrEmpty(_searchString))
+                {
+                    BuilderQuery += $"&filter[_and][{intdex}][_or][0][co_so_che_bien_nlts][name][_contains]={_searchString}";
+                    BuilderQuery += $"&filter[_and][{intdex}][_or][1][co_so_nlts_du_dieu_kien_attp][name][_contains]={_searchString}";
+                    BuilderQuery += $"&filter[_and][{intdex}][_or][2][hanh_vi_vi_pham][name][_contains]={_searchString}";
+                    BuilderQuery += $"&filter[_and][{intdex}][_or][3][huong_xu_ly][_contains]={_searchString}";
+                    intdex++;
+                }
+
+                if(_fromDate != null)
+                {
+                    BuilderQuery += $"&filter[_and][{intdex}][ngay_ghi_nhan][_gte]={_fromDate.Value.ToString("yyyy-MM-dd")}";
+                    intdex++;
+                }
+
+                if(_toDate != null)
+                {
+                    BuilderQuery += $"&filter[_and][{intdex}][ngay_ghi_nhan][_lte]={_toDate.Value.ToString("yyyy-MM-dd")}";
+                    intdex++;
+                }
+                
+
+                var result = await MainService.GetAllAsync(BuilderQuery);
+                if (result.IsSuccess)
+                {
+                    MainModels = result.Data ?? new List<QLCLCoSoViPhamATTPModel>();
+                    if (result.Meta != null)
+                    {
+                        TotalItems = result.Meta.filter_count ?? 0;
+                        TotalPages = (int)Math.Ceiling((double)TotalItems / PageSize);
+                    }
+                }
+                else
+                {
+                    MainModels = new List<QLCLCoSoViPhamATTPModel>();
+                    AlertService.ShowAlert(result.Message ?? "Lỗi khi lấy dữ liệu", "danger");
+                }
+            }
+            catch (Exception ex)
+            {
+                AlertService.ShowAlert($"Lỗi: {ex.Message}", "danger");
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+
+        private void OpenAddOrUpdateModal(QLCLCoSoViPhamATTPModel? item)
+        {
+            try
+            {
+                _titleAddOrUpdate = item != null ? "Sửa" : "Thêm mới";
+                SelectedItem = item?.DeepClone() ?? new QLCLCoSoViPhamATTPModel();
+                openAddOrUpdateModal = true;
+
+                // Wait for modal to render
+                _ = Task.Run(async () =>
+                {
+                    await Task.Delay(500);
+                    await JsRuntime.InvokeVoidAsync("initializeDatePicker");
+                });
+            }
+            catch (Exception ex)
+            {
+                AlertService.ShowAlert($"Lỗi: {ex.Message}", "danger");
+            }
+        }
+
+        private void OpenDeleteModal(QLCLCoSoViPhamATTPModel item)
+        {
+            try
+            {
+                SelectedItem = item;
+                openDeleteModal = true;
+            }
+            catch (Exception ex)
+            {
+                AlertService.ShowAlert($"Lỗi: {ex.Message}", "danger");
+            }
+        }
+
+        private void CloseDeleteModal()
+        {
+            try
+            {
+                SelectedItem = new QLCLCoSoViPhamATTPModel();
+                openDeleteModal = false;
+            }
+            catch (Exception ex)
+            {
+                AlertService.ShowAlert($"Lỗi: {ex.Message}", "danger");
+            }
+        }
+
+        private void CloseAddOrUpdateModal()
+        {
+            try
+            {
+                SelectedItem = new QLCLCoSoViPhamATTPModel();
+                openAddOrUpdateModal = false;
+            }
+            catch (Exception ex)
+            {
+                AlertService.ShowAlert($"Lỗi: {ex.Message}", "danger");
+            }
+        }
+
+        private async Task OnValidSubmit()
+        {
+            try
+            {
+                var resultCreate = SelectedItem.id == 0 ? await MainService.CreateAsync(SelectedItem) : new();
+                var resultUpdate = SelectedItem.id > 0 ? await MainService.UpdateAsync(SelectedItem) : new();
+                string message =resultCreate.Message ?? resultUpdate.Message;
+                if (resultCreate.IsSuccess || resultUpdate.IsSuccess)
+                {
+                    await LoadData();
+                    openAddOrUpdateModal = false;
+                    AlertService.ShowAlert(SelectedItem.id == 0 ? "Thêm mới thành công!" : "Cập nhật thành công!", "success");
+                }
+                else
+                {
+                    AlertService.ShowAlert($"Lỗi khi {(SelectedItem.id == 0 ? "thêm mới" : "cập nhật")} dữ liệu :" + message , "danger");
+                }
+            }
+            catch (Exception ex)
+            {
+                AlertService.ShowAlert($"Lỗi: {ex.Message}", "danger");
+            }
+        }
+
+        private async Task OnPageSizeChanged()
+        {
+            Page = 1;
+            await LoadData();
+        }
+
+        private async Task PreviousPage()
+        {
+            if (Page > 1)
+            {
+                Page--;
+                await LoadData();
+            }
+        }
+
+        private async Task SelectedPage(int page)
+        {
+            Page = page;
+            await LoadData();
+        }
+
+        private async Task NextPage()
+        {
+            if (Page < TotalPages)
+            {
+                Page++;
+                await LoadData();
+            }
+        }
+
+
+        private async Task OnDelete()
+        {
+            try
+            {
+                if (SelectedItem == null) return;
+
+                var result = await MainService.DeleteAsync(SelectedItem);
+                if (result.IsSuccess && result.Data)
+                {
+                    await LoadData();
+                    AlertService.ShowAlert("Xoá thành công!", "success");
+                    openDeleteModal = false;
+                }
+                else
+                {
+                    AlertService.ShowAlert(result.Message ?? "Lỗi khi xóa dữ liệu", "danger");
+                }
+            }
+            catch (Exception ex)
+            {
+                AlertService.ShowAlert($"Lỗi: {ex.Message}", "danger");
+            }
+        }
+
+        private async Task OnDateChanged(ChangeEventArgs e, string fieldName)
+        {
+            try
+            {
+                var dateStr = e.Value?.ToString();
+                if (string.IsNullOrEmpty(dateStr))
+                {
+                    if (fieldName == "ngay_ghi_nhan")
+                        SelectedItem.ngay_ghi_nhan = null;
+                    else if (fieldName == "ngay_xu_ly")
+                        SelectedItem.ngay_xu_ly = null;
+                    else if (fieldName == "fromDate")
+                    {
+                        _fromDate = null;
+                        await LoadData();
+                    }
+                    else if (fieldName == "toDate")
+                    {
+                        _toDate = null;
+                        await LoadData();
+                    }
+                    return;
+                }
+
+                var parts = dateStr.Split('/');
+                if (parts.Length == 3 && 
+                    int.TryParse(parts[0], out int day) && 
+                    int.TryParse(parts[1], out int month) && 
+                    int.TryParse(parts[2], out int year))
+                {
+                    var date = new DateTime(year, month, day);
+                    
+                    if (fieldName == "ngay_ghi_nhan")
+                        SelectedItem.ngay_ghi_nhan = date;
+                    else if (fieldName == "ngay_xu_ly")
+                        SelectedItem.ngay_xu_ly = date;
+                    else if (fieldName == "fromDate")
+                    {
+                        _fromDate = date;
+                        await LoadData();
+                    }
+                    else if (fieldName == "toDate")
+                    {
+                        _toDate = date;
+                        await LoadData();
+                    }
+                    
+                }
+            }
+            catch (Exception ex)
+            {
+                AlertService.ShowAlert($"Lỗi khi xử lý ngày: {ex.Message}", "danger");
+            }
+        }
+
+        private async Task<IEnumerable<QLCLCoSoCheBienNLTSModel>> LoadQLCLCoSoCheBienNLTSData(string searchText)
+        {
+            return await LoadBlazorTypeaheadData(searchText, QLCLCoSoCheBienNLTSService, isIgnoreCheck: true);
+        }
+        private async Task<IEnumerable<QLCLCoSoNLTSDuDieuKienATTPModel>> LoadQLCLCoSoNLTSDuDieuKienATTPData(string searchText)
+        {
+            string query = $"&filter[_and][][loai][_eq]={1}";
+            return await LoadBlazorTypeaheadData(searchText, QLCLCoSoNLTSDuDieuKienATTPService, query, isIgnoreCheck: true);
+        }
+        private async Task<IEnumerable<QLCLCoSoNLTSDuDieuKienATTPModel>> LoadQLCLCoSoNLTSKhongDuDieuKienATTPData(string searchText)
+        {
+            string query = $"&filter[_and][][loai][_eq]={2}";
+            return await LoadBlazorTypeaheadData(searchText, QLCLCoSoNLTSDuDieuKienATTPService, query, isIgnoreCheck: true);
+        }
+        private async Task<IEnumerable<QLCLHanhViViPhamModel>> LoadQLCLHanhViViPhamData(string searchText)
+        {
+            return await LoadBlazorTypeaheadData(searchText, QLCLHanhViViPhamService, isIgnoreCheck: true);
+        }
+        private async Task<IEnumerable<QLCLHinhThucXuPhatModel>> LoadQLCLHinhThucXuPhatData(string searchText)
+        {
+            return await LoadBlazorTypeaheadData(searchText, QLCLHinhThucXuPhatService, isIgnoreCheck: true);
+        }
+        private async Task<IEnumerable<DonViTinhModel>> LoadDonViTinhData(string searchText)
+        {
+            return await LoadBlazorTypeaheadData(searchText, DonViTinhService, isIgnoreCheck: true);
+        }
+
+        public void OnLoaiCoSoChanged(LoaiCoSoNLTS? item)
+        {
+            SelectedItem.loai_co_so = item;
+            SelectedItem.co_so_che_bien_nlts = null;
+            SelectedItem.co_so_nlts_du_dieu_kien_attp = null;
+        }
+    }
+
+}

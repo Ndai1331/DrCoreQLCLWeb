@@ -144,6 +144,7 @@ namespace CoreAdminWeb.DIInjections
             services.AddScoped<IBaseService<QLCLNguyenLieuCheBienModel>, QLCLNguyenLieuCheBienService>();
             services.AddScoped<IBaseService<QLCLPhamViHoatDongModel>, QLCLPhamViHoatDongService>();
             services.AddScoped<IBaseService<QLCLCoSoCheBienNLTSModel>, QLCLCoSoCheBienNLTSService>();
+            services.AddScoped<IBaseService<QLCLCoSoViPhamATTPModel>, QLCLCoSoViPhamATTPService>();
             services.AddScoped<IDuBaoDichBenhChiTietService, DuBaoDichBenhChiTietService>();
             services.AddScoped<IBaseService<QLCLLoaiSanPhamModel>, QLCLLoaiSanPhamService>();
             services.AddScoped<IBaseService<QLCLSanPhamSanXuatModel>, QLCLSanPhamSanXuatService>();
