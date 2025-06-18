@@ -1,5 +1,6 @@
 ﻿using CoreAdminWeb.Model.Base;
 using CoreAdminWeb.Model.User;
+using System.Text.Json.Serialization;
 
 namespace CoreAdminWeb.Model
 {

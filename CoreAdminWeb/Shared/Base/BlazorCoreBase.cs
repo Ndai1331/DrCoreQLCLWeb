@@ -206,6 +206,5 @@ namespace CoreAdminWeb.Shared.Base
                 await loadData();
             }
         }
-
     }
 }

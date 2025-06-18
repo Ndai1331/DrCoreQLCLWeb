@@ -21,6 +21,8 @@ namespace CoreAdminWeb.Model
 
         [JsonIgnore]
         public Enums.LoaiCoSo? loai_co_so { get; set; } = Enums.LoaiCoSo.DuDieuKien;
+        public List<QLCLKiemTraHauKiemATTPChiTietModel>? chi_tiet { get; set; }
+
     }
     public class QLCLKiemTraHauKiemATTPCRUDModel : BaseDetailModel
     {
