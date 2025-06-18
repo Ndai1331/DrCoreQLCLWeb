@@ -21,7 +21,7 @@ namespace CoreAdminWeb.Model
         public decimal? so_luong { get; set; }
         public DonViTinhModel? don_vi_tinh { get; set; }
         public decimal? gia_tri_tang_vat { get; set; }
-        public TrangThaiXuLyKhac? xu_ly_khac { get; set; }
+        public TrangThaiXuLyKhac? xu_ly_khac { get; set; } = TrangThaiXuLyKhac.DinhChiLuuHanh;
         public new TrangThaiXuLy? status { get; set; } = TrangThaiXuLy.ChuaXuLy;
     }
     public class QLCLCoSoViPhamATTPCRUDModel : BaseDetailModel
@@ -39,7 +39,7 @@ namespace CoreAdminWeb.Model
         public decimal? so_luong { get; set; }
         public int? don_vi_tinh { get; set; }
         public decimal? gia_tri_tang_vat { get; set; }
-        public TrangThaiXuLyKhac? xu_ly_khac { get; set; }
+        public TrangThaiXuLyKhac? xu_ly_khac { get; set; } = TrangThaiXuLyKhac.DinhChiLuuHanh;
         public DateTime? ngay_ghi_nhan { get; set; }
         public DateTime? ngay_xu_ly { get; set; }
         public string? co_quan_xu_ly { get; set; }

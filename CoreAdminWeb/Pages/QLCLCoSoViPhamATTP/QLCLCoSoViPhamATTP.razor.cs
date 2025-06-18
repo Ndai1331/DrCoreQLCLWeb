@@ -176,7 +176,7 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamATTP
                 var resultCreate = SelectedItem.id == 0 ? await MainService.CreateAsync(SelectedItem) : new();
                 var resultUpdate = SelectedItem.id > 0 ? await MainService.UpdateAsync(SelectedItem) : new();
                 string message =resultCreate.Message ?? resultUpdate.Message;
-                if (resultCreate.IsSuccess || resultUpdate.IsSuccess)
+                if ((SelectedItem.id == 0 && resultCreate.IsSuccess) || (SelectedItem.id > 0 &&resultUpdate.IsSuccess))
                 {
                     await LoadData();
                     openAddOrUpdateModal = false;
