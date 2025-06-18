@@ -53,10 +53,10 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
 
         private async Task LoadData()
         {
-            BuildPaginationQuery(Page, PageSize);
+            BuildPaginationQuery(Page, PageSize, "id", false);
             int index =1;
 
-            BuilderQuery += "filter[_and][0][deleted][_eq]=false&sort=sort";
+            BuilderQuery += "&filter[_and][0][deleted][_eq]=false";
             if (!string.IsNullOrEmpty(_searchString))
             {
                 BuilderQuery += $"&filter[_and][{index}][_or][0][su_co_an_toan][_contains]={_searchString}";

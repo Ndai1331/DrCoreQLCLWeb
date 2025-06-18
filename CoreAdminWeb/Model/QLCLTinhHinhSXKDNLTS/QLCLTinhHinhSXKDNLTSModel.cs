@@ -19,8 +19,8 @@ namespace CoreAdminWeb.Model
         public QLCLCoSoCheBienNLTSModel? qlcl_co_so_che_bien_nlts { get; set; }
         public string? su_co_an_toan { get; set; }
         public string? bien_phap_xu_ly_chat_thai { get; set; }
-        public bool? deleted { get; set; }
-        public int? sort { get; set; }
+        public bool? deleted { get; set; } = false;
+        public int? sort { get; set; } = 0;
     }
 
     /// <summary>
@@ -34,8 +34,8 @@ namespace CoreAdminWeb.Model
         public DateTime? thoi_gian_ket_thuc { get; set; }
         public string? su_co_an_toan { get; set; }
         public string? bien_phap_xu_ly_chat_thai { get; set; }
-        public bool? deleted { get; set; }
-        public bool? sort { get; set; }
+        public bool? deleted { get; set; } = false;
+        public int? sort { get; set; } = 0;
 
     }
 
