@@ -30,23 +30,6 @@
                 <div class="w-full grid grid-cols-1 gap-4 md:grid-cols-4 xl:grid-cols-4 sm:gap-4 md:w-4/5 pb-2">
                     
                     <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
-                        <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Từ ngày ghi nhận</MudText>
-                         <input type="text" 
-                                   class="form-input date-picker"
-                                   placeholder="Từ ngày"
-                                   value="@(_fromDate?.ToString("dd/MM/yyyy"))"
-                                   @onchange="@(e => OnDateChanged(e, "fromDate"))" />
-                    </div>
-                    <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
-                        <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Đến ngày ghi nhận</MudText>
-                        <input type="text" 
-                               class="form-input date-picker"
-                               placeholder="Đến ngày"
-                               value="@(_toDate?.ToString("dd/MM/yyyy"))"
-                               @onchange="@(e => OnDateChanged(e, "toDate"))" />
-                    </div>
-
-                    <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
                         <MudForm class="flex-1">
                             <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Tìm kiếm</MudText>
                             <div class="relative">
@@ -66,6 +49,23 @@
                             </div>
                         </MudForm>
                     </div>
+                    <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
+                        <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Từ ngày ghi nhận</MudText>
+                         <input type="text" 
+                                   class="form-input date-picker"
+                                   placeholder="Từ ngày"
+                                   value="@(_fromDate?.ToString("dd/MM/yyyy"))"
+                                   @onchange="@(e => OnDateChanged(e, "fromDate"))" />
+                    </div>
+                    <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
+                        <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Đến ngày ghi nhận</MudText>
+                        <input type="text" 
+                               class="form-input date-picker"
+                               placeholder="Đến ngày"
+                               value="@(_toDate?.ToString("dd/MM/yyyy"))"
+                               @onchange="@(e => OnDateChanged(e, "toDate"))" />
+                    </div>
+
                 </div>
 
                 <div class="flex items-end md:w-1/5 justify-end py-2">
