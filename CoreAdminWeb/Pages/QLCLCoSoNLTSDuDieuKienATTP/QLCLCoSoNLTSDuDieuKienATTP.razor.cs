@@ -70,6 +70,18 @@ namespace CoreAdminWeb.Pages.QLCLCoSoNLTSDuDieuKienATTP
                 BuilderQuery += $"&filter[_and][{index}][_or][7][he_thong_quan_ly_chat_luong][_contains]={_searchString}";
                 index++;
             }
+            if(_selectedTinhFilter != null)
+            {
+                BuilderQuery += $"&filter[_and][{index}][province][_eq]={_selectedTinhFilter.id}";
+                index++;
+            }
+
+            if(_selectedXaFilter != null)
+            {
+                BuilderQuery += $"&filter[_and][{index}][ward][_eq]={_selectedXaFilter.id}";
+                index++;
+            }
+
             if(_fromDate != null)
             {
                 BuilderQuery += $"&filter[_and][{index}][ngay_cap][_gte]={_fromDate.Value.ToString("yyyy-MM-dd")}";

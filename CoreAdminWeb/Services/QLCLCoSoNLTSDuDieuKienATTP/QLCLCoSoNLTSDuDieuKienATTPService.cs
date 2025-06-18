@@ -10,7 +10,8 @@ namespace CoreAdminWeb.Services
     {
         private readonly string _collection = "QLCLCoSoNLTSDuDieuKienATTP";
         private const string Fields = "*,user_created.last_name,user_created.first_name,user_updated.last_name,user_updated.first_name"
-            + ",province.id,province,province.name,ward.id,ward,ward.name,loai_hinh_kinh_doanh.id,loai_hinh_kinh_doanh.code,loai_hinh_kinh_doanh.name";
+            + ",province.id,province,province.name,ward.id,ward,ward.name,loai_hinh_kinh_doanh.id,loai_hinh_kinh_doanh.code,loai_hinh_kinh_doanh.name"
+            +",chi_tiets.id, chi_tiets.sort, chi_tiets.deleted ,chi_tiets.san_pham.id,chi_tiets.san_pham.name";
 
         /// <summary>
         /// Creates a response with error handling
