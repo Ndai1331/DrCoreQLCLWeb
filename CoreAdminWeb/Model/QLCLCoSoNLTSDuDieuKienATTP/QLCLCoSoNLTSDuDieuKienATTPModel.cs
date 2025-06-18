@@ -18,6 +18,7 @@ namespace CoreAdminWeb.Model
         public string? xu_ly_ket_qua { get; set; }
         public string? he_thong_quan_ly_chat_luong { get; set; }
         public Enums.KetQuaKiemTraDinhKy? ket_qua_tham_dinh { get; set; } = Enums.KetQuaKiemTraDinhKy.Dat;
+        public Enums.LoaiCoSo? dieu_kien { get; set; } = Enums.LoaiCoSo.DuDieuKien;
     }
     public class QLCLCoSoNLTSDuDieuKienATTPCRUDModel : BaseDetailModel
     {
@@ -36,6 +37,7 @@ namespace CoreAdminWeb.Model
         public string? xu_ly_ket_qua { get; set; }
         public string? he_thong_quan_ly_chat_luong { get; set; }
         public Enums.KetQuaKiemTraDinhKy? ket_qua_tham_dinh { get; set; } = Enums.KetQuaKiemTraDinhKy.Dat;
+        public Enums.LoaiCoSo? dieu_kien { get; set; } = Enums.LoaiCoSo.DuDieuKien;
     }
 
 

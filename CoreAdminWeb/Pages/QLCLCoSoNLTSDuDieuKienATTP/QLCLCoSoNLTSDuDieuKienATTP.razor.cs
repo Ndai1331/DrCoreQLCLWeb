@@ -54,9 +54,10 @@ namespace CoreAdminWeb.Pages.QLCLCoSoNLTSDuDieuKienATTP
         private async Task LoadData()
         {
             BuildPaginationQuery(Page, PageSize, "id", false);
-            int index =1;
+            int index = 2;
 
             BuilderQuery += "&filter[_and][0][deleted][_eq]=false";
+            BuilderQuery += "&filter[_and][1][loai][_eq]=1";
             if (!string.IsNullOrEmpty(_searchString))
             {
                 BuilderQuery += $"&filter[_and][{index}][_or][0][code][_contains]={_searchString}";
@@ -79,7 +80,6 @@ namespace CoreAdminWeb.Pages.QLCLCoSoNLTSDuDieuKienATTP
             {
                 BuilderQuery += $"&filter[_and][{index}][ngay_cap][_lte]={_toDate.Value.ToString("yyyy-MM-dd")}";
             }
-
 
             var result = await MainService.GetAllAsync(BuilderQuery);
             if (result.IsSuccess)
