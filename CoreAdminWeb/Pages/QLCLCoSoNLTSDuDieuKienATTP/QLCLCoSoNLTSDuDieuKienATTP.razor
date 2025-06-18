@@ -282,9 +282,9 @@ pTitle="Dữ liệu các cơ sở sản xuất, kinh doanh NLTS đủ điều ki
 }
 @if (openAddOrUpdateModal)
 {
-    <div class="fixed inset-0 bg-black/80 z-[99999] overflow-y-auto dark:bg-dark/90">
+    <div class="fixed inset-0 bg-black/80 z-[99999] dark:bg-dark/90">
         <div class="flex items-center justify-center min-h-screen px-4" @onclick="CloseAddOrUpdateModal">
-            <div class="relative w-full max-w-5xl p-0 my-8 overflow-hidden bg-white border rounded-lg border-black/10 dark:bg-darklight dark:border-darkborder" @onclick:stopPropagation>
+            <div class="relative w-full max-w-5xl p-0 my-8 overflow-y-auto bg-white border rounded-lg border-black/10 dark:bg-darklight dark:border-darkborder" style="max-height: 90vh;" @onclick:stopPropagation>
                 <div class="flex items-center justify-between px-5 py-3 bg-white border-b border-black/10 dark:bg-darklight dark:border-darkborder">
                     <MudText Typo="Typo.h5" Class="text-lg font-semibold text-slate-800 dark:text-slate-100">@_titleAddOrUpdate</MudText>
                     <MudButton Class="text-muted hover:text-black dark:hover:text-white" OnClick="CloseAddOrUpdateModal">
@@ -295,11 +295,9 @@ pTitle="Dữ liệu các cơ sở sản xuất, kinh doanh NLTS đủ điều ki
                     </MudButton>
                 </div>
                 <div class="p-5 space-y-4">
-                    <EditForm Model="@SelectedItem" OnValidSubmit="OnValidSubmit">
-
-                         <div class="text-black dark:text-muted">
+                    <EditForm Model="@SelectedItem" OnValidSubmit="OnValidSubmit" class="overflow-y-auto">
+                        <div class="text-black dark:text-muted">
                             <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-
                                 <div class="space-y-2 md:col-span-1">
                                     <label>Mã số doanh nghiệp <span class="text-danger">*</span></label>
                                     <input type="text" class="form-input" @bind="@SelectedItem.code" Label="Mã số doanh nghiệp" />
@@ -464,9 +462,8 @@ pTitle="Dữ liệu các cơ sở sản xuất, kinh doanh NLTS đủ điều ki
                                         }
                                     </select>
                                 </div>
-
                             
-                                <div class="space-y-2 md:col-span-2">
+                                @* <div class="space-y-2 md:col-span-2">
                                     <div x-data="{activeDefTab:'tab1'}" class="w-full">
                                         <ul class="flex flex-wrap text-sm text-center border-b border-black/10 dark:border-darkborder">
                                             <li class="ltr:mr-2 rtl:ml-2">
@@ -483,7 +480,7 @@ pTitle="Dữ liệu các cơ sở sản xuất, kinh doanh NLTS đủ điều ki
                                                 case "tab1":
                                                     <div class="text-black dark:text-muted">
                                                         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                                            <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+                                                            <div class="relative shadow-md sm:rounded-lg space-y-2 md:col-span-2">
                                                                 <table id="chiTiet" class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400" style="width:100%">
                                                                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                                                         <tr>
@@ -543,18 +540,103 @@ pTitle="Dữ liệu các cơ sở sản xuất, kinh doanh NLTS đủ điều ki
                                             }
                                         </div>
                                     </div>
-                                </div>
+                                </div> *@
                             </div>
                         </div>
-
-                        
-
-                        <div class="flex items-center justify-end gap-2 py-4">
+                        @* <div class="flex items-center justify-end gap-2 py-4">
                             <MudButton Class="transition-all duration-300 border btn-crud rounded-md btn text-danger border-danger hover:bg-danger hover:text-white" OnClick="CloseAddOrUpdateModal">Huỷ</MudButton>
                             <MudButton Class="transition-all duration-300 border btn-crud rounded-md btn text-purple border-purple hover:bg-purple hover:text-white"
                                        OnClick="OnValidSubmit">Lưu</MudButton>
-                        </div>
+                        </div> *@
                     </EditForm>
+
+                    <div class="text-black dark:text-muted">
+                        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                            <div class="space-y-2 md:col-span-2">
+                                <div x-data="{activeDefTab:'tab1'}" class="w-full">
+                                    <ul class="flex flex-wrap text-sm text-center border-b border-black/10 dark:border-darkborder">
+                                        <li class="ltr:mr-2 rtl:ml-2">
+                                            <MudLink Href="javascript:;"
+                                            OnClick="@(() => {OnTabChanged("tab1");})"
+                                                    Class="@($"inline-block p-4 rounded-t-lg {(activeDefTab == "tab1" ? "bg-purple/10 text-purple" : "bg-transparent font-normal text-muted dark:hover:text-purple hover:bg-purple/10 hover:text-purple")}")">
+                                                Sản phẩm
+                                            </MudLink>
+                                        </li>
+                                    </ul>
+                                    <div class="tab-content mt-3 text-[13px]">
+                                        @switch (activeDefTab)
+                                        {
+                                            case "tab1":
+                                                <div class="text-black dark:text-muted">
+                                                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                                        <div class="relative overflow-x-auto shadow-md sm:rounded-lg space-y-2 md:col-span-2">
+                                                            <table id="chiTiet" class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400" style="width:100%">
+                                                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                                                    <tr>
+                                                                        <th>STT</th>
+                                                                        <th>Tên sản phẩm</th>
+                                                                        <th class="flex items-center gap-2">Tác vụ</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    @foreach (var item in SelectedSanPhamItemsDetail.Where(c => c.deleted == null || c.deleted == false).Select((v, i) => new { Data = v, Index = i }))
+                                                                    {
+                                                                        <tr>
+                                                                            <td>@(item.Index + 1)</td>
+                                                                            <td>
+                                                                                <BlazoredTypeahead EnableDropDown="true"
+                                                                                                ShowDropDownOnFocus="true"
+                                                                                                MinimumLength="0"
+                                                                                                TItem="QLCLSanPhamSanXuatModel"
+                                                                                                TValue="QLCLSanPhamSanXuatModel"
+                                                                                                SearchMethod="LoadSanPhamData"
+                                                                                                @bind-Value="item.Data.san_pham"
+                                                                                                placeholder="Chọn sản phẩm"
+                                                                                                Class="form-select">
+                                                                                    <SelectedTemplate Context="item">
+                                                                                        @item.name
+                                                                                    </SelectedTemplate>
+                                                                                    <ResultTemplate Context="item">
+                                                                                        @item.name
+                                                                                    </ResultTemplate>
+                                                                                    <NotFoundTemplate Context="item">
+                                                                                        Không tìm thấy dữ liệu
+                                                                                    </NotFoundTemplate>
+                                                                                </BlazoredTypeahead>
+                                                                            </td>
+                                                                            <td class="flex items-center gap-2">
+                                                                                <MudButton Class="transition-all duration-300 border btn-crud rounded-md btn text-danger border-danger hover:bg-danger hover:text-white"
+                                                                                        @onclick="@(e => OpenSanPhamDetailDeleteModal(item.Data))">
+                                                                                    <i class="ri-delete-bin-line"></i>
+                                                                                </MudButton>
+                                                                            </td>
+                                                                        </tr>
+                                                                    }
+                                                                </tbody>
+                                                            </table>
+                                                            <MudButton Class="transition-all duration-300 border btn-crud rounded-md btn text-purple border-purple hover:bg-purple hover:text-white" OnClick="OnAddSanPham">Thêm dòng</MudButton>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                break;
+                                            default:
+                                                <div>
+                                                    <p>
+                                                        Select a tab to view content.
+                                                    </p>
+                                                </div>
+                                                break;
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-end gap-2 py-4">
+                        <MudButton Class="transition-all duration-300 border btn-crud rounded-md btn text-danger border-danger hover:bg-danger hover:text-white" OnClick="CloseAddOrUpdateModal">Huỷ</MudButton>
+                        <MudButton Class="transition-all duration-300 border btn-crud rounded-md btn text-purple border-purple hover:bg-purple hover:text-white"
+                                    OnClick="OnValidSubmit">Lưu</MudButton>
+                    </div>
                 </div>
             </div>
         </div>

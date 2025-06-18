@@ -15,7 +15,6 @@ namespace CoreAdminWeb.Model
     public class QLCLDotKiemTraHauKiemATTPCRUDModel : BaseDetailModel
     {
         public new string status { get; set; } = Status.active.ToString();
-     
         public DateTime? bat_dau_tu { get; set; }
         public DateTime? den { get; set; }
         public string? so_quyet_dinh { get; set; }

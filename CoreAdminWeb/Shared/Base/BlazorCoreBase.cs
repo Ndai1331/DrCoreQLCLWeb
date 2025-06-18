@@ -207,6 +207,5 @@ namespace CoreAdminWeb.Shared.Base
             }
         }
 
-
     }
 }
