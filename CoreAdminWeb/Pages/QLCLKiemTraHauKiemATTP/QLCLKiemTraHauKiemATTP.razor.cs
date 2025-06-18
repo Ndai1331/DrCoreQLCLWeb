@@ -127,7 +127,7 @@ namespace CoreAdminWeb.Pages.QLCLKiemTraHauKiemATTP
 
         private async Task LoadSanPhamDetailData()
         {
-            var buildQuery = $"sort=-id";
+            var buildQuery = $"sort=id";
             buildQuery += $"&filter[_and][][kiem_tra_hau_kiem_attp][_eq]={SelectedItem.id}";
             // buildQuery += $"&filter[_and][][deleted][_eq]=false";
             var result = await QLCLKiemTraHauKiemATTPChiTietService.GetAllAsync(buildQuery);
