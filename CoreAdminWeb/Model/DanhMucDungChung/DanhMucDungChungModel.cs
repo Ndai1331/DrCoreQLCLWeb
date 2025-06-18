@@ -3,6 +3,26 @@ using CoreAdminWeb.Model.Base;
 
 namespace CoreAdminWeb.Model
 {
+    public class QLCLHinhThucXuPhatModel : BaseModel<int>
+    {
+        public string? mo_ta{set;get;}
+    }
+    public class QLCLHinhThucXuPhatCRUDModel : BaseDetailModel
+    {
+        public new string status { set; get; } = Status.active.ToString();
+        public string? mo_ta{set;get;}
+
+    }
+    public class QLCLHanhViViPhamModel : BaseModel<int>
+    {
+        public string? muc_phat{set;get;}
+    }
+    public class QLCLHanhViViPhamCRUDModel : BaseDetailModel
+    {
+        public new string status { set; get; } = Status.active.ToString();
+        public string? muc_phat{set;get;}
+
+    }
     public class QLCLLoaiHinhCoSoModel : BaseModel<int>
     {
     }
