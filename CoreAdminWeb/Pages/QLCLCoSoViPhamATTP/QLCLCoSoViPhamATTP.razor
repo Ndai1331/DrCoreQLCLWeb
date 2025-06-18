@@ -5,7 +5,7 @@
 @using CoreAdminWeb.Shared.Base
 @using CoreAdminWeb.Commons.Utils
 @using CoreAdminWeb.Enums
-@* @inject IBaseService<QLCLCoSoViPhamATTPModel> MainService *@
+@inject IBaseService<QLCLCoSoViPhamATTPModel> MainService
 @inherits BlazorCoreBase
 @layout MainLayout
 <PageHeader Title="Dữ liệu các cơ sở vi phạm về ATTP" pTitle="Dữ liệu các cơ sở vi phạm về ATTP"></PageHeader>
@@ -111,7 +111,7 @@
                                 {
                                     <td>@MainModels[i].co_so_nlts_du_dieu_kien_attp?.name</td>
                                 }
-                                <td>@MainModels[i].hanh_vi_vi_pham</td>
+                                <td>@MainModels[i].hanh_vi_vi_pham.name</td>
                                 <td>@MainModels[i].huong_xu_ly</td>
                                 <td>@MainModels[i].phat_tien</td>
                                 <td>@MainModels[i].gia_tri_tang_vat</td>

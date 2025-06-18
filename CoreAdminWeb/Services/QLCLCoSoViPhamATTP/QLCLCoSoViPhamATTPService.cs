@@ -10,10 +10,10 @@ namespace CoreAdminWeb.Services
     {
         private readonly string _collection = "QLCLCoSoViPhamATTP";
         private const string Fields = "*,user_created.last_name,user_created.first_name,user_updated.last_name,user_updated.first_name"
-            + ",co_so_che_bien_nlts.id,co_so_che_bien_nlts.name,"
-            + ",co_so_nlts_du_dieu_kien_attp.id,co_so_nlts_du_dieu_kien_attp.name,"
-            + ",hanh_vi_vi_pham.id,hanh_vi_vi_pham,hanh_vi_vi_pham.name,"
-            + ",hinh_thuc_xu_phat.id,hinh_thuc_xu_phat.name,"
+            + ",co_so_che_bien_nlts.id,co_so_che_bien_nlts.name"
+            + ",co_so_nlts_du_dieu_kien_attp.id,co_so_nlts_du_dieu_kien_attp.name"
+            + ",hanh_vi_vi_pham.id,hanh_vi_vi_pham,hanh_vi_vi_pham.name"
+            + ",hinh_thuc_xu_phat.id,hinh_thuc_xu_phat.name"
             + ",don_vi_tinh.id,don_vi_tinh.name";
 
         /// <summary>
