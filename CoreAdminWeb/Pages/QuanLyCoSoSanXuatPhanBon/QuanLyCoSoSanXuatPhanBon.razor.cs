@@ -45,13 +45,13 @@ namespace CoreAdminWeb.Pages.QuanLyCoSoSanXuatPhanBon
         private async Task<IEnumerable<XaPhuongModel>> LoadXaData(string searchText)
         {
             string query = $"&filter[_and][][ProvinceId][_eq]={SelectedItem.province?.id ?? 0}";
-            return await LoadBlazorTypeaheadData(searchText, XaPhuongService, isIgnoreCheck: true);
+            return await LoadBlazorTypeaheadData(searchText, XaPhuongService, query, isIgnoreCheck: true);
         }
 
         private async Task<IEnumerable<XaPhuongModel>> LoadXaFilterData(string searchText)
         {
             string query = $"&filter[_and][][ProvinceId][_eq]={_selectedTinhFilter?.id ?? 0}";
-            return await LoadBlazorTypeaheadData(searchText, XaPhuongService, isIgnoreCheck: true);
+            return await LoadBlazorTypeaheadData(searchText, XaPhuongService, query, isIgnoreCheck: true);
         }
 
         private void OnTinhChanged(TinhModel? selected)
