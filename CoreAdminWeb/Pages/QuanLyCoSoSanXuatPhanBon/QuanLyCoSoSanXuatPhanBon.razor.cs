@@ -37,6 +37,7 @@ namespace CoreAdminWeb.Pages.QuanLyCoSoSanXuatPhanBon
             return await LoadBlazorTypeaheadData(searchText, QLCLLoaiHinhKinhDoanhService, isIgnoreCheck: true);
         }
 
+
         private async Task<IEnumerable<TinhModel>> LoadTinhData(string searchText)
         {
             return await LoadBlazorTypeaheadData(searchText, TinhThanhService, isIgnoreCheck: true);
