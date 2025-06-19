@@ -279,7 +279,7 @@
                             </div>
                             <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
                                 <label>Loại cơ sở<span class="text-danger">*</span></label>
-                                <select class="form-select" @bind-value="@SelectedItem.loai_co_so" @bind-value:event="onchange">
+                                <select class="form-select" @onchange="OnLoaiCoSoChanged">
                                     @foreach (var item in LoaiCoSoList)
                                     {
                                         <option value="@item">@item.GetDescription()</option>
