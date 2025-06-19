@@ -107,7 +107,6 @@ namespace CoreAdminWeb.Pages.QLCLCoSoNLTSDuDieuKienATTPHetHan
         {
             string query = $"sort=-id";
             query += $"&filter[_and][][ProvinceId][_eq]={(_selectedTinhFilter == null ? 0 : _selectedTinhFilter?.id)}";
-            query += $"&filter[_and][][deleted][_eq]=false";
             return await LoadBlazorTypeaheadData(searchText, XaPhuongService,query);
         }
 

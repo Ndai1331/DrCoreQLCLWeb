@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo cáo dữ liệu hỗ trợ xúc tiến thương mại</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="top-bar-main">
+            <div class="top-bar-left">
+                SỞ NÔNG NGHIỆP & PTNT TỈNH QUẢNG TRỊ<br>
+                HỆ THỐNG CƠ SỞ DỮ LIỆU NÔNG NGHIỆP
+            </div>
+            <div class="top-bar-center">
+                HỆ THỐNG CSDL QUẢN LÝ CHẤT LƯỢNG NÔNG LÂM THỦY SẢN
+            </div>
+            <div class="top-bar-right">
+                <div class="user-menu">
+                    <span>QUẢN TRỊ HỆ THỐNG</span>
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <ul class="nav flex-column">
+                <!-- Dashboard -->
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <!-- Quản lý Cơ sở chế biến nông lâm thủy sản -->
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#qlDoanhNghiepSubmenu" role="button" aria-expanded="false" aria-controls="qlDoanhNghiepSubmenu">
+                        <i class="fas fa-briefcase"></i>
+                        <span>Quản lý Cơ sở chế biến nông lâm thủy sản</span>
+                        <i class="fas fa-caret-down float-end"></i>
+                    </a>
+                    <div class="collapse" id="qlDoanhNghiepSubmenu">
+                        <ul class="nav flex-column ms-3">
+                            <li class="nav-item"><a class="nav-link" href="co-so-che-bien.html">DL các doanh nghiệp sản xuất kinh doanh</a></li>
+                            <li class="nav-item"><a class="nav-link" href="pham-vi-kinh-doanh.html">DL địa bàn, phạm vi sản xuất kinh doanh</a></li>
+                            <li class="nav-item"><a class="nav-link" href="hoat-dong-kinh-doanh.html">DL Tình hình hoạt động kinh doanh</a></li>
+                            <li class="nav-item"><a class="nav-link" href="bao-cao-thong-ke-doanh-nghiep.html">Báo cáo thống kê</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- Quản lý các cơ sở quản lý chất lượng tiên tiến chất lượng tiên tiến -->
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#qlCoSoQuanLySubmenu" role="button" aria-expanded="false" aria-controls="qlCoSoQuanLySubmenu">
+                        <i class="fas fa-warehouse"></i>
+                        <span>Quản lý các cơ sở quản lý chất lượng tiên tiến chất lượng tiên tiến</span>
+                        <i class="fas fa-caret-down float-end"></i>
+                    </a>
+                    <div class="collapse" id="qlCoSoQuanLySubmenu">
+                        <ul class="nav flex-column ms-3">
+                            <li class="nav-item"><a class="nav-link" href="co-so-du-dieu-kien.html">DL các cơ sở đạt chứng nhận quản lý chất lượng, hợp chuẩn hợp quy.</a></li>
+                            <li class="nav-item"><a class="nav-link" href="dieu-tra-kiem-ke.html">DL về các đợt điều tra, kiểm kê đánh giá</a></li>
+                            <li class="nav-item"><a class="nav-link" href="co-so-vi-pham.html">DL về vi phạm quản lý chất lượng</a></li>
+                            <li class="nav-item"><a class="nav-link" href="chung-nhan-het-han.html">DL về các cơ sở, chứng nhận hết hạn</a></li>
+                            <li class="nav-item"><a class="nav-link" href="bao-cao-thong-ke-tong-hop.html"><i class="fas fa-chart-bar"></i> Báo cáo thống kê tổng hợp</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- Quản lý báo cáo định kỳ -->
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#qlBaoCaoDinhKySubmenu" role="button" aria-expanded="false" aria-controls="qlBaoCaoDinhKySubmenu">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Quản lý báo cáo định kỳ</span>
+                        <i class="fas fa-caret-down float-end"></i>
+                    </a>
+                    <div class="collapse" id="qlBaoCaoDinhKySubmenu">
+                        <ul class="nav flex-column ms-3">
+                            <li class="nav-item"><a class="nav-link" href="bao-cao-dinh-ky-co-so.html">DL thống kê báo cáo định kỳ các cơ sở</a></li>
+                            <li class="nav-item"><a class="nav-link" href="bao-cao-phan-loai-vat-tu-nong-nghiep.html">Báo cáo các phân loại điều kiện đảm bảo chất lượng các cơ sở sản xuất kinh doanh vật tư nông nghiệp</a></li>
+                            <li class="nav-item"><a class="nav-link" href="bao-cao-phan-loai-nong-lam-san-muoi.html">Báo cáo các phân loại điều kiện đảm bảo chất lượng an toàn thực phẩm các sản phẩm nông lâm sản, muối</a></li>
+                            <li class="nav-item"><a class="nav-link" href="bao-cao-vi-pham-linh-vuc.html">DL báo cáo vi phạm trong lĩnh vực</a></li>
+                            <li class="nav-item"><a class="nav-link" href="bao-cao-kiem-tra-hau-kiem-attp.html">Báo cáo dữ liệu về kiểm tra, hậu kiểm ATTP</a></li>
+                            <li class="nav-item"><a class="nav-link active" href="bao-cao-ho-tro-xuc-tien-thuong-mai.html">Báo cáo dữ liệu hỗ trợ xúc tiến thương mại</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- Quản lý thông tin cung cấp -->
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#qlThongTinCungCapSubmenu" role="button" aria-expanded="false" aria-controls="qlThongTinCungCapSubmenu">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Quản lý thông tin cung cấp cho người dân</span>
+                        <i class="fas fa-caret-down float-end"></i>
+                    </a>
+                    <div class="collapse" id="qlThongTinCungCapSubmenu">
+                        <ul class="nav flex-column ms-3">
+                            <li class="nav-item"><a class="nav-link" href="co-so-vat-tu-nong-nghiep.html">DL các cơ sở sản xuất, kinh doanh vật tư nông nghiệp</a></li>
+                            <li class="nav-item"><a class="nav-link" href="co-so-hop-chuan-hop-quy.html">DL các cơ sở sản xuất kinh doanh chế biến hợp chuẩn hợp quy</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- Quảng bá, xúc tiến thương mại -->
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#quangBaSubmenu" role="button" aria-expanded="false" aria-controls="quangBaSubmenu">
+                        <i class="fas fa-bullhorn"></i>
+                        <span>Quảng bá, xúc tiến thương mại</span>
+                        <i class="fas fa-caret-down float-end"></i>
+                    </a>
+                    <div class="collapse" id="quangBaSubmenu">
+                        <ul class="nav flex-column ms-3">
+                            <li class="nav-item"><a class="nav-link" href="kenh-quang-ba.html">DL các kênh quảng bá xúc tiến thương mại</a></li>
+                            <li class="nav-item"><a class="nav-link" href="phat-trien-thi-truong.html">DL Tình hình phát triển thị trường</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- CSDL về các văn bản quy phạm -->
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#vbqpplSubmenu" role="button" aria-expanded="false" aria-controls="vbqpplSubmenu">
+                        <i class="fas fa-book"></i>
+                        <span>CSDL về các văn bản quy phạm</span>
+                        <i class="fas fa-caret-down float-end"></i>
+                    </a>
+                    <div class="collapse" id="vbqpplSubmenu">
+                        <ul class="nav flex-column ms-3">
+                            <li class="nav-item"><a class="nav-link" href="danh-muc-vbqppl.html">Danh mục VBQPPL</a></li>
+                            <li class="nav-item"><a class="nav-link" href="danh-muc-linh-vuc.html">Danh mục lĩnh vực</a></li>
+                            <li class="nav-item"><a class="nav-link" href="tim-kiem-vbqppl-noi-dung.html">Tìm kiếm VBQPPL theo nội dung</a></li>
+                            <li class="nav-item"><a class="nav-link" href="tim-kiem-vbqppl-cqbh.html">Tìm kiếm VBQPPL theo CQBH</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="index.html">Trang chủ</a></li>
+                    <li class="breadcrumb-item">Quản lý báo cáo định kỳ</li>
+                    <li class="breadcrumb-item active">Báo cáo dữ liệu hỗ trợ xúc tiến thương mại</li>
+                </ol>
+            </nav>
+            <!-- Filter Section -->
+            <div class="filter-section mb-3">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label">Từ ngày - Đến ngày:</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="dd/MM/yyyy - dd/MM/yyyy">
+                            <button class="btn btn-outline-secondary btn-sm" type="button"><i class="fas fa-calendar"></i></button>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Tỉnh thành:</label>
+                        <select class="form-select">
+                            <option>Quảng Trị</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Xã phường:</label>
+                        <select class="form-select">
+                            <option>--</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Tìm kiếm:</label>
+                        <input type="text" class="form-control" placeholder="Nhập để tìm kiếm">
+                    </div>
+                    <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+                        <button class="btn btn-primary btn-sm"><i class="fas fa-chart-bar"></i> Thống kê</button>
+                        <button class="btn btn-success btn-sm"><i class="fas fa-file-excel"></i> Xuất excel</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Table Section -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover text-center align-middle">
+                            <thead>
+                                <tr>
+                                    <th>STT</th>
+                                    <th class="text-start">Tên chương trình</th>
+                                    <th class="text-start">Địa điểm</th>
+                                    <th class="text-end">Số lượng chủ thể tham gia</th>
+                                    <th class="text-end">Lượt khách tham quan</th>
+                                    <th class="text-end">Doanh thu (VNĐ)</th>
+                                    <th class="text-end">Số HĐ ký kết</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td class="text-start">Hội chợ nông sản 2024</td>
+                                    <td class="text-start">TP. Đông Hà</td>
+                                    <td class="text-end">50</td>
+                                    <td class="text-end">1,200</td>
+                                    <td class="text-end">500,000,000</td>
+                                    <td class="text-end">15</td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td class="text-start">Triển lãm thủy sản</td>
+                                    <td class="text-start">Huyện Gio Linh</td>
+                                    <td class="text-end">30</td>
+                                    <td class="text-end">800</td>
+                                    <td class="text-end">300,000,000</td>
+                                    <td class="text-end">8</td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td class="text-start">Hội thảo nông nghiệp</td>
+                                    <td class="text-start">TP. Đông Hà</td>
+                                    <td class="text-end">25</td>
+                                    <td class="text-end">150</td>
+                                    <td class="text-end">0</td>
+                                    <td class="text-end">5</td>
+                                </tr>
+                                <tr>
+                                    <td>4</td>
+                                    <td class="text-start">Chợ phiên nông sản</td>
+                                    <td class="text-start">Huyện Vĩnh Linh</td>
+                                    <td class="text-end">40</td>
+                                    <td class="text-end">2,000</td>
+                                    <td class="text-end">800,000,000</td>
+                                    <td class="text-end">20</td>
+                                </tr>
+                                <tr>
+                                    <td>5</td>
+                                    <td class="text-start">Hội chợ xuân</td>
+                                    <td class="text-start">TP. Đông Hà</td>
+                                    <td class="text-end">45</td>
+                                    <td class="text-end">3,000</td>
+                                    <td class="text-end">1,200,000,000</td>
+                                    <td class="text-end">25</td>
+                                </tr>
+                                <tr>
+                                    <td>6</td>
+                                    <td class="text-start">Triển lãm lâm sản</td>
+                                    <td class="text-start">Huyện Hướng Hóa</td>
+                                    <td class="text-end">35</td>
+                                    <td class="text-end">900</td>
+                                    <td class="text-end">400,000,000</td>
+                                    <td class="text-end">12</td>
+                                </tr>
+                                <tr>
+                                    <td>7</td>
+                                    <td class="text-start">Hội thảo thương mại</td>
+                                    <td class="text-start">TP. Đông Hà</td>
+                                    <td class="text-end">20</td>
+                                    <td class="text-end">100</td>
+                                    <td class="text-end">0</td>
+                                    <td class="text-end">3</td>
+                                </tr>
+                                <tr>
+                                    <td>8</td>
+                                    <td class="text-start">Chợ phiên đặc sản</td>
+                                    <td class="text-start">Huyện Cam Lộ</td>
+                                    <td class="text-end">38</td>
+                                    <td class="text-end">1,500</td>
+                                    <td class="text-end">600,000,000</td>
+                                    <td class="text-end">18</td>
+                                </tr>
+                                <tr>
+                                    <td>9</td>
+                                    <td class="text-start">Hội chợ hè</td>
+                                    <td class="text-start">TP. Đông Hà</td>
+                                    <td class="text-end">42</td>
+                                    <td class="text-end">2,500</td>
+                                    <td class="text-end">900,000,000</td>
+                                    <td class="text-end">22</td>
+                                </tr>
+                                <tr>
+                                    <td>10</td>
+                                    <td class="text-start">Triển lãm nông nghiệp</td>
+                                    <td class="text-start">Huyện Triệu Phong</td>
+                                    <td class="text-end">33</td>
+                                    <td class="text-end">950</td>
+                                    <td class="text-end">450,000,000</td>
+                                    <td class="text-end">14</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Pagination & Total -->
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <div>
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination pagination-sm mb-0">
+                                    <li class="page-item"><a class="page-link" href="#">&laquo;</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">&lt;</a></li>
+                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">&gt;</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
+                                </ul>
+                            </nav>
+                            <select class="form-select form-select-sm d-inline-block w-auto ms-2">
+                                <option>10</option>
+                                <option>20</option>
+                                <option>50</option>
+                            </select>
+                        </div>
+                        <div>
+                            <span class="badge bg-light text-dark">Tổng số 10</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html> 
