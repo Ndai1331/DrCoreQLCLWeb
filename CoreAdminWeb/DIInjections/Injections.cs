@@ -163,6 +163,7 @@ namespace CoreAdminWeb.DIInjections
             services.AddScoped(typeof(IExportExcelService<>), typeof(ExportExcelService<>));
             services.AddScoped<IReportService<ReportBaoCaoKiemTraHauKiemATTPModel>, ReportBaoCaoKiemTraHauKiemATTP>();
             services.AddScoped<IReportService<QLCLCoSoNLTSDuDieuKienATTPModel>, ReportBaoCaoChiTietKiemTraHauKiemATTPService>();
+            services.AddScoped<IReportService<ReportBaoCaoKiemTraHauKiemLayMauATTPModel>, ReportBaoCaoKiemTraHauKiemLayMauATTPService>();
             services.AddScoped<AlertService>();
         }
     }

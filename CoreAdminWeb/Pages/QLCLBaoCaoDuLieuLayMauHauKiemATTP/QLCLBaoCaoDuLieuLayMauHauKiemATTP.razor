@@ -35,8 +35,9 @@ pTitle="Báo cáo dữ liệu lấy mẫu hậu kiểm, giám sát ATTP"></PageH
                                                MinimumLength="0"
                                                TItem="TinhModel"
                                                TValue="TinhModel"
-                                               SearchMethod="LoadTinhData"
-                                               @bind-Value="@_selectedTinhFilter"
+                                               Value="@_selectedTinhFilter"
+                                               ValueExpression="@(() => _selectedTinhFilter)"
+                                               ValueChanged="OnTinhFilterChanged"
                                                placeholder="Chọn tỉnh thành"
                                                Class="form-select">
                                 <SelectedTemplate Context="item">
@@ -60,7 +61,9 @@ pTitle="Báo cáo dữ liệu lấy mẫu hậu kiểm, giám sát ATTP"></PageH
                                                TItem="XaPhuongModel"
                                                TValue="XaPhuongModel"
                                                SearchMethod="LoadXaFilterData"
-                                               @bind-Value="@_selectedXaFilter"
+                                               Value="@_selectedXaFilter"
+                                               ValueExpression="@(() => _selectedXaFilter)"
+                                               ValueChanged="OnXaFilterChanged"
                                                placeholder="Chọn xã phường"
                                                Class="form-select">
                                 <SelectedTemplate Context="item">
@@ -116,9 +119,9 @@ pTitle="Báo cáo dữ liệu lấy mẫu hậu kiểm, giám sát ATTP"></PageH
                         <div>
                             <MudButton Class="xs:w-full sm:w-auto md:w-auto btn flex items-center gap-1.5
                             bg-success border-success text-white hover:bg-success/[0.85]
-                            hover:border-success/[0.85] text-nowrap" @onclick="@(e => OpenAddOrUpdateModal(null))">
-                                <i class="ri-add-line"></i>
-                                Thêm mới
+                            hover:border-success/[0.85] text-nowrap" @onclick="@(e => OnExportExcel())">
+                                <i class="ri-file-excel-line"></i>
+                                Xuất file excel
                             </MudButton>
                         </div>
                     </div>
@@ -133,232 +136,101 @@ pTitle="Báo cáo dữ liệu lấy mẫu hậu kiểm, giám sát ATTP"></PageH
                         <th class="px-6 py-3 text-center">Số lượng mẫu</th>
                         <th class="px-6 py-3 text-start">Chỉ tiêu phân tích</th>
                         <th class="px-6 py-3 text-center">Số lượng mẫu không đạt</th>
-                        <th class="px-6 py-3 text-center">Kết quả</th>
-                        <th class="px-6 py-3 text-center">Xử lý vi phạm</th>
+                        <th class="px-6 py-3 text-center">Chỉ tiêu vi phạm</th>
+                        <th class="px-6 py-3 text-center">Mức phát hiện</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 text-center">1</td>
-                        <td class="px-6 py-4 font-medium text-gray-900">Rau xanh</td>
-                        <td class="px-6 py-4 text-center">15</td>
-                        <td class="px-6 py-4">Chỉ tiêu thuốc BVTV</td>
-                        <td class="px-6 py-4 text-center">3</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Không đạt</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Đã xử phạt</span>
-                        </td>
-                    </tr>
-                    <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 text-center">2</td>
-                        <td class="px-6 py-4 font-medium text-gray-900">Thịt lợn</td>
-                        <td class="px-6 py-4 text-center">20</td>
-                        <td class="px-6 py-4">Chỉ tiêu vi sinh</td>
-                        <td class="px-6 py-4 text-center">2</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Không đạt</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Đã xử phạt</span>
-                        </td>
-                    </tr>
-                    <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 text-center">3</td>
-                        <td class="px-6 py-4 font-medium text-gray-900">Thủy sản</td>
-                        <td class="px-6 py-4 text-center">25</td>
-                        <td class="px-6 py-4">Chỉ tiêu hóa chất, chất bảo quản</td>
-                        <td class="px-6 py-4 text-center">4</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Không đạt</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Đang xử lý</span>
-                        </td>
-                    </tr>
-                    <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 text-center">4</td>
-                        <td class="px-6 py-4 font-medium text-gray-900">Trái cây</td>
-                        <td class="px-6 py-4 text-center">18</td>
-                        <td class="px-6 py-4">Chỉ tiêu thuốc BVTV</td>
-                        <td class="px-6 py-4 text-center">2</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Không đạt</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Đã xử phạt</span>
-                        </td>
-                    </tr>
-                    <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 text-center">5</td>
-                        <td class="px-6 py-4 font-medium text-gray-900">Gạo</td>
-                        <td class="px-6 py-4 text-center">12</td>
-                        <td class="px-6 py-4">Chỉ tiêu hóa chất, chất bảo quản</td>
-                        <td class="px-6 py-4 text-center">1</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Đạt</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="text-gray-500">--</span>
-                        </td>
-                    </tr>
-                    <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 text-center">6</td>
-                        <td class="px-6 py-4 font-medium text-gray-900">Mật ong</td>
-                        <td class="px-6 py-4 text-center">10</td>
-                        <td class="px-6 py-4">Chỉ tiêu hóa chất, chất bảo quản</td>
-                        <td class="px-6 py-4 text-center">3</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Không đạt</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Đã xử phạt</span>
-                        </td>
-                    </tr>
-                    <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 text-center">7</td>
-                        <td class="px-6 py-4 font-medium text-gray-900">Nước mắm</td>
-                        <td class="px-6 py-4 text-center">15</td>
-                        <td class="px-6 py-4">Chỉ tiêu vi sinh</td>
-                        <td class="px-6 py-4 text-center">2</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Không đạt</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Đang xử lý</span>
-                        </td>
-                    </tr>
-                    <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 text-center">8</td>
-                        <td class="px-6 py-4 font-medium text-gray-900">Mật ong</td>
-                        <td class="px-6 py-4 text-center">8</td>
-                        <td class="px-6 py-4">Chỉ tiêu hóa chất, chất bảo quản</td>
-                        <td class="px-6 py-4 text-center">1</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Không đạt</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Đã xử phạt</span>
-                        </td>
-                    </tr>
-                    <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 text-center">9</td>
-                        <td class="px-6 py-4 font-medium text-gray-900">Rau xanh</td>
-                        <td class="px-6 py-4 text-center">22</td>
-                        <td class="px-6 py-4">Chỉ tiêu thuốc BVTV</td>
-                        <td class="px-6 py-4 text-center">4</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Không đạt</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Đã xử phạt</span>
-                        </td>
-                    </tr>
-                    <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 text-center">10</td>
-                        <td class="px-6 py-4 font-medium text-gray-900">Thịt gà</td>
-                        <td class="px-6 py-4 text-center">16</td>
-                        <td class="px-6 py-4">Chỉ tiêu vi sinh</td>
-                        <td class="px-6 py-4 text-center">2</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Không đạt</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Đang xử lý</span>
-                        </td>
-                    </tr>
-                    <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 text-center">11</td>
-                        <td class="px-6 py-4 font-medium text-gray-900">Sữa tươi</td>
-                        <td class="px-6 py-4 text-center">14</td>
-                        <td class="px-6 py-4">Chỉ tiêu vi sinh, hóa chất</td>
-                        <td class="px-6 py-4 text-center">0</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Đạt</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="text-gray-500">--</span>
-                        </td>
-                    </tr>
-                    <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 text-center">12</td>
-                        <td class="px-6 py-4 font-medium text-gray-900">Bánh kẹo</td>
-                        <td class="px-6 py-4 text-center">19</td>
-                        <td class="px-6 py-4">Chỉ tiêu phụ gia, chất bảo quản</td>
-                        <td class="px-6 py-4 text-center">3</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Không đạt</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Đã xử phạt</span>
-                        </td>
-                    </tr>
-                    <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 text-center">13</td>
-                        <td class="px-6 py-4 font-medium text-gray-900">Nước giải khát</td>
-                        <td class="px-6 py-4 text-center">13</td>
-                        <td class="px-6 py-4">Chỉ tiêu vi sinh, hóa chất</td>
-                        <td class="px-6 py-4 text-center">1</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Cần cải thiện</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Cảnh báo</span>
-                        </td>
-                    </tr>
-                    <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 text-center">14</td>
-                        <td class="px-6 py-4 font-medium text-gray-900">Gia vị</td>
-                        <td class="px-6 py-4 text-center">11</td>
-                        <td class="px-6 py-4">Chỉ tiêu hóa chất, chất bảo quản</td>
-                        <td class="px-6 py-4 text-center">2</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Không đạt</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Đã xử phạt</span>
-                        </td>
-                    </tr>
-                    <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 text-center">15</td>
-                        <td class="px-6 py-4 font-medium text-gray-900">Thực phẩm đóng hộp</td>
-                        <td class="px-6 py-4 text-center">17</td>
-                        <td class="px-6 py-4">Chỉ tiêu vi sinh, hóa chất</td>
-                        <td class="px-6 py-4 text-center">1</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Đạt</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="text-gray-500">--</span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            </div>
-            <!-- Pagination for Mock Data -->
-            <div class="flex items-center justify-between p-4">
-                <div class="flex items-center gap-2">
-                    <span class="text-sm text-gray-700 dark:text-gray-300">Hiển thị</span>
-                    <select class="form-select text-sm">
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                    </select>
-                    <span class="text-sm text-gray-700 dark:text-gray-300">mục</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <div>
-                        <ul class="inline-flex my-2 -space-x-px list-inside">
-                            <li><a href="#" class="px-3 py-2 bg-white border cursor-not-allowed ltr:ml-0 rtl:mr-0 ltr:rounded-l-lg rtl:rounded-r-lg text-black/50 border-black/10 dark:bg-transparent dark:text-darkmuted dark:border-darkborder">Trước</a></li>
-                            <li><a href="#" class="px-3 py-2 text-black border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple bg-purple text-white">1</a></li>
-                            <li><a href="#" class="px-3 py-2 text-black border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple">2</a></li>
-                            <li><a href="#" class="px-3 py-2 text-black border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple">3</a></li>
-                            <li><a href="#" class="px-3 py-2 bg-white border cursor-not-allowed ltr:ml-0 rtl:mr-0 ltr:rounded-r-lg rtl:rounded-l-lg text-black/50 border-black/10 dark:bg-transparent dark:text-darkmuted dark:border-darkborder">Sau</a></li>
-                        </ul>
-                    </div>
-                </div>
+                        @foreach (var item in MainModels.Select((v, i) => new { Data = v, Index = i }))
+                        {
+                            <tr>
+                                <td>@(((Page - 1) * PageSize) + item.Index + 1)</td>
+                                <td>@item.Data.san_pham</td>
+                                <td>@item.Data.so_luong_mau</td>
+                                <td>@item.Data.chi_tieu</td>
+                                <td>@item.Data.so_mau_khong_dat</td>
+                                <td>@item.Data.chi_tieu_vi_pham</td>
+                                <td>@item.Data.muc_phat_hien</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="9">
+                                <div class="flex items-center justify-between p-4">
+                                    <div class="flex items-center gap-2">
+                                        <span>Hiển thị</span>
+                                        <select class="form-select" @bind="PageSize" @bind:event="oninput" @onchange="async (e) => await OnPageSizeChanged(LoadData)">
+                                            <option value="10">10</option>
+                                            <option value="25">25</option>
+                                            <option value="50">50</option>
+                                            <option value="100">100</option>
+                                        </select>
+                                        <span>mục</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+
+                                        <div>
+                                            <ul class="inline-flex my-2 -space-x-px list-inside">
+                                                <li><MudLink Href="#" Class="px-3 py-2 bg-white border cursor-not-allowed ltr:ml-0 rtl:mr-0 ltr:rounded-l-lg rtl:rounded-r-lg text-black/50 border-black/10 dark:bg-transparent dark:text-darkmuted dark:border-darkborder" @onclick="async (e) => await PreviousPage(LoadData)" disabled="@(Page <= 1)">Trước</MudLink></li>
+                                                @{
+                                                    var startPage = Math.Max(1, Page - 1);
+                                                    var endPage = Math.Min(TotalPages, Page + 1);
+
+                                                    // Always show first page
+                                                    <li>
+                                                        <a href="#"
+                                                           class="px-3 py-2 text-black  border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple @(Page == 1 ? "bg-purple text-white" : "bg-white")"
+                                                           @onclick="async (e) => await SelectedPage(1, LoadData)">1</a>
+                                                    </li>
+
+                                                    // Show ellipsis if needed
+                                                    if (startPage > 2)
+                                                    {
+                                                        <li><span class="px-3 py-2">...</span></li>
+                                                    }
+
+                                                    // Show pages around current page
+                                                    for (int i = startPage; i <= endPage; i++)
+                                                    {
+                                                        if (i > 1 && i < TotalPages)
+                                                        {
+                                                            <li>
+                                                                <a href="#"
+                                                                   class="px-3 py-2 text-black  border border-black/10
+                                                                    hover:bg-purple hover:text-white dark:bg-transparent
+                                                                    dark:text-white dark:border-darkborder dark:hover:bg-purple
+                                                                    dark:hover:text-white dark:hover:border-purple @(Page == i ? "bg-purple text-white" : "bg-white")"
+                                                                   @onclick="async (e) => await SelectedPage(i, LoadData)">@i</a>
+                                                            </li>
+                                                        }
+                                                    }
+
+                                                    // Show ellipsis if needed
+                                                    if (endPage < TotalPages - 1)
+                                                    {
+                                                        <li><span class="px-3 py-2">...</span></li>
+                                                    }
+
+                                                    // Always show last page if there is more than one page
+                                                    if (TotalPages > 1)
+                                                    {
+                                                        <li>
+                                                            <a href="#"
+                                                               class="px-3 py-2 text-black  border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple @(Page == TotalPages ? "bg-purple text-white" : "bg-white")"
+                                                               @onclick="async (e) => await SelectedPage(TotalPages, LoadData)">@TotalPages</a>
+                                                        </li>
+                                                    }
+                                                }
+                                                <li><MudLink Href="#" Class="px-3 py-2 bg-white border cursor-not-allowed ltr:ml-0 rtl:mr-0 ltr:rounded-r-lg rtl:rounded-l-lg text-black/50 border-black/10 dark:bg-transparent dark:text-darkmuted dark:border-darkborder" @onclick="async (e) => await NextPage(LoadData)" disabled="@(Page >= TotalPages)">Sau</MudLink></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
             </div>
         </div>
     </div>

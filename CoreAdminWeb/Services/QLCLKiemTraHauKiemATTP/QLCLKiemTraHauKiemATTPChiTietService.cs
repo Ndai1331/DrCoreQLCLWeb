@@ -20,7 +20,8 @@ namespace CoreAdminWeb.Services
     {
         private readonly string _collection = "QLCLKiemTraHauKiemATTPChiTiet";
         private const string Fields = "*,user_created.last_name,user_created.first_name,user_updated.last_name,user_updated.first_name"
-            + ",kiem_tra_hau_kiem_attp.id,"
+            + ",kiem_tra_hau_kiem_attp.id,kiem_tra_hau_kiem_attp.province.id,kiem_tra_hau_kiem_attp.ward.id,"
+            + "kiem_tra_hau_kiem_attp.ngay_kiem_tra,"
             + "san_pham.id, san_pham.name,san_pham.code";
 
         /// <summary>
