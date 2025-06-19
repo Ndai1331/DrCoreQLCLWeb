@@ -330,9 +330,10 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamATTP
             return await LoadBlazorTypeaheadData(searchText, DonViTinhService, isIgnoreCheck: true);
         }
 
-        public void OnLoaiCoSoChanged(LoaiCoSoNLTS? item)
+        public void OnLoaiCoSoChanged(ChangeEventArgs e)
         {
-            SelectedItem.loai_co_so = item;
+            var value = e.Value?.ToString();
+            SelectedItem.loai_co_so = !string.IsNullOrEmpty(value) ? (LoaiCoSoNLTS)Enum.Parse(typeof(LoaiCoSoNLTS), value) : LoaiCoSoNLTS.CoSoCheBien;
             SelectedItem.co_so_che_bien_nlts = null;
             SelectedItem.co_so_nlts_du_dieu_kien_attp = null;
         }
