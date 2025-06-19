@@ -158,6 +158,8 @@ namespace CoreAdminWeb.DIInjections
             services.AddScoped<IBaseService<QLCLDotKiemTraHauKiemATTPModel>, QLCLDotKiemTraHauKiemATTPService>();
             services.AddScoped<IBaseService<QLCLKiemTraHauKiemATTPModel>, QLCLKiemTraHauKiemATTPService>();
             services.AddScoped<IQLCLKiemTraHauKiemATTPChiTietService, QLCLKiemTraHauKiemATTPChiTietService>();
+            services.AddScoped(typeof(IExportExcelService<>), typeof(ExportExcelService<>));
+
             services.AddScoped<AlertService>();
         }
     }

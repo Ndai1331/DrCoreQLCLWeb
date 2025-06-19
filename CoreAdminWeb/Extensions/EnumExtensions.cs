@@ -48,5 +48,47 @@ namespace CoreAdminWeb.Extensions
 
             return value; // Return input if parsing fails
         }
+
+        public static string GetEnumDescription(this object enumValue)
+        {
+            var type = enumValue.GetType();
+            var name = Enum.GetName(type, enumValue);
+            if (name != null)
+            {
+                var field = type.GetField(name);
+                if (field != null)
+                {
+                    var attr = field.GetCustomAttribute<System.ComponentModel.DescriptionAttribute>();
+                    if (attr != null)
+                        return attr.Description;
+                }
+            }
+            return enumValue.ToString() ?? string.Empty;
+        }
+
+        public static string GetEnumDescription(this object? value, Type enumType)
+        {
+            if (value == null) return string.Empty;
+
+            if (value is Enum)
+            {
+                var field = enumType.GetField(value.ToString() ?? string.Empty);
+                var attr = field?.GetCustomAttribute<DescriptionAttribute>();
+                return attr?.Description ?? value.ToString() ?? string.Empty;
+            }
+
+            if (value is string str)
+            {
+                if (Enum.TryParse(enumType, str, true, out var enumObj))
+                {
+                    var field = enumType.GetField(enumObj.ToString() ?? string.Empty);
+                    var attr = field?.GetCustomAttribute<DescriptionAttribute>();
+                    return attr?.Description ?? enumObj.ToString() ?? string.Empty;
+                }
+                return str;
+            }
+
+            return value.ToString() ?? string.Empty;
+        }
     }
 }
