@@ -186,15 +186,15 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamChatLuongHangHoaVaATTP
 
             if(_selectedTinhFilter != null)
             {
-                BuilderQuery += $"&filter[_and][{index}][co_so_che_bien_nlts][province][_eq]={_selectedTinhFilter.id}";
-                BuilderQuery += $"&filter[_and][{index}][co_so_nlts_du_dieu_kien_attp][province][_eq]={_selectedTinhFilter.id}";
+                BuilderQuery += $"&filter[_and][{index}][_or][0][co_so_che_bien_nlts][province][_eq]={_selectedTinhFilter.id}";
+                BuilderQuery += $"&filter[_and][{index}][_or][1][co_so_nlts_du_dieu_kien_attp][province][_eq]={_selectedTinhFilter.id}";
                 index++;
             }
 
             if(_selectedXaFilter != null)
             {
-                BuilderQuery += $"&filter[_and][{index}][co_so_che_bien_nlts][ward][_eq]={_selectedXaFilter.id}";
-                BuilderQuery += $"&filter[_and][{index}][co_so_nlts_du_dieu_kien_attp][ward][_eq]={_selectedXaFilter.id}";
+                BuilderQuery += $"&filter[_and][{index}][_or][0][co_so_che_bien_nlts][ward][_eq]={_selectedXaFilter.id}";
+                BuilderQuery += $"&filter[_and][{index}][_or][1][co_so_nlts_du_dieu_kien_attp][ward][_eq]={_selectedXaFilter.id}";
                 index++;
             }
 
