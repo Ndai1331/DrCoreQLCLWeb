@@ -1,0 +1,260 @@
+﻿@page "/bao-cao-du-lieu-vi-pham"
+@using CoreAdminWeb.Commons.Utils
+@using CoreAdminWeb.Extensions
+@using CoreAdminWeb.Model
+@using CoreAdminWeb.Shared.Base
+@inherits BlazorCoreBase
+@layout MainLayout
+
+<PageHeader Title="Báo cáo dữ liệu vi phạm" 
+pTitle="Báo cáo dữ liệu vi phạm"></PageHeader>
+
+<!-- Start All Card -->
+<div class="flex flex-col gap-4 min-h-[calc(100vh-212px)]">
+    <div class="grid grid-cols-1 gap-4">
+        <div class="card">
+            @if (IsLoading)
+            {
+                <div class="flex flex-col items-center justify-center gap-3">
+                    <div class="w-full h-4 rounded-full bg-gray-200">
+                        <div class="h-4 rounded-full bg-success animate-progress"
+                             style="background-image: linear-gradient(45deg,hsla(0,0%,100%,.15) 25%,transparent 0,transparent 50%,hsla(0,0%,100%,.15) 0,hsla(0,0%,100%,.15) 75%,transparent 0,transparent); background-size: 1rem 1rem;">
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class="flex items-end justify-between flex-1 gap-2 sm:gap-4">
+                <!-- Left: Filter Area -->
+                <div class="w-full grid grid-cols-1 gap-4 md:grid-cols-4 xl:grid-cols-4 sm:gap-4 md:w-4/5 pb-2">
+                    <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
+                        <MudForm>
+                            <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Tỉnh thành</MudText>
+                            <BlazoredTypeahead EnableDropDown="true"
+                                               ShowDropDownOnFocus="true"
+                                               MinimumLength="0"
+                                               TItem="TinhModel"
+                                               TValue="TinhModel"
+                                               SearchMethod="LoadTinhData"
+                                               @bind-Value="@_selectedTinhFilter"
+                                               placeholder="Chọn tỉnh thành"
+                                               Class="form-select">
+                                <SelectedTemplate Context="item">
+                                    @item.name
+                                </SelectedTemplate>
+                                <ResultTemplate Context="item">
+                                    @item.name
+                                </ResultTemplate>
+                                <NotFoundTemplate Context="item">
+                                    Không tìm thấy dữ liệu
+                                </NotFoundTemplate>
+                            </BlazoredTypeahead>
+                        </MudForm>
+                    </div>
+                    <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
+                        <MudForm>
+                            <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Xã phường</MudText>
+                            <BlazoredTypeahead EnableDropDown="true"
+                                               ShowDropDownOnFocus="true"
+                                               MinimumLength="0"
+                                               TItem="XaPhuongModel"
+                                               TValue="XaPhuongModel"
+                                               SearchMethod="LoadXaFilterData"
+                                               @bind-Value="@_selectedXaFilter"
+                                               placeholder="Chọn xã phường"
+                                               Class="form-select">
+                                <SelectedTemplate Context="item">
+                                    @item.name
+                                </SelectedTemplate>
+                                <ResultTemplate Context="item">
+                                    @item.name
+                                </ResultTemplate>
+                                <NotFoundTemplate Context="item">
+                                    Không tìm thấy dữ liệu
+                                </NotFoundTemplate>
+                            </BlazoredTypeahead>
+                        </MudForm>
+                    </div>
+                    <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
+                        <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Từ ngày kiểm tra</MudText>
+                         <input type="text" 
+                                   class="form-input date-picker"
+                                   placeholder="Từ ngày kiểm tra"
+                                   value="@(_fromDate?.ToString("dd/MM/yyyy"))"
+                                   @onchange="@(e => OnDateChanged(e, "fromDate"))" />
+                    </div>
+                    <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
+                        <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Đến ngày kiểm tra</MudText>
+                        <input type="text" 
+                               class="form-input date-picker"
+                               placeholder="Đến ngày kiểm tra"
+                               value="@(_toDate?.ToString("dd/MM/yyyy"))"
+                               @onchange="@(e => OnDateChanged(e, "toDate"))" />
+                    </div>
+
+                    <div class="xs:col-span-4 sm:col-span-4 md:col-span-3">
+                        <MudForm class="flex-1">
+                            <div class="relative">
+                                <input type="text" id="search"
+                                       class="border-black/10 dark:text-white/80 dark:placeholder:text-white/30 dark:border-darkborder dark:bg-dark dark:focus:border-white/30 focus:border-black/30 placeholder:text-black/50 border text-black text-sm rounded block w-full ltr:pl-3 rtl:pr-3 ltr:pr-7 rtl:pl-7 h-10 bg-[#f9fbfd] focus:ring-0 focus:outline-0"
+                                       placeholder="Tìm kiếm..."
+                                       required=""
+                                       @bind-value="@_searchString"
+                                       @bind-value:event="oninput"
+                                       @onkeydown="async (e) => await OnInputKeyDownSearch(e, LoadData)">
+
+                                <MudButton OnClick="LoadData" type="button" Class="absolute inset-y-0 flex items-center text-black ltr:right-0 rtl:left-0 ltr:pr-2 rtl:pl-2 dark:text-white/80">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-4 h-4">
+                                        <path d="M11 2C15.968 2 20 6.032 20 11C20 15.968 15.968 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2ZM11 18C14.8675 18 18 14.8675 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18ZM19.4853 18.0711L22.3137 20.8995L20.8995 22.3137L18.0711 19.4853L19.4853 18.0711Z" fill="currentColor"></path>
+                                    </svg>
+                                </MudButton>
+                            </div>
+                        </MudForm>
+                    </div>
+
+                    <div class="flex items-end xs:col-span-4 sm:col-span-4 md:col-span-1 justify-end">
+                        <div>
+                            <MudButton Class="xs:w-full sm:w-auto md:w-auto btn flex items-center gap-1.5
+                            bg-success border-success text-white hover:bg-success/[0.85]
+                            hover:border-success/[0.85] text-nowrap" @onclick="@(e => OpenAddOrUpdateModal(null))">
+                                <i class="ri-add-line"></i>
+                                Thêm mới
+                            </MudButton>
+                        </div>
+                    </div>
+                </div>
+            </div>
+             <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+                <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
+                            <th class="px-6 py-3 text-center">STT</th>
+                            <th class="px-6 py-3 text-center">Ngày ghi nhận</th>
+                            <th class="px-6 py-3 text-start">Tên cơ sở</th>
+                            <th class="px-6 py-3 text-start">Loại cơ sở</th>
+                            <th class="px-6 py-3 text-start">Hành vi vi phạm</th>
+                            <th class="px-6 py-3 text-start">Hình thức xử lý</th>
+                            <th class="px-6 py-3 text-center">Ngày xử lý</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="bg-white border-b hover:bg-gray-50">
+                            <td class="px-6 py-4 text-center">1</td>
+                            <td class="px-6 py-4 text-center">12/12/2024</td>
+                            <td class="px-6 py-4 font-medium text-gray-900">HTX Trung Giang</td>
+                            <td class="px-6 py-4">Chế biến thủy sản</td>
+                            <td class="px-6 py-4">Sử dụng hóa chất cấm</td>
+                            <td class="px-6 py-4">Phạt tiền, đình chỉ</td>
+                            <td class="px-6 py-4 text-center">15/12/2024</td>
+                        </tr>
+                        <tr class="bg-white border-b hover:bg-gray-50">
+                            <td class="px-6 py-4 text-center">2</td>
+                            <td class="px-6 py-4 text-center">24/01/2025</td>
+                            <td class="px-6 py-4 font-medium text-gray-900">HKD Minh Anh</td>
+                            <td class="px-6 py-4">Kinh doanh nông sản</td>
+                            <td class="px-6 py-4">Không đảm bảo vệ sinh</td>
+                            <td class="px-6 py-4">Nhắc nhở, cam kết</td>
+                            <td class="px-6 py-4 text-center">25/01/2025</td>
+                        </tr>
+                        <tr class="bg-white border-b hover:bg-gray-50">
+                            <td class="px-6 py-4 text-center">3</td>
+                            <td class="px-6 py-4 text-center">05/02/2025</td>
+                            <td class="px-6 py-4 font-medium text-gray-900">Công ty TNHH Thủy sản Đông Hà</td>
+                            <td class="px-6 py-4">Sản xuất thủy sản</td>
+                            <td class="px-6 py-4">Sử dụng chất bảo quản vượt quá quy định</td>
+                            <td class="px-6 py-4">Phạt tiền, thu hồi sản phẩm</td>
+                            <td class="px-6 py-4 text-center">10/02/2025</td>
+                        </tr>
+                        <tr class="bg-white border-b hover:bg-gray-50">
+                            <td class="px-6 py-4 text-center">4</td>
+                            <td class="px-6 py-4 text-center">18/02/2025</td>
+                            <td class="px-6 py-4 font-medium text-gray-900">Cơ sở chế biến nông sản Vĩnh Linh</td>
+                            <td class="px-6 py-4">Chế biến nông sản</td>
+                            <td class="px-6 py-4">Không có giấy phép vệ sinh an toàn thực phẩm</td>
+                            <td class="px-6 py-4">Đình chỉ hoạt động, phạt tiền</td>
+                            <td class="px-6 py-4 text-center">25/02/2025</td>
+                        </tr>
+                        <tr class="bg-white border-b hover:bg-gray-50">
+                            <td class="px-6 py-4 text-center">5</td>
+                            <td class="px-6 py-4 text-center">03/03/2025</td>
+                            <td class="px-6 py-4 font-medium text-gray-900">HTX Nông nghiệp Gio Linh</td>
+                            <td class="px-6 py-4">Sản xuất nông nghiệp</td>
+                            <td class="px-6 py-4">Sử dụng thuốc bảo vệ thực vật cấm</td>
+                            <td class="px-6 py-4">Phạt tiền, tiêu hủy sản phẩm</td>
+                            <td class="px-6 py-4 text-center">08/03/2025</td>
+                        </tr>
+                        <tr class="bg-white border-b hover:bg-gray-50">
+                            <td class="px-6 py-4 text-center">6</td>
+                            <td class="px-6 py-4 text-center">15/03/2025</td>
+                            <td class="px-6 py-4 font-medium text-gray-900">Công ty Sản xuất Phân bón Quảng Trị</td>
+                            <td class="px-6 py-4">Sản xuất phân bón</td>
+                            <td class="px-6 py-4">Sản xuất phân bón không đạt tiêu chuẩn</td>
+                            <td class="px-6 py-4">Phạt tiền, thu hồi giấy phép</td>
+                            <td class="px-6 py-4 text-center">20/03/2025</td>
+                        </tr>
+                        <tr class="bg-white border-b hover:bg-gray-50">
+                            <td class="px-6 py-4 text-center">7</td>
+                            <td class="px-6 py-4 text-center">28/03/2025</td>
+                            <td class="px-6 py-4 font-medium text-gray-900">Cơ sở kinh doanh thuốc BVTV Hướng Hóa</td>
+                            <td class="px-6 py-4">Kinh doanh thuốc BVTV</td>
+                            <td class="px-6 py-4">Bán thuốc bảo vệ thực vật hết hạn</td>
+                            <td class="px-6 py-4">Phạt tiền, thu hồi sản phẩm</td>
+                            <td class="px-6 py-4 text-center">02/04/2025</td>
+                        </tr>
+                        <tr class="bg-white border-b hover:bg-gray-50">
+                            <td class="px-6 py-4 text-center">8</td>
+                            <td class="px-6 py-4 text-center">10/04/2025</td>
+                            <td class="px-6 py-4 font-medium text-gray-900">HTX Chăn nuôi Cam Lộ</td>
+                            <td class="px-6 py-4">Chăn nuôi gia súc</td>
+                            <td class="px-6 py-4">Sử dụng chất cấm trong chăn nuôi</td>
+                            <td class="px-6 py-4">Phạt tiền, đình chỉ hoạt động</td>
+                            <td class="px-6 py-4 text-center">15/04/2025</td>
+                        </tr>
+                        <tr class="bg-white border-b hover:bg-gray-50">
+                            <td class="px-6 py-4 text-center">9</td>
+                            <td class="px-6 py-4 text-center">22/04/2025</td>
+                            <td class="px-6 py-4 font-medium text-gray-900">Công ty TNHH Lâm sản Triệu Phong</td>
+                            <td class="px-6 py-4">Chế biến lâm sản</td>
+                            <td class="px-6 py-4">Khai thác gỗ trái phép</td>
+                            <td class="px-6 py-4">Phạt tiền, thu hồi giấy phép</td>
+                            <td class="px-6 py-4 text-center">28/04/2025</td>
+                        </tr>
+                        <tr class="bg-white border-b hover:bg-gray-50">
+                            <td class="px-6 py-4 text-center">10</td>
+                            <td class="px-6 py-4 text-center">05/05/2025</td>
+                            <td class="px-6 py-4 font-medium text-gray-900">Cơ sở sản xuất giống cây trồng Đông Hà</td>
+                            <td class="px-6 py-4">Sản xuất giống cây trồng</td>
+                            <td class="px-6 py-4">Sản xuất giống không đạt tiêu chuẩn</td>
+                            <td class="px-6 py-4">Phạt tiền, tiêu hủy sản phẩm</td>
+                            <td class="px-6 py-4 text-center">10/05/2025</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- Pagination for Mock Data -->
+            <div class="flex items-center justify-between p-4">
+                <div class="flex items-center gap-2">
+                    <span class="text-sm text-gray-700 dark:text-gray-300">Hiển thị</span>
+                    <select class="form-select text-sm">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    <span class="text-sm text-gray-700 dark:text-gray-300">mục</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div>
+                        <ul class="inline-flex my-2 -space-x-px list-inside">
+                            <li><a href="#" class="px-3 py-2 bg-white border cursor-not-allowed ltr:ml-0 rtl:mr-0 ltr:rounded-l-lg rtl:rounded-r-lg text-black/50 border-black/10 dark:bg-transparent dark:text-darkmuted dark:border-darkborder">Trước</a></li>
+                            <li><a href="#" class="px-3 py-2 text-black border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple bg-purple text-white">1</a></li>
+                            <li><a href="#" class="px-3 py-2 text-black border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple">2</a></li>
+                            <li><a href="#" class="px-3 py-2 text-black border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple">3</a></li>
+                            <li><a href="#" class="px-3 py-2 bg-white border cursor-not-allowed ltr:ml-0 rtl:mr-0 ltr:rounded-r-lg rtl:rounded-l-lg text-black/50 border-black/10 dark:bg-transparent dark:text-darkmuted dark:border-darkborder">Sau</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
