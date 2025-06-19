@@ -18,9 +18,6 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoViPhamLinhVuc
                                               IBaseService<QLCLDotKiemTraHauKiemATTPModel> DotKiemTraService) : BlazorCoreBase
     {
         private List<QLCLKiemTraHauKiemATTPModel> MainModels { get; set; } = new();
-        private bool openDeleteModal = false;
-        private bool openSanPhamDetailDeleteModal = false;
-        private bool openAddOrUpdateModal = false;
 
         private List<Enums.LoaiCoSo> LoaiCoSoItems { get; set; } = new List<Enums.LoaiCoSo>() {
             Enums.LoaiCoSo.DuDieuKien,
