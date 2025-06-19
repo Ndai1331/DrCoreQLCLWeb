@@ -3,6 +3,7 @@
 @using CoreAdminWeb.Extensions
 @using CoreAdminWeb.Model
 @using CoreAdminWeb.Shared.Base
+@using CoreAdminWeb.Enums
 @inherits BlazorCoreBase
 @layout MainLayout
 
@@ -27,7 +28,7 @@ pTitle="Báo cáo dữ liệu vi phạm"></PageHeader>
             <div class="flex items-end justify-between flex-1 gap-2 sm:gap-4">
                 <!-- Left: Filter Area -->
                 <div class="w-full grid grid-cols-1 gap-4 md:grid-cols-4 xl:grid-cols-4 sm:gap-4 md:w-4/5 pb-2">
-                    <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
+                     <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
                         <MudForm>
                             <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Tỉnh thành</MudText>
                             <BlazoredTypeahead EnableDropDown="true"
@@ -36,7 +37,9 @@ pTitle="Báo cáo dữ liệu vi phạm"></PageHeader>
                                                TItem="TinhModel"
                                                TValue="TinhModel"
                                                SearchMethod="LoadTinhData"
-                                               @bind-Value="@_selectedTinhFilter"
+                                               Value="@_selectedTinhFilter"
+                                                ValueExpression="@(() => _selectedTinhFilter)"
+                                                ValueChanged="OnTinhFilterChanged"
                                                placeholder="Chọn tỉnh thành"
                                                Class="form-select">
                                 <SelectedTemplate Context="item">
@@ -60,7 +63,9 @@ pTitle="Báo cáo dữ liệu vi phạm"></PageHeader>
                                                TItem="XaPhuongModel"
                                                TValue="XaPhuongModel"
                                                SearchMethod="LoadXaFilterData"
-                                               @bind-Value="@_selectedXaFilter"
+                                               Value="@_selectedXaFilter"
+                                               ValueExpression="@(() => _selectedXaFilter)"
+                                               ValueChanged="OnXaFilterChanged"
                                                placeholder="Chọn xã phường"
                                                Class="form-select">
                                 <SelectedTemplate Context="item">
@@ -75,22 +80,24 @@ pTitle="Báo cáo dữ liệu vi phạm"></PageHeader>
                             </BlazoredTypeahead>
                         </MudForm>
                     </div>
+                    
                     <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
-                        <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Từ ngày kiểm tra</MudText>
+                        <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Từ ngày ghi nhận</MudText>
                          <input type="text" 
                                    class="form-input date-picker"
-                                   placeholder="Từ ngày kiểm tra"
+                                   placeholder="Từ ngày"
                                    value="@(_fromDate?.ToString("dd/MM/yyyy"))"
                                    @onchange="@(e => OnDateChanged(e, "fromDate"))" />
                     </div>
-                    <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
-                        <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Đến ngày kiểm tra</MudText>
-                        <input type="text" 
-                               class="form-input date-picker"
-                               placeholder="Đến ngày kiểm tra"
-                               value="@(_toDate?.ToString("dd/MM/yyyy"))"
-                               @onchange="@(e => OnDateChanged(e, "toDate"))" />
+                      <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
+                        <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Đến ngày </MudText>
+                         <input type="text" 
+                                   class="form-input date-picker"
+                                   placeholder="Đến ngày"
+                                   value="@(_toDate?.ToString("dd/MM/yyyy"))"
+                                   @onchange="@(e => OnDateChanged(e, "toDate"))" />
                     </div>
+                    
 
                     <div class="xs:col-span-4 sm:col-span-4 md:col-span-3">
                         <MudForm class="flex-1">
@@ -116,144 +123,133 @@ pTitle="Báo cáo dữ liệu vi phạm"></PageHeader>
                         <div>
                             <MudButton Class="xs:w-full sm:w-auto md:w-auto btn flex items-center gap-1.5
                             bg-success border-success text-white hover:bg-success/[0.85]
-                            hover:border-success/[0.85] text-nowrap" @onclick="@(e => OpenAddOrUpdateModal(null))">
-                                <i class="ri-add-line"></i>
-                                Thêm mới
+                            hover:border-success/[0.85] text-nowrap" @onclick="@(e => OnExportExcel())">
+                                <i class="ri-file-excel-line"></i>
+                                Xuất file excel
                             </MudButton>
                         </div>
                     </div>
                 </div>
             </div>
-             <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-                <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+
+            <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+                <table id="example" class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400" style="width:100%">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
-                            <th class="px-6 py-3 text-center">STT</th>
-                            <th class="px-6 py-3 text-center">Ngày ghi nhận</th>
-                            <th class="px-6 py-3 text-start">Tên cơ sở</th>
-                            <th class="px-6 py-3 text-start">Loại cơ sở</th>
-                            <th class="px-6 py-3 text-start">Hành vi vi phạm</th>
-                            <th class="px-6 py-3 text-start">Hình thức xử lý</th>
-                            <th class="px-6 py-3 text-center">Ngày xử lý</th>
+                            <th>STT</th>
+                            <th>Ngày ghi nhận</th>
+                            <th>Tên cơ sở</th>
+                            <th>Loại cơ sở</th>
+                            <th>Hành vi vi phạm</th>
+                            <th>Hình thức xử phạt</th>
+                            <th>Ngày xử lý</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="bg-white border-b hover:bg-gray-50">
-                            <td class="px-6 py-4 text-center">1</td>
-                            <td class="px-6 py-4 text-center">12/12/2024</td>
-                            <td class="px-6 py-4 font-medium text-gray-900">HTX Trung Giang</td>
-                            <td class="px-6 py-4">Chế biến thủy sản</td>
-                            <td class="px-6 py-4">Sử dụng hóa chất cấm</td>
-                            <td class="px-6 py-4">Phạt tiền, đình chỉ</td>
-                            <td class="px-6 py-4 text-center">15/12/2024</td>
-                        </tr>
-                        <tr class="bg-white border-b hover:bg-gray-50">
-                            <td class="px-6 py-4 text-center">2</td>
-                            <td class="px-6 py-4 text-center">24/01/2025</td>
-                            <td class="px-6 py-4 font-medium text-gray-900">HKD Minh Anh</td>
-                            <td class="px-6 py-4">Kinh doanh nông sản</td>
-                            <td class="px-6 py-4">Không đảm bảo vệ sinh</td>
-                            <td class="px-6 py-4">Nhắc nhở, cam kết</td>
-                            <td class="px-6 py-4 text-center">25/01/2025</td>
-                        </tr>
-                        <tr class="bg-white border-b hover:bg-gray-50">
-                            <td class="px-6 py-4 text-center">3</td>
-                            <td class="px-6 py-4 text-center">05/02/2025</td>
-                            <td class="px-6 py-4 font-medium text-gray-900">Công ty TNHH Thủy sản Đông Hà</td>
-                            <td class="px-6 py-4">Sản xuất thủy sản</td>
-                            <td class="px-6 py-4">Sử dụng chất bảo quản vượt quá quy định</td>
-                            <td class="px-6 py-4">Phạt tiền, thu hồi sản phẩm</td>
-                            <td class="px-6 py-4 text-center">10/02/2025</td>
-                        </tr>
-                        <tr class="bg-white border-b hover:bg-gray-50">
-                            <td class="px-6 py-4 text-center">4</td>
-                            <td class="px-6 py-4 text-center">18/02/2025</td>
-                            <td class="px-6 py-4 font-medium text-gray-900">Cơ sở chế biến nông sản Vĩnh Linh</td>
-                            <td class="px-6 py-4">Chế biến nông sản</td>
-                            <td class="px-6 py-4">Không có giấy phép vệ sinh an toàn thực phẩm</td>
-                            <td class="px-6 py-4">Đình chỉ hoạt động, phạt tiền</td>
-                            <td class="px-6 py-4 text-center">25/02/2025</td>
-                        </tr>
-                        <tr class="bg-white border-b hover:bg-gray-50">
-                            <td class="px-6 py-4 text-center">5</td>
-                            <td class="px-6 py-4 text-center">03/03/2025</td>
-                            <td class="px-6 py-4 font-medium text-gray-900">HTX Nông nghiệp Gio Linh</td>
-                            <td class="px-6 py-4">Sản xuất nông nghiệp</td>
-                            <td class="px-6 py-4">Sử dụng thuốc bảo vệ thực vật cấm</td>
-                            <td class="px-6 py-4">Phạt tiền, tiêu hủy sản phẩm</td>
-                            <td class="px-6 py-4 text-center">08/03/2025</td>
-                        </tr>
-                        <tr class="bg-white border-b hover:bg-gray-50">
-                            <td class="px-6 py-4 text-center">6</td>
-                            <td class="px-6 py-4 text-center">15/03/2025</td>
-                            <td class="px-6 py-4 font-medium text-gray-900">Công ty Sản xuất Phân bón Quảng Trị</td>
-                            <td class="px-6 py-4">Sản xuất phân bón</td>
-                            <td class="px-6 py-4">Sản xuất phân bón không đạt tiêu chuẩn</td>
-                            <td class="px-6 py-4">Phạt tiền, thu hồi giấy phép</td>
-                            <td class="px-6 py-4 text-center">20/03/2025</td>
-                        </tr>
-                        <tr class="bg-white border-b hover:bg-gray-50">
-                            <td class="px-6 py-4 text-center">7</td>
-                            <td class="px-6 py-4 text-center">28/03/2025</td>
-                            <td class="px-6 py-4 font-medium text-gray-900">Cơ sở kinh doanh thuốc BVTV Hướng Hóa</td>
-                            <td class="px-6 py-4">Kinh doanh thuốc BVTV</td>
-                            <td class="px-6 py-4">Bán thuốc bảo vệ thực vật hết hạn</td>
-                            <td class="px-6 py-4">Phạt tiền, thu hồi sản phẩm</td>
-                            <td class="px-6 py-4 text-center">02/04/2025</td>
-                        </tr>
-                        <tr class="bg-white border-b hover:bg-gray-50">
-                            <td class="px-6 py-4 text-center">8</td>
-                            <td class="px-6 py-4 text-center">10/04/2025</td>
-                            <td class="px-6 py-4 font-medium text-gray-900">HTX Chăn nuôi Cam Lộ</td>
-                            <td class="px-6 py-4">Chăn nuôi gia súc</td>
-                            <td class="px-6 py-4">Sử dụng chất cấm trong chăn nuôi</td>
-                            <td class="px-6 py-4">Phạt tiền, đình chỉ hoạt động</td>
-                            <td class="px-6 py-4 text-center">15/04/2025</td>
-                        </tr>
-                        <tr class="bg-white border-b hover:bg-gray-50">
-                            <td class="px-6 py-4 text-center">9</td>
-                            <td class="px-6 py-4 text-center">22/04/2025</td>
-                            <td class="px-6 py-4 font-medium text-gray-900">Công ty TNHH Lâm sản Triệu Phong</td>
-                            <td class="px-6 py-4">Chế biến lâm sản</td>
-                            <td class="px-6 py-4">Khai thác gỗ trái phép</td>
-                            <td class="px-6 py-4">Phạt tiền, thu hồi giấy phép</td>
-                            <td class="px-6 py-4 text-center">28/04/2025</td>
-                        </tr>
-                        <tr class="bg-white border-b hover:bg-gray-50">
-                            <td class="px-6 py-4 text-center">10</td>
-                            <td class="px-6 py-4 text-center">05/05/2025</td>
-                            <td class="px-6 py-4 font-medium text-gray-900">Cơ sở sản xuất giống cây trồng Đông Hà</td>
-                            <td class="px-6 py-4">Sản xuất giống cây trồng</td>
-                            <td class="px-6 py-4">Sản xuất giống không đạt tiêu chuẩn</td>
-                            <td class="px-6 py-4">Phạt tiền, tiêu hủy sản phẩm</td>
-                            <td class="px-6 py-4 text-center">10/05/2025</td>
-                        </tr>
+                        @for (int i = 0; i < MainModels.Count; i++)
+                        {
+                            var currentIndex = i;
+                            <tr>
+                                <td>@(((Page - 1) * PageSize) + i + 1)</td>
+                                <td>@MainModels[i].ngay_ghi_nhan?.ToString("dd/MM/yyyy")</td>
+                                @if(MainModels[i].loai_co_so == LoaiCoSoNLTS.CoSoCheBien)
+                                {
+                                    <td>@MainModels[i].co_so_che_bien_nlts?.name</td>
+                                }
+                                else if(MainModels[i].loai_co_so == LoaiCoSoNLTS.CoSoXSKDDuDieuKien || MainModels[i].loai_co_so == LoaiCoSoNLTS.CoSoXSKDKhongDuDieuKien)
+                                {
+                                    <td>@MainModels[i].co_so_nlts_du_dieu_kien_attp?.name</td>
+                                }
+                                <td>@MainModels[i].loai_co_so?.GetDescription()</td>
+                                <td>@MainModels[i].hanh_vi_vi_pham?.name</td>
+                                <td>@MainModels[i].hinh_thuc_xu_phat?.name</td>
+                                <td>@MainModels[i].ngay_xu_ly?.ToString("dd/MM/yyyy")</td>
+                            </tr>
+                        }
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="9">
+                                <div class="flex items-center justify-between p-4">
+                                    <div class="flex items-center gap-2">
+                                        <span>Hiển thị</span>
+                                        <select class="form-select" @bind="PageSize" @bind:event="oninput" @onchange="async () => await OnPageSizeChanged(LoadData)">
+                                            <option value="10">10</option>
+                                            <option value="25">25</option>
+                                            <option value="50">50</option>
+                                            <option value="100">100</option>
+                                        </select>
+                                        <span>mục</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <div>
+                                            <ul class="inline-flex my-2 -space-x-px list-inside">
+                                                <li>
+                                                    <MudLink Href="#"
+                                                             Class="px-3 py-2 bg-white border cursor-not-allowed ltr:ml-0 rtl:mr-0 ltr:rounded-l-lg rtl:rounded-r-lg text-black/50 border-black/10 dark:bg-transparent dark:text-darkmuted dark:border-darkborder"
+                                                             @onclick="async () => await PreviousPage(LoadData)"
+                                                             disabled="@(Page <= 1)">Trước</MudLink>
+                                                </li>
+                                                @{
+                                                    var startPage = Math.Max(1, Page - 1);
+                                                    var endPage = Math.Min(TotalPages, Page + 1);
+
+                                                    // First page
+                                                    <li>
+                                                        <a href="#"
+                                                           class="px-3 py-2 text-black border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple @(Page == 1 ? "bg-purple text-white" : "bg-white")"
+                                                           @onclick="() => SelectedPage(1, LoadData)">1</a>
+                                                    </li>
+
+                                                    // Ellipsis if needed
+                                                    if (startPage > 2)
+                                                    {
+                                                        <li><span class="px-3 py-2">...</span></li>
+                                                    }
+
+                                                    // Pages around current
+                                                    for (int i = startPage; i <= endPage; i++)
+                                                    {
+                                                        if (i > 1 && i < TotalPages)
+                                                        {
+                                                            <li>
+                                                                <a href="#"
+                                                                   class="px-3 py-2 text-black border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple @(Page == i ? "bg-purple text-white" : "bg-white")"
+                                                                   @onclick="() => SelectedPage(i, LoadData)">@i</a>
+                                                            </li>
+                                                        }
+                                                    }
+
+                                                    // Ellipsis if needed
+                                                    if (endPage < TotalPages - 1)
+                                                    {
+                                                        <li><span class="px-3 py-2">...</span></li>
+                                                    }
+
+                                                    // Last page if more than one page
+                                                    if (TotalPages > 1)
+                                                    {
+                                                        <li>
+                                                            <a href="#"
+                                                               class="px-3 py-2 text-black border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple @(Page == TotalPages ? "bg-purple text-white" : "bg-white")"
+                                                               @onclick="() => SelectedPage(TotalPages, LoadData)">@TotalPages</a>
+                                                        </li>
+                                                    }
+                                                }
+                                                <li>
+                                                    <MudLink Href="#"
+                                                             Class="px-3 py-2 bg-white border cursor-not-allowed ltr:ml-0 rtl:mr-0 ltr:rounded-r-lg rtl:rounded-l-lg text-black/50 border-black/10 dark:bg-transparent dark:text-darkmuted dark:border-darkborder"
+                                                             @onclick="async () => await NextPage(LoadData)"
+                                                             disabled="@(Page >= TotalPages)">Sau</MudLink>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tfoot>
                 </table>
-            </div>
-            <!-- Pagination for Mock Data -->
-            <div class="flex items-center justify-between p-4">
-                <div class="flex items-center gap-2">
-                    <span class="text-sm text-gray-700 dark:text-gray-300">Hiển thị</span>
-                    <select class="form-select text-sm">
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                    </select>
-                    <span class="text-sm text-gray-700 dark:text-gray-300">mục</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <div>
-                        <ul class="inline-flex my-2 -space-x-px list-inside">
-                            <li><a href="#" class="px-3 py-2 bg-white border cursor-not-allowed ltr:ml-0 rtl:mr-0 ltr:rounded-l-lg rtl:rounded-r-lg text-black/50 border-black/10 dark:bg-transparent dark:text-darkmuted dark:border-darkborder">Trước</a></li>
-                            <li><a href="#" class="px-3 py-2 text-black border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple bg-purple text-white">1</a></li>
-                            <li><a href="#" class="px-3 py-2 text-black border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple">2</a></li>
-                            <li><a href="#" class="px-3 py-2 text-black border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple">3</a></li>
-                            <li><a href="#" class="px-3 py-2 bg-white border cursor-not-allowed ltr:ml-0 rtl:mr-0 ltr:rounded-r-lg rtl:rounded-l-lg text-black/50 border-black/10 dark:bg-transparent dark:text-darkmuted dark:border-darkborder">Sau</a></li>
-                        </ul>
-                    </div>
-                </div>
             </div>
         </div>
     </div>

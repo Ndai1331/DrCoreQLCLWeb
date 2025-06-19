@@ -36,7 +36,9 @@ pTitle="Báo cáo dữ liệu thẩm định cấp giấy chứng nhận đủ �
                                                TItem="TinhModel"
                                                TValue="TinhModel"
                                                SearchMethod="LoadTinhData"
-                                               @bind-Value="@_selectedTinhFilter"
+                                               Value="@_selectedTinhFilter"
+                                                ValueExpression="@(() => _selectedTinhFilter)"
+                                                ValueChanged="OnTinhFilterChanged"
                                                placeholder="Chọn tỉnh thành"
                                                Class="form-select">
                                 <SelectedTemplate Context="item">
@@ -60,7 +62,9 @@ pTitle="Báo cáo dữ liệu thẩm định cấp giấy chứng nhận đủ �
                                                TItem="XaPhuongModel"
                                                TValue="XaPhuongModel"
                                                SearchMethod="LoadXaFilterData"
-                                               @bind-Value="@_selectedXaFilter"
+                                               Value="@_selectedXaFilter"
+                                               ValueExpression="@(() => _selectedXaFilter)"
+                                               ValueChanged="OnXaFilterChanged"
                                                placeholder="Chọn xã phường"
                                                Class="form-select">
                                 <SelectedTemplate Context="item">
@@ -92,33 +96,13 @@ pTitle="Báo cáo dữ liệu thẩm định cấp giấy chứng nhận đủ �
                                @onchange="@(e => OnDateChanged(e, "toDate"))" />
                     </div>
 
-                    <div class="xs:col-span-4 sm:col-span-4 md:col-span-3">
-                        <MudForm class="flex-1">
-                            <div class="relative">
-                                <input type="text" id="search"
-                                       class="border-black/10 dark:text-white/80 dark:placeholder:text-white/30 dark:border-darkborder dark:bg-dark dark:focus:border-white/30 focus:border-black/30 placeholder:text-black/50 border text-black text-sm rounded block w-full ltr:pl-3 rtl:pr-3 ltr:pr-7 rtl:pl-7 h-10 bg-[#f9fbfd] focus:ring-0 focus:outline-0"
-                                       placeholder="Tìm kiếm..."
-                                       required=""
-                                       @bind-value="@_searchString"
-                                       @bind-value:event="oninput"
-                                       @onkeydown="async (e) => await OnInputKeyDownSearch(e, LoadData)">
-
-                                <MudButton OnClick="LoadData" type="button" Class="absolute inset-y-0 flex items-center text-black ltr:right-0 rtl:left-0 ltr:pr-2 rtl:pl-2 dark:text-white/80">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-4 h-4">
-                                        <path d="M11 2C15.968 2 20 6.032 20 11C20 15.968 15.968 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2ZM11 18C14.8675 18 18 14.8675 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18ZM19.4853 18.0711L22.3137 20.8995L20.8995 22.3137L18.0711 19.4853L19.4853 18.0711Z" fill="currentColor"></path>
-                                    </svg>
-                                </MudButton>
-                            </div>
-                        </MudForm>
-                    </div>
-
-                    <div class="flex items-end xs:col-span-4 sm:col-span-4 md:col-span-1 justify-end">
+                    <div class="flex items-end col-span-4 sm:col-span-4 md:col-span-1 justify-end">
                         <div>
                             <MudButton Class="xs:w-full sm:w-auto md:w-auto btn flex items-center gap-1.5
                             bg-success border-success text-white hover:bg-success/[0.85]
-                            hover:border-success/[0.85] text-nowrap" @onclick="@(e => OpenAddOrUpdateModal(null))">
-                                <i class="ri-add-line"></i>
-                                Thêm mới
+                            hover:border-success/[0.85] text-nowrap" @onclick="@(e => OnExportExcel())">
+                                <i class="ri-file-excel-line"></i>
+                                Xuất file excel
                             </MudButton>
                         </div>
                     </div>
@@ -129,237 +113,158 @@ pTitle="Báo cáo dữ liệu thẩm định cấp giấy chứng nhận đủ �
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
                         <th class="px-6 py-3 text-center">STT</th>
-                        <th class="px-6 py-3 text-start">Sản phẩm lấy mẫu</th>
-                        <th class="px-6 py-3 text-center">Số lượng mẫu</th>
-                        <th class="px-6 py-3 text-start">Chỉ tiêu phân tích</th>
-                        <th class="px-6 py-3 text-center">Số lượng mẫu không đạt</th>
-                        <th class="px-6 py-3 text-center">Kết quả</th>
-                        <th class="px-6 py-3 text-center">Xử lý vi phạm</th>
+                        <th class="px-6 py-3 text-start">Tháng</th>
+                        <th class="px-6 py-3 text-center">Số cơ sở được thẩm định</th>
+                        <th class="px-6 py-3 text-center">Số cơ sở đạt</th>
+                        <th class="px-6 py-3 text-center">Số cơ sở không đạt</th>
+                        <th class="px-6 py-3 text-center">Số cơ sở được cấp GCN</th>
+                        <th class="px-6 py-3 text-center">Tỷ lệ cơ sở được cấp GCN</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 text-center">1</td>
-                        <td class="px-6 py-4 font-medium text-gray-900">Rau xanh</td>
-                        <td class="px-6 py-4 text-center">15</td>
-                        <td class="px-6 py-4">Chỉ tiêu thuốc BVTV</td>
-                        <td class="px-6 py-4 text-center">3</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Không đạt</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Đã xử phạt</span>
-                        </td>
-                    </tr>
-                    <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 text-center">2</td>
-                        <td class="px-6 py-4 font-medium text-gray-900">Thịt lợn</td>
-                        <td class="px-6 py-4 text-center">20</td>
-                        <td class="px-6 py-4">Chỉ tiêu vi sinh</td>
-                        <td class="px-6 py-4 text-center">2</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Không đạt</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Đã xử phạt</span>
-                        </td>
-                    </tr>
-                    <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 text-center">3</td>
-                        <td class="px-6 py-4 font-medium text-gray-900">Thủy sản</td>
-                        <td class="px-6 py-4 text-center">25</td>
-                        <td class="px-6 py-4">Chỉ tiêu hóa chất, chất bảo quản</td>
-                        <td class="px-6 py-4 text-center">4</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Không đạt</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Đang xử lý</span>
-                        </td>
-                    </tr>
-                    <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 text-center">4</td>
-                        <td class="px-6 py-4 font-medium text-gray-900">Trái cây</td>
-                        <td class="px-6 py-4 text-center">18</td>
-                        <td class="px-6 py-4">Chỉ tiêu thuốc BVTV</td>
-                        <td class="px-6 py-4 text-center">2</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Không đạt</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Đã xử phạt</span>
-                        </td>
-                    </tr>
-                    <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 text-center">5</td>
-                        <td class="px-6 py-4 font-medium text-gray-900">Gạo</td>
-                        <td class="px-6 py-4 text-center">12</td>
-                        <td class="px-6 py-4">Chỉ tiêu hóa chất, chất bảo quản</td>
-                        <td class="px-6 py-4 text-center">1</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Đạt</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="text-gray-500">--</span>
-                        </td>
-                    </tr>
-                    <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 text-center">6</td>
-                        <td class="px-6 py-4 font-medium text-gray-900">Mật ong</td>
-                        <td class="px-6 py-4 text-center">10</td>
-                        <td class="px-6 py-4">Chỉ tiêu hóa chất, chất bảo quản</td>
-                        <td class="px-6 py-4 text-center">3</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Không đạt</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Đã xử phạt</span>
-                        </td>
-                    </tr>
-                    <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 text-center">7</td>
-                        <td class="px-6 py-4 font-medium text-gray-900">Nước mắm</td>
-                        <td class="px-6 py-4 text-center">15</td>
-                        <td class="px-6 py-4">Chỉ tiêu vi sinh</td>
-                        <td class="px-6 py-4 text-center">2</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Không đạt</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Đang xử lý</span>
-                        </td>
-                    </tr>
-                    <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 text-center">8</td>
-                        <td class="px-6 py-4 font-medium text-gray-900">Mật ong</td>
-                        <td class="px-6 py-4 text-center">8</td>
-                        <td class="px-6 py-4">Chỉ tiêu hóa chất, chất bảo quản</td>
-                        <td class="px-6 py-4 text-center">1</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Không đạt</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Đã xử phạt</span>
-                        </td>
-                    </tr>
-                    <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 text-center">9</td>
-                        <td class="px-6 py-4 font-medium text-gray-900">Rau xanh</td>
-                        <td class="px-6 py-4 text-center">22</td>
-                        <td class="px-6 py-4">Chỉ tiêu thuốc BVTV</td>
-                        <td class="px-6 py-4 text-center">4</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Không đạt</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Đã xử phạt</span>
-                        </td>
-                    </tr>
-                    <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 text-center">10</td>
-                        <td class="px-6 py-4 font-medium text-gray-900">Thịt gà</td>
-                        <td class="px-6 py-4 text-center">16</td>
-                        <td class="px-6 py-4">Chỉ tiêu vi sinh</td>
-                        <td class="px-6 py-4 text-center">2</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Không đạt</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Đang xử lý</span>
-                        </td>
-                    </tr>
-                    <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 text-center">11</td>
-                        <td class="px-6 py-4 font-medium text-gray-900">Sữa tươi</td>
-                        <td class="px-6 py-4 text-center">14</td>
-                        <td class="px-6 py-4">Chỉ tiêu vi sinh, hóa chất</td>
-                        <td class="px-6 py-4 text-center">0</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Đạt</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="text-gray-500">--</span>
-                        </td>
-                    </tr>
-                    <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 text-center">12</td>
-                        <td class="px-6 py-4 font-medium text-gray-900">Bánh kẹo</td>
-                        <td class="px-6 py-4 text-center">19</td>
-                        <td class="px-6 py-4">Chỉ tiêu phụ gia, chất bảo quản</td>
-                        <td class="px-6 py-4 text-center">3</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Không đạt</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Đã xử phạt</span>
-                        </td>
-                    </tr>
-                    <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 text-center">13</td>
-                        <td class="px-6 py-4 font-medium text-gray-900">Nước giải khát</td>
-                        <td class="px-6 py-4 text-center">13</td>
-                        <td class="px-6 py-4">Chỉ tiêu vi sinh, hóa chất</td>
-                        <td class="px-6 py-4 text-center">1</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Cần cải thiện</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Cảnh báo</span>
-                        </td>
-                    </tr>
-                    <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 text-center">14</td>
-                        <td class="px-6 py-4 font-medium text-gray-900">Gia vị</td>
-                        <td class="px-6 py-4 text-center">11</td>
-                        <td class="px-6 py-4">Chỉ tiêu hóa chất, chất bảo quản</td>
-                        <td class="px-6 py-4 text-center">2</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Không đạt</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Đã xử phạt</span>
-                        </td>
-                    </tr>
-                    <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 text-center">15</td>
-                        <td class="px-6 py-4 font-medium text-gray-900">Thực phẩm đóng hộp</td>
-                        <td class="px-6 py-4 text-center">17</td>
-                        <td class="px-6 py-4">Chỉ tiêu vi sinh, hóa chất</td>
-                        <td class="px-6 py-4 text-center">1</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Đạt</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="text-gray-500">--</span>
-                        </td>
-                    </tr>
-                </tbody>
+                        @foreach (var item in MainModels.Select((v, i) => new { Data = v, Index = i }))
+                        {
+                            <tr @onclick="async (e) => await OnRowClick(item.Data.thang)">
+                                <td>@(((Page - 1) * PageSize) + item.Index + 1)</td>
+                                <td>@item.Data.thang</td>
+                                <td>@item.Data.tong_co_so_tham_dinh</td>
+                                <td>@item.Data.so_dat</td>
+                                <td>@item.Data.so_khong_dat</td>
+                                <td>@item.Data.so_co_so_duoc_cap_gcn</td>
+                                <td>@item.Data.ty_le_co_so_duoc_cap_gcn</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="9">
+                                <div class="flex items-center justify-between p-4">
+                                    <div class="flex items-center gap-2">
+                                        <span>Hiển thị</span>
+                                        <select class="form-select" @bind="PageSize" @bind:event="oninput" @onchange="async (e) => await OnPageSizeChanged(LoadData)">
+                                            <option value="10">10</option>
+                                            <option value="25">25</option>
+                                            <option value="50">50</option>
+                                            <option value="100">100</option>
+                                        </select>
+                                        <span>mục</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+
+                                        <div>
+                                            <ul class="inline-flex my-2 -space-x-px list-inside">
+                                                <li><MudLink Href="#" Class="px-3 py-2 bg-white border cursor-not-allowed ltr:ml-0 rtl:mr-0 ltr:rounded-l-lg rtl:rounded-r-lg text-black/50 border-black/10 dark:bg-transparent dark:text-darkmuted dark:border-darkborder" @onclick="async (e) => await PreviousPage(LoadData)" disabled="@(Page <= 1)">Trước</MudLink></li>
+                                                @{
+                                                    var startPage = Math.Max(1, Page - 1);
+                                                    var endPage = Math.Min(TotalPages, Page + 1);
+
+                                                    // Always show first page
+                                                    <li>
+                                                        <a href="#"
+                                                           class="px-3 py-2 text-black  border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple @(Page == 1 ? "bg-purple text-white" : "bg-white")"
+                                                           @onclick="async (e) => await SelectedPage(1, LoadData)">1</a>
+                                                    </li>
+
+                                                    // Show ellipsis if needed
+                                                    if (startPage > 2)
+                                                    {
+                                                        <li><span class="px-3 py-2">...</span></li>
+                                                    }
+
+                                                    // Show pages around current page
+                                                    for (int i = startPage; i <= endPage; i++)
+                                                    {
+                                                        if (i > 1 && i < TotalPages)
+                                                        {
+                                                            <li>
+                                                                <a href="#"
+                                                                   class="px-3 py-2 text-black  border border-black/10
+                                                                    hover:bg-purple hover:text-white dark:bg-transparent
+                                                                    dark:text-white dark:border-darkborder dark:hover:bg-purple
+                                                                    dark:hover:text-white dark:hover:border-purple @(Page == i ? "bg-purple text-white" : "bg-white")"
+                                                                   @onclick="async (e) => await SelectedPage(i, LoadData)">@i</a>
+                                                            </li>
+                                                        }
+                                                    }
+
+                                                    // Show ellipsis if needed
+                                                    if (endPage < TotalPages - 1)
+                                                    {
+                                                        <li><span class="px-3 py-2">...</span></li>
+                                                    }
+
+                                                    // Always show last page if there is more than one page
+                                                    if (TotalPages > 1)
+                                                    {
+                                                        <li>
+                                                            <a href="#"
+                                                               class="px-3 py-2 text-black  border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple @(Page == TotalPages ? "bg-purple text-white" : "bg-white")"
+                                                               @onclick="async (e) => await SelectedPage(TotalPages, LoadData)">@TotalPages</a>
+                                                        </li>
+                                                    }
+                                                }
+                                                <li><MudLink Href="#" Class="px-3 py-2 bg-white border cursor-not-allowed ltr:ml-0 rtl:mr-0 ltr:rounded-r-lg rtl:rounded-l-lg text-black/50 border-black/10 dark:bg-transparent dark:text-darkmuted dark:border-darkborder" @onclick="async (e) => await NextPage(LoadData)" disabled="@(Page >= TotalPages)">Sau</MudLink></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tfoot>
             </table>
-            </div>
-            <!-- Pagination for Mock Data -->
-            <div class="flex items-center justify-between p-4">
-                <div class="flex items-center gap-2">
-                    <span class="text-sm text-gray-700 dark:text-gray-300">Hiển thị</span>
-                    <select class="form-select text-sm">
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                    </select>
-                    <span class="text-sm text-gray-700 dark:text-gray-300">mục</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <div>
-                        <ul class="inline-flex my-2 -space-x-px list-inside">
-                            <li><a href="#" class="px-3 py-2 bg-white border cursor-not-allowed ltr:ml-0 rtl:mr-0 ltr:rounded-l-lg rtl:rounded-r-lg text-black/50 border-black/10 dark:bg-transparent dark:text-darkmuted dark:border-darkborder">Trước</a></li>
-                            <li><a href="#" class="px-3 py-2 text-black border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple bg-purple text-white">1</a></li>
-                            <li><a href="#" class="px-3 py-2 text-black border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple">2</a></li>
-                            <li><a href="#" class="px-3 py-2 text-black border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple">3</a></li>
-                            <li><a href="#" class="px-3 py-2 bg-white border cursor-not-allowed ltr:ml-0 rtl:mr-0 ltr:rounded-r-lg rtl:rounded-l-lg text-black/50 border-black/10 dark:bg-transparent dark:text-darkmuted dark:border-darkborder">Sau</a></li>
-                        </ul>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
 </div>
+
+@if (openDetailModal)
+{
+    <div class="fixed inset-0 bg-black/80 z-[99999] overflow-y-auto dark:bg-dark/90">
+        <div class="flex items-center justify-center min-h-screen px-4" @onclick="CloseDetailModal">
+            <div class="relative w-full max-w-5xl p-0 my-8 overflow-hidden bg-white border rounded-lg border-black/10 dark:bg-darklight dark:border-darkborder" @onclick:stopPropagation>
+                <div class="flex items-center justify-between px-5 py-3 bg-white border-b border-black/10 dark:bg-darklight dark:border-darkborder">
+                    <MudText Typo="Typo.h5" Class="text-lg font-semibold text-slate-800 dark:text-slate-100">Chi tiết báo cáo</MudText>
+                    <MudButton Class="text-muted hover:text-black dark:hover:text-white" OnClick="CloseDetailModal">
+                        <svg class="w-5 h-5" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M24.2929 6.29289L6.29289 24.2929C6.10536 24.4804 6 24.7348 6 25C6 25.2652 6.10536 25.5196 6.29289 25.7071C6.48043 25.8946 6.73478 26 7 26C7.26522 26 7.51957 25.8946 7.70711 25.7071L25.7071 7.70711C25.8946 7.51957 26 7.26522 26 7C26 6.73478 25.8946 6.48043 25.7071 6.29289C25.5196 6.10536 25.2652 6 25 6C24.7348 6 24.4804 6.10536 24.2929 6.29289Z" fill="currentcolor" />
+                            <path d="M7.70711 6.29289C7.51957 6.10536 7.26522 6 7 6C6.73478 6 6.48043 6.10536 6.29289 6.29289C6.10536 6.48043 6 6.73478 6 7C6 7.26522 6.10536 7.51957 6.29289 7.70711L24.2929 25.7071C24.4804 25.8946 24.7348 26 25 26C25.2652 26 25.5196 25.8946 25.7071 25.7071C25.8946 25.5196 26 25.2652 26 25C26 24.7348 25.8946 24.4804 25.7071 24.2929L7.70711 6.29289Z" fill="currentcolor" />
+                        </svg>
+                    </MudButton>
+                </div>
+                <div class="p-5 space-y-4 relative overflow-x-auto shadow-md sm:rounded-lg">
+                    <table id="example" class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400" style="width:100%">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            <tr>
+                                <th>Mã cơ sở</th>
+                                <th>Tên cơ sở</th>
+                                <th>Địa chỉ</th>
+                                <th>Điện thoại</th>
+                                <th>Đại diện</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in DetailModels)
+                            {
+                                <tr>
+                                    <td>@item.code</td>
+                                    <td>@item.name</td>
+                                    <td>@item.dia_chi</td>
+                                    <td>@item.dien_thoai</td>
+                                    <td>@item.dai_dien</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="flex items-center justify-end gap-2 py-4">
+                    <MudButton Class="transition-all duration-300 border btn-crud rounded-md btn text-danger border-danger hover:bg-danger hover:text-white" OnClick="CloseDetailModal">
+                        <i class="ri-close-line"></i>
+                        Đóng
+                    </MudButton>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+

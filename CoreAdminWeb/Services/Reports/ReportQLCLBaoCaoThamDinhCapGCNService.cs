@@ -4,22 +4,22 @@ using CoreAdminWeb.Model.Reports;
 
 namespace CoreAdminWeb.Services.Reports
 {
-    public class ReportBaoCaoKiemTraHauKiemATTP : IReportService<ReportBaoCaoKiemTraHauKiemATTPModel>
+    public class ReportBaoCaoThamDinhCapGCNService : IReportService<ReportBaoCaoThamDinhCapGCNModel>
     {
        
-        public async Task<RequestHttpResponse<List<ReportBaoCaoKiemTraHauKiemATTPModel>>> GetAllAsync(string query)
+        public async Task<RequestHttpResponse<List<ReportBaoCaoThamDinhCapGCNModel>>> GetAllAsync(string query)
         {
             try
             {
-                var response = await ReportRequestClient.GetAPIAsync<RequestHttpResponse<List<ReportBaoCaoKiemTraHauKiemATTPModel>>>(query);
+                var response = await ReportRequestClient.GetAPIAsync<RequestHttpResponse<List<ReportBaoCaoThamDinhCapGCNModel>>>(query);
 
                 return response.IsSuccess
-                    ? new RequestHttpResponse<List<ReportBaoCaoKiemTraHauKiemATTPModel>> { Data = response.Data?.Data }
-                    : new RequestHttpResponse<List<ReportBaoCaoKiemTraHauKiemATTPModel>> { Errors = response.Errors };
+                    ? new RequestHttpResponse<List<ReportBaoCaoThamDinhCapGCNModel>> { Data = response.Data?.Data }
+                    : new RequestHttpResponse<List<ReportBaoCaoThamDinhCapGCNModel>> { Errors = response.Errors };
             }
             catch (Exception ex)
             {
-                return CreateErrorResponse<List<ReportBaoCaoKiemTraHauKiemATTPModel>>(ex);
+                return CreateErrorResponse<List<ReportBaoCaoThamDinhCapGCNModel>>(ex);
             }
         }
         private static RequestHttpResponse<T> CreateErrorResponse<T>(Exception ex)
