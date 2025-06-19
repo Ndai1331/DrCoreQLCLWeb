@@ -58,6 +58,8 @@ using CoreAdminWeb.Services.TonDuThuocBVTVTrongSanPham;
 using CoreAdminWeb.Services.Users;
 using CoreAdminWeb.Services.XuatNhapKhauPhanBons;
 using CoreAdminWeb.Services.XuatNhapKhauThuocBaoVeThucVats;
+using CoreAdminWeb.Services.Reports;
+using CoreAdminWeb.Model.Reports;
 
 namespace CoreAdminWeb.DIInjections
 {
@@ -159,7 +161,8 @@ namespace CoreAdminWeb.DIInjections
             services.AddScoped<IBaseService<QLCLKiemTraHauKiemATTPModel>, QLCLKiemTraHauKiemATTPService>();
             services.AddScoped<IQLCLKiemTraHauKiemATTPChiTietService, QLCLKiemTraHauKiemATTPChiTietService>();
             services.AddScoped(typeof(IExportExcelService<>), typeof(ExportExcelService<>));
-
+            services.AddScoped<IReportService<ReportBaoCaoKiemTraHauKiemATTPModel>, ReportBaoCaoKiemTraHauKiemATTP>();
+            services.AddScoped<IReportService<QLCLCoSoNLTSDuDieuKienATTPModel>, ReportBaoCaoChiTietKiemTraHauKiemATTPService>();
             services.AddScoped<AlertService>();
         }
     }

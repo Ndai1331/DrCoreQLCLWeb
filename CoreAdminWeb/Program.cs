@@ -34,6 +34,12 @@ builder.Services.AddHttpClient("DrCoreApiPublic", client =>
     client.Timeout = TimeSpan.FromSeconds(30);
 });
 
+builder.Services.AddHttpClient("DrCoreApiReport", client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["DrCoreApiReport:BaseUrl"]);
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
+
 builder.Services.AddAuthorizationCore();
 // Load base URL
 GlobalConstant.BaseUrl = builder.Configuration["DrCoreApi:BaseUrl"] ?? "https://core.hpte.vn/";
@@ -44,6 +50,8 @@ var httpClient = app.Services.GetRequiredService<IHttpClientFactory>().CreateCli
 RequestClient.Initialize(httpClient);
 var publicHttpClient = app.Services.GetRequiredService<IHttpClientFactory>().CreateClient("DrCoreApiPublic");
 PublicRequestClient.Initialize(publicHttpClient);
+var reportHttpClient = app.Services.GetRequiredService<IHttpClientFactory>().CreateClient("DrCoreApiReport");
+ReportRequestClient.Initialize(reportHttpClient);
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
