@@ -4,68 +4,21 @@ using CoreAdminWeb.Services.BaseServices;
 using CoreAdminWeb.Shared.Base;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
+using System.Drawing;
+using CoreAdminWeb.Extensions;
 
 namespace CoreAdminWeb.Pages.QLCLBaoCaoViPhamLinhVuc
 {
-    public partial class QLCLBaoCaoViPhamLinhVuc(IBaseService<QLCLKiemTraHauKiemATTPModel> MainService,
-                                              IQLCLKiemTraHauKiemATTPChiTietService QLCLKiemTraHauKiemATTPChiTietService,
+    public partial class QLCLBaoCaoViPhamLinhVuc(IBaseService<QLCLCoSoViPhamATTPModel> MainService,
                                               IBaseService<TinhModel> TinhService,
-                                              IBaseService<XaPhuongModel> XaPhuongService,
-                                              IBaseService<QLCLLoaiHinhKinhDoanhModel> LoaiHinhKinhDoanhService,
-                                              IBaseService<QLCLSanPhamSanXuatModel> SanPhamService,
-                                              IBaseService<QLCLCoSoNLTSDuDieuKienATTPModel> CoSoService,
-                                              IBaseService<QLCLDotKiemTraHauKiemATTPModel> DotKiemTraService) : BlazorCoreBase
+                                              IBaseService<XaPhuongModel> XaPhuongService) : BlazorCoreBase
     {
-        private List<QLCLKiemTraHauKiemATTPModel> MainModels { get; set; } = new();
-        private bool openDeleteModal = false;
-        private bool openSanPhamDetailDeleteModal = false;
-        private bool openAddOrUpdateModal = false;
-
-        private List<Enums.LoaiCoSo> LoaiCoSoItems { get; set; } = new List<Enums.LoaiCoSo>() {
-            Enums.LoaiCoSo.DuDieuKien,
-            Enums.LoaiCoSo.KhongDuDieuKien,
-        };
-        private List<Enums.LoaiHinhKiemTra> LoaiHinhKiemTraItems { get; set; } = new List<Enums.LoaiHinhKiemTra>() {
-            Enums.LoaiHinhKiemTra.KiemTraBanDau,
-            Enums.LoaiHinhKiemTra.KiemTraDinhKy,
-            Enums.LoaiHinhKiemTra.KiemTraDotXuat,
-            Enums.LoaiHinhKiemTra.KiemTraTheoDonYeuCau,
-            Enums.LoaiHinhKiemTra.KiemTraDoCoDauHieuViPham,
-        };
-        private List<Enums.HinhThucXetNghiem> HinhThucXetNghiemItems { get; set; } = new List<Enums.HinhThucXetNghiem>() {
-            Enums.HinhThucXetNghiem.XetNghiemTaiPhongKiemNghiem,
-            Enums.HinhThucXetNghiem.XetNghiemNhanh,
-        };
-        private List<Enums.KetQuaKiemTraDinhKy> KetQuaKiemTraItems { get; set; } = new List<Enums.KetQuaKiemTraDinhKy>() {
-            Enums.KetQuaKiemTraDinhKy.Dat,
-            Enums.KetQuaKiemTraDinhKy.KhongDat,
-        };
-        private List<Enums.TinhHinhViPham> TinhHinhViPhamItems { get; set; } = new List<Enums.TinhHinhViPham>() {
-            Enums.TinhHinhViPham.Co,
-            Enums.TinhHinhViPham.Khong,
-        };
-        private List<Enums.LoaiXetNghiem> LoaiXetNghiemItems { get; set; } = new List<Enums.LoaiXetNghiem>() {
-            Enums.LoaiXetNghiem.HoaSinh,
-            Enums.LoaiXetNghiem.ViSinh,
-        };
-        private List<Enums.ChiTieu> ChiTieuItems { get; set; } = new List<Enums.ChiTieu>() {
-            Enums.ChiTieu.ChiTieuViSinh,
-            Enums.ChiTieu.ChiTieuThuocBVTV,
-            Enums.ChiTieu.ChiTieuHoaChat
-        };
-        private List<Enums.MauGoc> MauGocItems { get; set; } = new List<Enums.MauGoc>() {
-            Enums.MauGoc.MauGoc,
-            Enums.MauGoc.MauKhac,
-        };
-        private QLCLKiemTraHauKiemATTPModel SelectedItem { get; set; } = new QLCLKiemTraHauKiemATTPModel();
-        private List<QLCLKiemTraHauKiemATTPChiTietModel> SelectedSanPhamItemsDetail { get; set; } = new List<QLCLKiemTraHauKiemATTPChiTietModel>();
-        private QLCLKiemTraHauKiemATTPChiTietModel? SelectedSanPhamItemDetail { get; set; } = default;
+        private List<QLCLCoSoViPhamATTPModel> MainModels { get; set; } = new();
         private string _searchString = "";
         private TinhModel? _selectedTinhFilter { get; set; }
         private XaPhuongModel? _selectedXaFilter { get; set; }
-        private string _titleAddOrUpdate = "Thêm mới";
-        private string activeDefTab { get; set; } = "tab1";
         private DateTime? _fromDate { get; set; }
         private DateTime? _toDate { get; set; }
 
@@ -87,33 +40,53 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoViPhamLinhVuc
         private async Task LoadData()
         {
             BuildPaginationQuery(Page, PageSize, "id", false);
-            int index = 2;
+            int index = 3;
 
             BuilderQuery += "&filter[_and][0][deleted][_eq]=false";
             if (!string.IsNullOrEmpty(_searchString))
             {
-                BuilderQuery += $"&filter[_and][{index}][_or][0][code][_contains]={_searchString}";
-                BuilderQuery += $"&filter[_and][{index}][_or][1][name][_contains]={_searchString}";
-                BuilderQuery += $"&filter[_and][{index}][_or][2][dia_chi_san_xuat_kinh_doanh][_contains]={_searchString}";
-                BuilderQuery += $"&filter[_and][{index}][_or][3][co_quan_kiem_tra][_contains]={_searchString}";
-                BuilderQuery += $"&filter[_and][{index}][_or][4][noi_dung_kiem_tra][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{index}][_or][0][co_so_che_bien_nlts][code][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{index}][_or][1][co_so_nlts_du_dieu_kien_attp][code][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{index}][_or][2][co_so_che_bien_nlts][name][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{index}][_or][3][co_so_nlts_du_dieu_kien_attp][name][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{index}][_or][4][co_so_che_bien_nlts][dia_chi][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{index}][_or][5][co_so_nlts_du_dieu_kien_attp][dia_chi][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{index}][_or][6][san_pham_vi_pham][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{index}][_or][7][hanh_vi_vi_pham][name][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{index}][_or][8][xu_ly_khac][_contains]={_searchString}";
                 index++;
             }
+
+
+            if(_selectedTinhFilter != null)
+            {
+                BuilderQuery += $"&filter[_and][{index}][_or][0][co_so_che_bien_nlts][province][_eq]={_selectedTinhFilter.id}";
+                BuilderQuery += $"&filter[_and][{index}][_or][1][co_so_nlts_du_dieu_kien_attp][province][_eq]={_selectedTinhFilter.id}";
+                index++;
+            }
+
+            if(_selectedXaFilter != null)
+            {
+                BuilderQuery += $"&filter[_and][{index}][_or][0][co_so_che_bien_nlts][ward][_eq]={_selectedXaFilter.id}";
+                BuilderQuery += $"&filter[_and][{index}][_or][1][co_so_nlts_du_dieu_kien_attp][ward][_eq]={_selectedXaFilter.id}";
+                index++;
+            }
+
             if(_fromDate != null)
             {
-                BuilderQuery += $"&filter[_and][{index}][ngay_kiem_tra][_gte]={_fromDate.Value.ToString("yyyy-MM-dd")}";
+                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_gte]={_fromDate.Value.ToString("yyyy-MM-dd")}";
                 index++;
             }
 
             if(_toDate != null)
             {
-                BuilderQuery += $"&filter[_and][{index}][ngay_kiem_tra][_lte]={_toDate.Value.ToString("yyyy-MM-dd")}";
+                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_lte]={_toDate.Value.ToString("yyyy-MM-dd")}";
             }
 
             var result = await MainService.GetAllAsync(BuilderQuery);
             if (result.IsSuccess)
             {
-                MainModels = result.Data ?? new List<QLCLKiemTraHauKiemATTPModel>();
+                MainModels = result.Data ?? new List<QLCLCoSoViPhamATTPModel>();
                 if (result.Meta != null)
                 {
                     TotalItems = result.Meta.filter_count ?? 0;
@@ -122,291 +95,28 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoViPhamLinhVuc
             }
             else
             {
-                MainModels = new List<QLCLKiemTraHauKiemATTPModel>();
+                MainModels = new List<QLCLCoSoViPhamATTPModel>();
             }
         }
-
-        private async Task LoadSanPhamDetailData()
-        {
-            var buildQuery = $"sort=id";
-            buildQuery += $"&filter[_and][][kiem_tra_hau_kiem_attp][_eq]={SelectedItem.id}";
-            // buildQuery += $"&filter[_and][][deleted][_eq]=false";
-            var result = await QLCLKiemTraHauKiemATTPChiTietService.GetAllAsync(buildQuery);
-            SelectedSanPhamItemsDetail = result.Data ?? new List<QLCLKiemTraHauKiemATTPChiTietModel>();
-        }
-
         private async Task<IEnumerable<TinhModel>> LoadTinhData(string searchText)
         {
             return await LoadBlazorTypeaheadData(searchText, TinhService);
         }
-
-        private async Task<IEnumerable<XaPhuongModel>> LoadXaCRUDData(string searchText)
-        {
-            string query = $"sort=-id";
-            query += $"&filter[_and][][ProvinceId][_eq]={(SelectedItem.province == null ? 0 : SelectedItem.province?.id)}";
-            return await LoadBlazorTypeaheadData(searchText, XaPhuongService,query);
-        }
-
-
         private async Task<IEnumerable<XaPhuongModel>> LoadXaFilterData(string searchText)
         {
             string query = $"sort=-id";
             query += $"&filter[_and][][ProvinceId][_eq]={(_selectedTinhFilter == null ? 0 : _selectedTinhFilter?.id)}";
             return await LoadBlazorTypeaheadData(searchText, XaPhuongService,query);
         }
-        private async Task<IEnumerable<QLCLLoaiHinhKinhDoanhModel>> LoadLoaiHinhKinhDoanhData(string searchText)
+        private async Task OnTinhFilterChanged(TinhModel? item)
         {
-            return await LoadBlazorTypeaheadData(searchText, LoaiHinhKinhDoanhService);
+            _selectedTinhFilter = item;
+            await LoadData();
         }
-        private async Task<IEnumerable<QLCLSanPhamSanXuatModel>> LoadSanPhamData(string searchText)
+        private async Task OnXaFilterChanged(XaPhuongModel? item)
         {
-            return await LoadBlazorTypeaheadData(searchText, SanPhamService);
-        }
-
-        private async Task<IEnumerable<QLCLCoSoNLTSDuDieuKienATTPModel>> LoadCoSoData(string searchText)
-        {
-            string query = $"&filter[_and][][loai][_eq]={SelectedItem.loai_co_so?.GetHashCode()}";
-            return await LoadBlazorTypeaheadData(searchText, CoSoService, query);
-        }
-
-        private async Task<IEnumerable<QLCLDotKiemTraHauKiemATTPModel>> LoadDotKiemTraData(string searchText)
-        {
-            return await LoadBlazorTypeaheadData(searchText, DotKiemTraService);
-        }
-
-        private void OpenDeleteModal(QLCLKiemTraHauKiemATTPModel item)
-        {
-            SelectedItem = item;
-            openDeleteModal = true;
-        }
-
-        private async Task OnDelete()
-        {
-            if (SelectedItem.id == 0)
-            {
-                AlertService.ShowAlert("Không có dữ liệu để xóa", "warning");
-                return;
-            }
-
-            var result = await MainService.DeleteAsync(SelectedItem);
-            if (result.IsSuccess && result.Data)
-            {
-                await LoadData();
-                AlertService.ShowAlert("Xoá thành công!", "success");
-                openDeleteModal = false;
-            }
-            else
-            {
-                AlertService.ShowAlert(result.Message ?? "Lỗi khi xóa dữ liệu", "danger");
-            }
-        }
-
-        private void CloseDeleteModal()
-        {
-            SelectedItem = new QLCLKiemTraHauKiemATTPModel();
-            openDeleteModal = false;
-        }
-
-        private void OpenSanPhamDetailDeleteModal(QLCLKiemTraHauKiemATTPChiTietModel item)
-        {
-            SelectedSanPhamItemDetail = item;
-            openSanPhamDetailDeleteModal = true;
-        }
-
-        private void OnSanPhamDetailDelete()
-        {
-            if (SelectedSanPhamItemDetail == null)
-            {
-                AlertService.ShowAlert("Không có dữ liệu để xóa", "warning");
-                return;
-            }
-
-            foreach (var item in SelectedSanPhamItemsDetail)
-            {
-                if (item.id > 0 && item.id == SelectedSanPhamItemDetail.id || item.sort > 0 && item.sort == SelectedSanPhamItemDetail.sort)
-                {
-                    item.deleted = true;
-                }
-            }
-
-            SelectedSanPhamItemDetail = default;
-
-            openSanPhamDetailDeleteModal = false;
-
-            if (!SelectedSanPhamItemsDetail.Any(c => c.deleted == null || c.deleted == false))
-                SelectedSanPhamItemsDetail.Add(new QLCLKiemTraHauKiemATTPChiTietModel()
-                {
-                    kiem_tra_hau_kiem_attp = SelectedItem,
-                    sort = (SelectedSanPhamItemsDetail.Max(c => c.sort) ?? 0) + 1,
-                    san_pham = null,
-                    deleted = false,
-                });
-            StateHasChanged();
-        }
-
-        private void CloseSanPhamDetailDeleteModal()
-        {
-            SelectedSanPhamItemDetail = default;
-            openSanPhamDetailDeleteModal = false;
-        }
-
-        private void OnAddSanPham()
-        {
-            if (SelectedSanPhamItemsDetail == null)
-                SelectedSanPhamItemsDetail = new List<QLCLKiemTraHauKiemATTPChiTietModel>();
-
-            SelectedSanPhamItemsDetail.Add(new QLCLKiemTraHauKiemATTPChiTietModel
-            {
-                kiem_tra_hau_kiem_attp = SelectedItem,
-                sort = (SelectedSanPhamItemsDetail.Max(c => c.sort) ?? 0) + 1,
-                san_pham = null,
-                so_luong_mau = 0,
-                loai_xet_nghiem = Enums.LoaiXetNghiem.HoaSinh,
-                mau_goc = Enums.MauGoc.MauGoc,
-                chi_tieu = Enums.ChiTieu.ChiTieuViSinh,
-                so_mau_khong_dat = 0,
-                chi_tieu_vi_pham = "",
-                muc_phat_hien = "",
-                deleted = false,
-            });
-        }
-
-        private async Task OpenAddOrUpdateModal(QLCLKiemTraHauKiemATTPModel? item)
-        {
-            _titleAddOrUpdate = item != null ? "Sửa" : "Thêm mới";
-            SelectedItem = item != null ? item : new QLCLKiemTraHauKiemATTPModel();
-
-            if (SelectedItem.id > 0)
-            {
-                await LoadSanPhamDetailData();
-                SelectedItem.loai_co_so = SelectedItem.co_so.loai;
-            }
-
-            if (!SelectedSanPhamItemsDetail.Any())
-                SelectedSanPhamItemsDetail.Add(new QLCLKiemTraHauKiemATTPChiTietModel()
-                {
-                    kiem_tra_hau_kiem_attp = SelectedItem,
-                    sort = (SelectedSanPhamItemsDetail.Max(c => c.sort) ?? 0) + 1,
-                    san_pham = null,
-                    deleted = false,
-                });
-
-            openAddOrUpdateModal = true;
-
-            // Wait for modal to render
-            _ = Task.Run(async () =>
-            {
-                await Task.Delay(500);
-                await JsRuntime.InvokeVoidAsync("initializeDatePicker");
-            });
-        }
-
-        private async Task OnValidSubmit()
-        {
-            if (SelectedItem.id <= 0)
-            {
-                var result = await MainService.CreateAsync(SelectedItem);
-                if (result.IsSuccess)
-                {
-                    var sanPhamChiTietList = SelectedSanPhamItemsDetail
-                        .Where(c => c.deleted == false || c.deleted == null)
-                        .Select(c =>
-                        {
-                            c.kiem_tra_hau_kiem_attp = result.Data;
-                            return c;
-                        })
-                        .ToList();
-
-                    var sanPhamDetailResult = await QLCLKiemTraHauKiemATTPChiTietService.CreateAsync(sanPhamChiTietList);
-                    if (!sanPhamDetailResult.IsSuccess)
-                    {
-                        AlertService.ShowAlert(sanPhamDetailResult.Message ?? "Lỗi khi thêm mới chi tiết dữ liệu", "danger");
-                        return;
-                    }
-                    await LoadData();
-                    openAddOrUpdateModal = false;
-                    AlertService.ShowAlert("Thêm mới thành công!", "success");
-                }
-                else
-                {
-                    AlertService.ShowAlert(result.Message ?? "Lỗi khi thêm mới dữ liệu", "danger");
-                }
-            }
-            else
-            {
-                var result = await MainService.UpdateAsync(SelectedItem);
-                if (result.IsSuccess)
-                {
-
-
-                    var addNewSanPhamChiTietList = SelectedSanPhamItemsDetail
-                        .Where(c => (c.deleted == false || c.deleted == null) && c.id == 0)
-                        .Select(c =>
-                        {
-                            c.kiem_tra_hau_kiem_attp = SelectedItem;
-                            return c;
-                        }).ToList();
-                    var removeSanPhamChiTietList = SelectedSanPhamItemsDetail
-                        .Where(c => c.deleted == true && c.id > 0)
-                        .Select(c =>
-                        {
-                            c.kiem_tra_hau_kiem_attp = SelectedItem;
-                            c.deleted = true;
-                            return c;
-                        }).ToList();
-                    var updateSanPhamChiTietList = SelectedSanPhamItemsDetail
-                        .Where(c => (c.deleted == false || c.deleted == null) && c.id > 0)
-                        .Select(c =>
-                        {
-                            c.kiem_tra_hau_kiem_attp = SelectedItem;
-                            return c;
-                        }).ToList();
-
-                    if (addNewSanPhamChiTietList.Any())
-                    {
-                        var detailResult = await QLCLKiemTraHauKiemATTPChiTietService.CreateAsync(addNewSanPhamChiTietList);
-                        if (!detailResult.IsSuccess)
-                        {
-                            AlertService.ShowAlert(detailResult.Message ?? "Lỗi khi thêm mới chi tiết dữ liệu", "danger");
-                            return;
-                        }
-                    }
-
-                    if (removeSanPhamChiTietList.Any())
-                    {
-                        var detailResult = await QLCLKiemTraHauKiemATTPChiTietService.DeleteAsync(removeSanPhamChiTietList);
-                        if (!detailResult.IsSuccess)
-                        {
-                            AlertService.ShowAlert(detailResult.Message ?? "Lỗi khi xóa chi tiết dữ liệu", "danger");
-                            return;
-                        }
-                    }
-
-                    if (updateSanPhamChiTietList.Any())
-                    {
-                        var detailResult = await QLCLKiemTraHauKiemATTPChiTietService.UpdateAsync(updateSanPhamChiTietList);
-                        if (!detailResult.IsSuccess)
-                        {
-                            AlertService.ShowAlert(detailResult.Message ?? "Lỗi khi cập nhật chi tiết dữ liệu", "danger");
-                            return;
-                        }
-                    }
-
-                    await LoadData();
-                    openAddOrUpdateModal = false;
-                    AlertService.ShowAlert("Cập nhật thành công!", "success");
-                }
-                else
-                {
-                    AlertService.ShowAlert(result.Message ?? "Lỗi khi cập nhật dữ liệu", "danger");
-                }
-            }
-        }
-
-        private void CloseAddOrUpdateModal()
-        {
-            SelectedItem = new QLCLKiemTraHauKiemATTPModel();
-            openAddOrUpdateModal = false;
+            _selectedXaFilter = item;
+            await LoadData();
         }
         private async Task OnDateChanged(ChangeEventArgs e, string fieldName)
         {
@@ -417,10 +127,6 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoViPhamLinhVuc
                 {
                     switch (fieldName)
                     {
-                        case nameof(SelectedItem.ngay_kiem_tra):
-                            SelectedItem.ngay_kiem_tra = null;
-                            break;
-
                         case "fromDate":
                             _fromDate = null;
                             await LoadData();
@@ -444,9 +150,6 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoViPhamLinhVuc
 
                     switch (fieldName)
                     {
-                        case nameof(SelectedItem.ngay_kiem_tra):
-                            SelectedItem.ngay_kiem_tra = date;
-                            break;
                         case "fromDate":
                             _fromDate = date;
                             await LoadData();
@@ -464,14 +167,117 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoViPhamLinhVuc
                 AlertService.ShowAlert($"Lỗi khi xử lý ngày: {ex.Message}", "danger");
             }
         }
-        private void OnTabChanged(string tab)
-        {
-            activeDefTab = tab;
-        }
-        private void OnMauGocChanged(ChangeEventArgs e, QLCLKiemTraHauKiemATTPChiTietModel item)
-        {
-            item.mau_goc = e.Value?.ToString() == "true" ? Enums.MauGoc.MauGoc : Enums.MauGoc.MauKhac;
-        }
 
+
+        private async Task OnExportExcel()
+        {
+            // Get all data for export
+            string  query  = $"sort=-id";
+            
+            int index = 3;
+
+            query += "&filter[_and][0][deleted][_eq]=false";
+
+            if (!string.IsNullOrEmpty(_searchString))
+            {
+                BuilderQuery += $"&filter[_and][{index}][_or][0][co_so_che_bien_nlts][code][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{index}][_or][1][co_so_nlts_du_dieu_kien_attp][code][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{index}][_or][2][co_so_che_bien_nlts][name][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{index}][_or][3][co_so_nlts_du_dieu_kien_attp][name][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{index}][_or][4][co_so_che_bien_nlts][dia_chi][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{index}][_or][5][co_so_nlts_du_dieu_kien_attp][dia_chi][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{index}][_or][6][san_pham_vi_pham][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{index}][_or][7][hanh_vi_vi_pham][name][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{index}][_or][8][xu_ly_khac][_contains]={_searchString}";
+                index++;
+            }
+
+            if(_selectedTinhFilter != null)
+            {
+                BuilderQuery += $"&filter[_and][{index}][_or][0][co_so_che_bien_nlts][province][_eq]={_selectedTinhFilter.id}";
+                BuilderQuery += $"&filter[_and][{index}][_or][1][co_so_nlts_du_dieu_kien_attp][province][_eq]={_selectedTinhFilter.id}";
+                index++;
+            }
+
+            if(_selectedXaFilter != null)
+            {
+                BuilderQuery += $"&filter[_and][{index}][_or][0][co_so_che_bien_nlts][ward][_eq]={_selectedXaFilter.id}";
+                BuilderQuery += $"&filter[_and][{index}][_or][1][co_so_nlts_du_dieu_kien_attp][ward][_eq]={_selectedXaFilter.id}";
+                index++;
+            }
+
+            if(_fromDate != null)
+            {
+                query += $"&filter[_and][{index}][ngay_ghi_nhan][_gte]={_fromDate.Value.ToString("yyyy-MM-dd")}";
+                index++;
+            }
+
+            if(_toDate != null)
+            {
+                query += $"&filter[_and][{index}][ngay_ghi_nhan][_lte]={_toDate.Value.ToString("yyyy-MM-dd")}";
+            }
+
+
+            var result = await MainService.GetAllAsync(query);
+            if (!result.IsSuccess || result.Data == null)
+            {
+                AlertService.ShowAlert("Không có dữ liệu để xuất Excel", "warning");
+                return;
+            }
+            var data = result.Data;
+
+            ExcelPackage.License.SetNonCommercialPersonal("Ndai1331");
+            // Create Excel package
+            using var package = new ExcelPackage(new FileInfo("MyWorkbook.xlsx"));
+            var ws = package.Workbook.Worksheets.Add("Data");
+
+            // Header
+            ws.Cells[1, 1].Value = "STT";
+            ws.Cells[1, 2].Value = "Mã cơ sở";
+            ws.Cells[1, 3].Value = "Tên cơ sở";
+            ws.Cells[1, 4].Value = "Ngày vi phạm";
+            ws.Cells[1, 5].Value = "Địa chỉ";
+            ws.Cells[1, 6].Value = "Sản phẩm";
+            ws.Cells[1, 7].Value = "Hành vi vi phạm";
+            ws.Cells[1, 8].Value = "Hình thức xử lý";
+
+            // Style header
+            using (var range = ws.Cells[1, 1, 1, 8])
+            {
+                range.Style.Font.Bold = true;
+                range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+            }
+
+            // Fill data
+            int row = 2;
+            int stt = 1;
+            foreach (var item in data)
+            {
+                var maCoSo = (item.loai_co_so == Enums.LoaiCoSoNLTS.CoSoCheBien) ? item.co_so_che_bien_nlts?.code : item.co_so_nlts_du_dieu_kien_attp?.code;
+                var tenCoSo = (item.loai_co_so == Enums.LoaiCoSoNLTS.CoSoCheBien) ? item.co_so_che_bien_nlts?.name : item.co_so_nlts_du_dieu_kien_attp?.name;
+                var diaChi = (item.loai_co_so == Enums.LoaiCoSoNLTS.CoSoCheBien) ? item.co_so_che_bien_nlts?.dia_chi : item.co_so_nlts_du_dieu_kien_attp?.dia_chi;
+                var hinhThucXuLy = item.hinh_thuc_xu_phat != null ? item.hinh_thuc_xu_phat?.name : item.xu_ly_khac?.GetDescription();
+                
+                ws.Cells[row, 1].Value = stt;
+                ws.Cells[row, 2].Value = maCoSo;
+                ws.Cells[row, 3].Value = tenCoSo;
+                ws.Cells[row, 4].Value = item.ngay_ghi_nhan?.ToString("dd/MM/yyyy");
+                ws.Cells[row, 5].Value = diaChi;
+                ws.Cells[row, 6].Value = item.san_pham_vi_pham;
+                ws.Cells[row, 7].Value = item.hanh_vi_vi_pham?.name;
+                ws.Cells[row, 8].Value = hinhThucXuLy;
+                row++;
+                stt++;
+            }
+
+            ws.Cells[ws.Dimension.Address].AutoFitColumns();
+
+            // Export to browser
+            var fileName = $"DanhSachCoSoViPhamChatLuongHangHoaVaATTP_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+            var fileBytes = package.GetAsByteArray();
+            // Nếu chưa có hàm saveAsFile trong wwwroot/js, hãy thêm hàm này để hỗ trợ download file từ base64
+            await JsRuntime.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(fileBytes));
+        }
     }
 }
