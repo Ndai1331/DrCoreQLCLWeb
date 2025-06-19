@@ -147,7 +147,6 @@ namespace CoreAdminWeb.Pages.QLCLKiemTraHauKiemATTP
         {
             string query = $"sort=-id";
             query += $"&filter[_and][][ProvinceId][_eq]={(SelectedItem.province == null ? 0 : SelectedItem.province?.id)}";
-            //query += $"&filter[_and][][deleted][_eq]=false";
             return await LoadBlazorTypeaheadData(searchText, XaPhuongService,query);
         }
 
@@ -156,7 +155,6 @@ namespace CoreAdminWeb.Pages.QLCLKiemTraHauKiemATTP
         {
             string query = $"sort=-id";
             query += $"&filter[_and][][ProvinceId][_eq]={(_selectedTinhFilter == null ? 0 : _selectedTinhFilter?.id)}";
-            query += $"&filter[_and][][deleted][_eq]=false";
             return await LoadBlazorTypeaheadData(searchText, XaPhuongService,query);
         }
         private async Task<IEnumerable<QLCLLoaiHinhKinhDoanhModel>> LoadLoaiHinhKinhDoanhData(string searchText)
