@@ -4,10 +4,7 @@ using CoreAdminWeb.Services.BaseServices;
 using CoreAdminWeb.Shared.Base;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using OfficeOpenXml;
-using OfficeOpenXml.Style;
-using System.IO;
-using CoreAdminWeb.Extensions;
+
 
 namespace CoreAdminWeb.Pages.QLCLBaoCaoViPhamLinhVuc
 {
