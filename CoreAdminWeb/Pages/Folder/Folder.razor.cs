@@ -52,7 +52,7 @@ namespace CoreAdminWeb.Pages.Folder
 
         private async Task LoadFolders()
         {
-            var result = await MainService.GetAllAsync("filter[system][_eq]=2");
+            var result = await MainService.GetAllAsync("filter[system][_eq]=1");
             if (result.IsSuccess)
             {
                 MainModels = FolderHelper.CreateSubMenus(result.Data ?? new List<FolderModel>());
@@ -172,7 +172,8 @@ namespace CoreAdminWeb.Pages.Folder
             DeselectAll(MainModels);
             selected.isSelected = true;
             SelectedItem = selected;
-             ResetPage();
+            ResetPage();
+            await LoadFiles();
             StateHasChanged();
         }
 
@@ -212,7 +213,7 @@ namespace CoreAdminWeb.Pages.Folder
                 return;
             }
 
-            SelectedCreateItem.system = 1;
+            SelectedCreateItem.system = 2;
             SelectedCreateItem.parent = SelectedItem.id == Guid.Empty ? null : SelectedItem.id;
             var result = await MainService.CreateAsync(SelectedCreateItem);
             if (result.IsSuccess)
@@ -388,6 +389,7 @@ namespace CoreAdminWeb.Pages.Folder
                 AlertService.ShowAlert($"Lỗi khi xử lý ngày: {ex.Message}", "danger");
             }
         }
+
 
     }
 }

@@ -195,13 +195,14 @@ pTitle="Dữ liệu các cơ sở có GCN đủ điều kiện ATTP hết hạn"
                                                     {
                                                         if (i > 1 && i < TotalPages)
                                                         {
+                                                            var currentPage = i; // Local variable to avoid closure issues
                                                             <li>
                                                                 <a href="#"
                                                                    class="px-3 py-2 text-black  border border-black/10
                                                                     hover:bg-purple hover:text-white dark:bg-transparent
                                                                     dark:text-white dark:border-darkborder dark:hover:bg-purple
                                                                     dark:hover:text-white dark:hover:border-purple @(Page == i ? "bg-purple text-white" : "bg-white")"
-                                                                   @onclick="async (e) => await SelectedPage(i, LoadData)">@i</a>
+                                                                   @onclick="async (e) => await SelectedPage(currentPage, LoadData)">@i</a>
                                                             </li>
                                                         }
                                                     }

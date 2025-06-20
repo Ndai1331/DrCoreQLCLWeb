@@ -151,16 +151,16 @@
                         <div class="flex items-center justify-center p-4">
                             <div class="flex items-center gap-2">
                                 <ul class="inline-flex my-2 -space-x-px list-inside">
-                                    <li><MudLink Href="#" Class="px-3 py-2 bg-white border cursor-not-allowed ltr:ml-0 rtl:mr-0 ltr:rounded-l-lg rtl:rounded-r-lg text-black/50 border-black/10 dark:bg-transparent dark:text-darkmuted dark:border-darkborder" @onclick="async (e) => await PreviousPage(LoadFolders)" disabled="@(Page <= 1)">Trước</MudLink></li>
+                                    <li><MudLink Href="#" Class="px-3 py-2 bg-white border cursor-not-allowed ltr:ml-0 rtl:mr-0 ltr:rounded-l-lg rtl:rounded-r-lg text-black/50 border-black/10 dark:bg-transparent dark:text-darkmuted dark:border-darkborder" @onclick="async (e) => await PreviousPage(LoadFiles)" disabled="@(Page <= 1)">Trước</MudLink></li>
                                     @{
                                         var startPage = Math.Max(1, Page - 1);
-                                        var endPage = Math.Min(TotalPages, Page + 1);
+                                        var endPage = Math.Min(TotalPages - 1, Page + 1);
 
                                         // Always show first page
                                         <li>
                                             <a href="#"
                                                 class="px-3 py-2 text-black  border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple @(Page == 1 ? "bg-purple text-white" : "bg-white")"
-                                                @onclick="async (e) => await SelectedPage(1,LoadFolders)">1</a>
+                                                @onclick="async (e) => await SelectedPage(1,LoadFiles)">1</a>
                                         </li>
 
                                         // Show ellipsis if needed
@@ -174,13 +174,14 @@
                                         {
                                             if (i > 1 && i < TotalPages)
                                             {
+                                                var currentPage = i; // Local variable to avoid closure issues
                                                 <li>
                                                     <a href="#"
                                                         class="px-3 py-2 text-black  border border-black/10
-                                                                                                                                                                                        hover:bg-purple hover:text-white dark:bg-transparent
-                                                                                                                                                                                        dark:text-white dark:border-darkborder dark:hover:bg-purple
-                                                                                                                                                                                        dark:hover:text-white dark:hover:border-purple @(Page == i ? "bg-purple text-white" : "bg-white")"
-                                                        @onclick="async (e) => await SelectedPage(i,LoadFolders)">@i</a>
+                                                        hover:bg-purple hover:text-white dark:bg-transparent
+                                                        dark:text-white dark:border-darkborder dark:hover:bg-purple
+                                                        dark:hover:text-white dark:hover:border-purple @(Page == i ? "bg-purple text-white" : "bg-white")"
+                                                        @onclick="async (e) => await SelectedPage(currentPage,LoadFiles)">@i</a>
                                                 </li>
                                             }
                                         }
@@ -197,15 +198,14 @@
                                             <li>
                                                 <a href="#"
                                                     class="px-3 py-2 text-black  border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple @(Page == TotalPages ? "bg-purple text-white" : "bg-white")"
-                                                    @onclick="async (e) => await SelectedPage(TotalPages,LoadFolders)">@TotalPages</a>
+                                                    @onclick="async (e) => await SelectedPage(TotalPages,LoadFiles)">@TotalPages</a>
                                             </li>
                                         }
                                     }
-                                    <li><MudLink Href="#" Class="px-3 py-2 bg-white border cursor-not-allowed ltr:ml-0 rtl:mr-0 ltr:rounded-r-lg rtl:rounded-l-lg text-black/50 border-black/10 dark:bg-transparent dark:text-darkmuted dark:border-darkborder" @onclick="async (e) => await NextPage(LoadFolders)" disabled="@(Page >= TotalPages)">Sau</MudLink></li>
+                                    <li><MudLink Href="#" Class="px-3 py-2 bg-white border cursor-not-allowed ltr:ml-0 rtl:mr-0 ltr:rounded-r-lg rtl:rounded-l-lg text-black/50 border-black/10 dark:bg-transparent dark:text-darkmuted dark:border-darkborder" @onclick="async (e) => await NextPage(LoadFiles)" disabled="@(Page >= TotalPages)">Sau</MudLink></li>
                                 </ul>
                             </div>
                         </div>
->>>>>>> 70b6d27da5781a1ffdd1bcff2f99f640fb83c322
                     </div>
                 </div>
             </div>

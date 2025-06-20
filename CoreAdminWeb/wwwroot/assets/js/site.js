@@ -33,8 +33,13 @@ function handleOutsideClick(event) {
     }
 }
 
-
-
+// Function to get clicked page number from data attribute
+function getClickedPageNumber() {
+    // Get the clicked element
+    var clickedElement = event.target;
+    // Get the data-page attribute
+    return clickedElement.getAttribute('data-page');
+}
 
 function initBassicLineChart(element, serries, labels, colors) {
 

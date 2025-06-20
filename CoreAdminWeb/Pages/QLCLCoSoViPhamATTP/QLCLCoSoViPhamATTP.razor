@@ -221,10 +221,11 @@
                                                     {
                                                         if (i > 1 && i < TotalPages)
                                                         {
+                                                            var currentPage = i; // Local variable to avoid closure issues
                                                             <li>
                                                                 <a href="#"
                                                                    class="px-3 py-2 text-black border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple @(Page == i ? "bg-purple text-white" : "bg-white")"
-                                                                   @onclick="() => SelectedPage(i, LoadData)">@i</a>
+                                                                   @onclick="() => SelectedPage(currentPage, LoadData)">@i</a>
                                                             </li>
                                                         }
                                                     }
