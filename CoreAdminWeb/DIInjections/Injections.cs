@@ -47,6 +47,8 @@ namespace CoreAdminWeb.DIInjections
             services.AddScoped<IBaseService<QLCLCoSoNLTSDuDieuKienATTPModel>, QLCLCoSoNLTSDuDieuKienATTPService>();
             services.AddScoped<IQLCLCoSoNLTSDuDieuKienATTPSanPhamService, QLCLCoSoNLTSDuDieuKienATTPSanPhamService>();
             services.AddScoped<IBaseService<QLCLCoSoVatTuNongNghiepModel>, QLCLCoSoVatTuNongNghiepService>();
+            services.AddScoped<IBaseService<QLCLPhatTrienThiTruongModel>, QLCLPhatTrienThiTruongService>();
+            services.AddScoped<IQLCLPhatTrienThiTruongSanPhamService, QLCLPhatTrienThiTruongSanPhamService>();
             services.AddScoped<IQLCLCoSoVatTuNongNghiepSanPhamService, QLCLCoSoVatTuNongNghiepSanPhamService>();
             services.AddScoped<IBaseService<QLCLDotKiemTraHauKiemATTPModel>, QLCLDotKiemTraHauKiemATTPService>();
             services.AddScoped<IBaseService<QLCLKiemTraHauKiemATTPModel>, QLCLKiemTraHauKiemATTPService>();
