@@ -76,40 +76,40 @@ namespace CoreAdminWeb.Pages.QLCLKenhQuangBaXucTienThuongMai
             {
                 IsLoading = true;
                 BuildPaginationQuery(Page, PageSize);
-                int intdex =1;
+                int index =1;
 
                 BuilderQuery += "filter[_and][0][deleted][_eq]=false&sort=sort";
                 if (!string.IsNullOrEmpty(_searchString))
                 {
-                    BuilderQuery += $"&filter[_and][{intdex}][_or][0][code][_contains]={_searchString}";
-                    BuilderQuery += $"&filter[_and][{intdex}][_or][1][name][_contains]={_searchString}";
-                    BuilderQuery += $"&filter[_and][{intdex}][_or][2][dia_diem_to_chuc][_contains]={_searchString}";
-                    BuilderQuery += $"&filter[_and][{intdex}][_or][3][description][_contains]={_searchString}";
-                    intdex++;
+                    BuilderQuery += $"&filter[_and][{index}][_or][0][code][_contains]={_searchString}";
+                    BuilderQuery += $"&filter[_and][{index}][_or][1][name][_contains]={_searchString}";
+                    BuilderQuery += $"&filter[_and][{index}][_or][2][dia_diem_to_chuc][_contains]={_searchString}";
+                    BuilderQuery += $"&filter[_and][{index}][_or][3][description][_contains]={_searchString}";
+                    index++;
                 }
 
                 if(_selectedTinhFilter != null)
                 {
-                    BuilderQuery += $"&filter[_and][{intdex}][province][_eq]={_selectedTinhFilter.id}";
-                    intdex++;
+                    BuilderQuery += $"&filter[_and][{index}][province][_eq]={_selectedTinhFilter.id}";
+                    index++;
                 }
 
                 if(_selectedXaFilter != null)
                 {
-                    BuilderQuery += $"&filter[_and][{intdex}][ward][_eq]={_selectedXaFilter.id}";
-                    intdex++;
+                    BuilderQuery += $"&filter[_and][{index}][ward][_eq]={_selectedXaFilter.id}";
+                    index++;
                 }
 
                 if (_fromDate != null)
                 {
-                    BuilderQuery += $"&filter[_and][{intdex}][ngay_to_chuc][_gte]={_fromDate.Value.ToString("yyyy-MM-dd")}";
-                    intdex++;
+                    BuilderQuery += $"&filter[_and][{index}][ngay_to_chuc][_gte]={_fromDate.Value.ToString("yyyy-MM-dd")}";
+                    index++;
                 }
 
                 if(_toDate != null)
                 {
-                    BuilderQuery += $"&filter[_and][{intdex}][ngay_to_chuc][_lte]={_toDate.Value.ToString("yyyy-MM-dd")}";
-                    intdex++;
+                    BuilderQuery += $"&filter[_and][{index}][ngay_to_chuc][_lte]={_toDate.Value.ToString("yyyy-MM-dd")}";
+                    index++;
                 }
                 
 
