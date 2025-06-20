@@ -86,7 +86,7 @@ namespace CoreAdminWeb.Pages.QuanLyCoSoBuonBan
         private async Task<IEnumerable<XaPhuongModel>> LoadXaFilterData(string searchText)
         {
             string query = $"&filter[_and][][ProvinceId][_eq]={_selectedTinhFilter?.id ?? 0}";
-            return await LoadBlazorTypeaheadData(searchText, XaPhuongService, isIgnoreCheck: true);
+            return await LoadBlazorTypeaheadData(searchText, XaPhuongService, query, isIgnoreCheck: true);
         }
         
         private async Task<IEnumerable<TinhModel>> LoadTinhData(string searchText)
@@ -97,7 +97,7 @@ namespace CoreAdminWeb.Pages.QuanLyCoSoBuonBan
         private async Task<IEnumerable<XaPhuongModel>> LoadXaData(string searchText)
         {
             string query = $"&filter[_and][][ProvinceId][_eq]={SelectedItem.province?.id ?? 0}";
-            return await LoadBlazorTypeaheadData(searchText, XaPhuongService, isIgnoreCheck: true);
+            return await LoadBlazorTypeaheadData(searchText, XaPhuongService, query, isIgnoreCheck: true);
         }
 
         private async Task<IEnumerable<QLCLLoaiHinhKinhDoanhModel>> LoadQLCLLoaiHinhKinhDoanhData(string searchText)

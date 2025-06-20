@@ -107,7 +107,7 @@ namespace CoreAdminWeb.Pages.DienTichGieoTrongCayLauNam
         private async Task<IEnumerable<XaPhuongModel>> LoadXaData(string searchText)
         {
             string query = $"&filter[_and][][ProvinceId][_eq]={SelectedItem.province?.id ?? 0}";
-            return await LoadBlazorTypeaheadData(searchText, XaPhuongService, isIgnoreCheck: true);
+            return await LoadBlazorTypeaheadData(searchText, XaPhuongService, query, isIgnoreCheck: true);
         }
         private async Task<IEnumerable<CayGiongCayTrongModel>> LoadCayGiongCayTrongData(string searchText)
         {

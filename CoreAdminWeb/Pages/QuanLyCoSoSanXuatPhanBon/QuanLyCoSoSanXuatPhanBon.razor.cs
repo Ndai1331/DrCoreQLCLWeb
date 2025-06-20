@@ -37,6 +37,7 @@ namespace CoreAdminWeb.Pages.QuanLyCoSoSanXuatPhanBon
             return await LoadBlazorTypeaheadData(searchText, QLCLLoaiHinhKinhDoanhService, isIgnoreCheck: true);
         }
 
+
         private async Task<IEnumerable<TinhModel>> LoadTinhData(string searchText)
         {
             return await LoadBlazorTypeaheadData(searchText, TinhThanhService, isIgnoreCheck: true);
@@ -45,13 +46,13 @@ namespace CoreAdminWeb.Pages.QuanLyCoSoSanXuatPhanBon
         private async Task<IEnumerable<XaPhuongModel>> LoadXaData(string searchText)
         {
             string query = $"&filter[_and][][ProvinceId][_eq]={SelectedItem.province?.id ?? 0}";
-            return await LoadBlazorTypeaheadData(searchText, XaPhuongService, isIgnoreCheck: true);
+            return await LoadBlazorTypeaheadData(searchText, XaPhuongService, query, isIgnoreCheck: true);
         }
 
         private async Task<IEnumerable<XaPhuongModel>> LoadXaFilterData(string searchText)
         {
             string query = $"&filter[_and][][ProvinceId][_eq]={_selectedTinhFilter?.id ?? 0}";
-            return await LoadBlazorTypeaheadData(searchText, XaPhuongService, isIgnoreCheck: true);
+            return await LoadBlazorTypeaheadData(searchText, XaPhuongService, query, isIgnoreCheck: true);
         }
 
         private void OnTinhChanged(TinhModel? selected)
