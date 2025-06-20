@@ -76,18 +76,18 @@ pTitle="Báo cáo dữ liệu hỗ trợ xúc tiến thương mại"></PageHeade
                         </MudForm>
                     </div>
                     <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
-                        <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Từ ngày kiểm tra</MudText>
+                        <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Từ ngày tổ chức</MudText>
                          <input type="text" 
                                    class="form-input date-picker"
-                                   placeholder="Từ ngày kiểm tra"
+                                   placeholder="Từ ngày tổ chức"
                                    value="@(_fromDate?.ToString("dd/MM/yyyy"))"
                                    @onchange="@(e => OnDateChanged(e, "fromDate"))" />
                     </div>
                     <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
-                        <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Đến ngày kiểm tra</MudText>
+                        <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Đến ngày tổ chức</MudText>
                         <input type="text" 
                                class="form-input date-picker"
-                               placeholder="Đến ngày kiểm tra"
+                               placeholder="Đến ngày tổ chức"
                                value="@(_toDate?.ToString("dd/MM/yyyy"))"
                                @onchange="@(e => OnDateChanged(e, "toDate"))" />
                     </div>
@@ -116,9 +116,9 @@ pTitle="Báo cáo dữ liệu hỗ trợ xúc tiến thương mại"></PageHeade
                         <div>
                             <MudButton Class="xs:w-full sm:w-auto md:w-auto btn flex items-center gap-1.5
                             bg-success border-success text-white hover:bg-success/[0.85]
-                            hover:border-success/[0.85] text-nowrap" @onclick="@(e => OpenAddOrUpdateModal(null))">
-                                <i class="ri-add-line"></i>
-                                Thêm mới
+                            hover:border-success/[0.85] text-nowrap" @onclick="@(e => OnExportExcel())">
+                                <i class="ri-file-excel-line"></i>
+                                Xuất file excel
                             </MudButton>
                         </div>
                     </div>
@@ -128,132 +128,113 @@ pTitle="Báo cáo dữ liệu hỗ trợ xúc tiến thương mại"></PageHeade
                 <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
-                            <th class="px-6 py-3 text-center">STT</th>
-                            <th class="px-6 py-3 text-start">Tên chương trình</th>
-                            <th class="px-6 py-3 text-start">Địa điểm</th>
-                            <th class="px-6 py-3 text-end">Số lượng chủ thể tham gia</th>
-                            <th class="px-6 py-3 text-end">Lượt khách tham quan</th>
-                            <th class="px-6 py-3 text-end">Doanh thu (VNĐ)</th>
-                            <th class="px-6 py-3 text-end">Số HĐ ký kết</th>
+                            <th>STT</th>
+                            <th>Tên chương trình</th>
+                            <th>Địa điểm</th>
+                            <th>Số lượng chủ thể tham gia</th>
+                            <th>Lượt khách tham quan</th>
+                            <th>Doanh thu (VNĐ)</th>
+                            <th>Số HĐ ký kết</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="bg-white border-b hover:bg-gray-50">
-                            <td class="px-6 py-4 text-center">1</td>
-                            <td class="px-6 py-4 font-medium text-gray-900">Hội chợ nông sản 2024</td>
-                            <td class="px-6 py-4">TP. Đông Hà</td>
-                            <td class="px-6 py-4 text-end">50</td>
-                            <td class="px-6 py-4 text-end">1,200</td>
-                            <td class="px-6 py-4 text-end">500,000,000</td>
-                            <td class="px-6 py-4 text-end">15</td>
-                        </tr>
-                        <tr class="bg-white border-b hover:bg-gray-50">
-                            <td class="px-6 py-4 text-center">2</td>
-                            <td class="px-6 py-4 font-medium text-gray-900">Triển lãm thủy sản</td>
-                            <td class="px-6 py-4">Huyện Gio Linh</td>
-                            <td class="px-6 py-4 text-end">30</td>
-                            <td class="px-6 py-4 text-end">800</td>
-                            <td class="px-6 py-4 text-end">300,000,000</td>
-                            <td class="px-6 py-4 text-end">8</td>
-                        </tr>
-                        <tr class="bg-white border-b hover:bg-gray-50">
-                            <td class="px-6 py-4 text-center">3</td>
-                            <td class="px-6 py-4 font-medium text-gray-900">Hội thảo nông nghiệp</td>
-                            <td class="px-6 py-4">TP. Đông Hà</td>
-                            <td class="px-6 py-4 text-end">25</td>
-                            <td class="px-6 py-4 text-end">150</td>
-                            <td class="px-6 py-4 text-end">0</td>
-                            <td class="px-6 py-4 text-end">5</td>
-                        </tr>
-                        <tr class="bg-white border-b hover:bg-gray-50">
-                            <td class="px-6 py-4 text-center">4</td>
-                            <td class="px-6 py-4 font-medium text-gray-900">Chợ phiên nông sản</td>
-                            <td class="px-6 py-4">Huyện Vĩnh Linh</td>
-                            <td class="px-6 py-4 text-end">40</td>
-                            <td class="px-6 py-4 text-end">2,000</td>
-                            <td class="px-6 py-4 text-end">800,000,000</td>
-                            <td class="px-6 py-4 text-end">20</td>
-                        </tr>
-                        <tr class="bg-white border-b hover:bg-gray-50">
-                            <td class="px-6 py-4 text-center">5</td>
-                            <td class="px-6 py-4 font-medium text-gray-900">Hội chợ xuân</td>
-                            <td class="px-6 py-4">TP. Đông Hà</td>
-                            <td class="px-6 py-4 text-end">45</td>
-                            <td class="px-6 py-4 text-end">3,000</td>
-                            <td class="px-6 py-4 text-end">1,200,000,000</td>
-                            <td class="px-6 py-4 text-end">25</td>
-                        </tr>
-                        <tr class="bg-white border-b hover:bg-gray-50">
-                            <td class="px-6 py-4 text-center">6</td>
-                            <td class="px-6 py-4 font-medium text-gray-900">Triển lãm lâm sản</td>
-                            <td class="px-6 py-4">Huyện Hướng Hóa</td>
-                            <td class="px-6 py-4 text-end">35</td>
-                            <td class="px-6 py-4 text-end">900</td>
-                            <td class="px-6 py-4 text-end">400,000,000</td>
-                            <td class="px-6 py-4 text-end">12</td>
-                        </tr>
-                        <tr class="bg-white border-b hover:bg-gray-50">
-                            <td class="px-6 py-4 text-center">7</td>
-                            <td class="px-6 py-4 font-medium text-gray-900">Hội thảo thương mại</td>
-                            <td class="px-6 py-4">TP. Đông Hà</td>
-                            <td class="px-6 py-4 text-end">20</td>
-                            <td class="px-6 py-4 text-end">100</td>
-                            <td class="px-6 py-4 text-end">0</td>
-                            <td class="px-6 py-4 text-end">3</td>
-                        </tr>
-                        <tr class="bg-white border-b hover:bg-gray-50">
-                            <td class="px-6 py-4 text-center">8</td>
-                            <td class="px-6 py-4 font-medium text-gray-900">Chợ phiên đặc sản</td>
-                            <td class="px-6 py-4">Huyện Cam Lộ</td>
-                            <td class="px-6 py-4 text-end">38</td>
-                            <td class="px-6 py-4 text-end">1,500</td>
-                            <td class="px-6 py-4 text-end">600,000,000</td>
-                            <td class="px-6 py-4 text-end">18</td>
-                        </tr>
-                        <tr class="bg-white border-b hover:bg-gray-50">
-                            <td class="px-6 py-4 text-center">9</td>
-                            <td class="px-6 py-4 font-medium text-gray-900">Hội chợ hè</td>
-                            <td class="px-6 py-4">TP. Đông Hà</td>
-                            <td class="px-6 py-4 text-end">42</td>
-                            <td class="px-6 py-4 text-end">2,500</td>
-                            <td class="px-6 py-4 text-end">900,000,000</td>
-                            <td class="px-6 py-4 text-end">22</td>
-                        </tr>
-                        <tr class="bg-white border-b hover:bg-gray-50">
-                            <td class="px-6 py-4 text-center">10</td>
-                            <td class="px-6 py-4 font-medium text-gray-900">Triển lãm nông nghiệp</td>
-                            <td class="px-6 py-4">Huyện Triệu Phong</td>
-                            <td class="px-6 py-4 text-end">33</td>
-                            <td class="px-6 py-4 text-end">950</td>
-                            <td class="px-6 py-4 text-end">450,000,000</td>
-                            <td class="px-6 py-4 text-end">14</td>
-                        </tr>
+                        @for (int i = 0; i < MainModels.Count; i++)
+                        {
+                            var currentIndex = i;
+                            <tr>
+                                <td>@(((Page - 1) * PageSize) + i + 1)</td>
+                                <td>@MainModels[i].name</td>
+                                <td>@MainModels[i].dia_diem_to_chuc</td>
+                                <td>@MainModels[i].so_luong_chu_the_tham_gia</td>
+                                <td>@MainModels[i].luot_khach_tham_quan</td>
+                                <td>@MainModels[i].gia_tri_giao_dich</td>
+                                <td>@MainModels[i].so_hop_dong_ky_ket</td>
+                            </tr>
+                        }
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="9">
+                                <div class="flex items-center justify-between p-4">
+                                    <div class="flex items-center gap-2">
+                                        <span>Hiển thị</span>
+                                        <select class="form-select" @bind="PageSize" @bind:event="oninput" @onchange="OnPageSizeChanged">
+                                            <option value="10">10</option>
+                                            <option value="25">25</option>
+                                            <option value="50">50</option>
+                                            <option value="100">100</option>
+                                        </select>
+                                        <span>mục</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <div>
+                                            <ul class="inline-flex my-2 -space-x-px list-inside">
+                                                <li>
+                                                    <MudLink Href="#"
+                                                             Class="px-3 py-2 bg-white border cursor-not-allowed ltr:ml-0 rtl:mr-0 ltr:rounded-l-lg rtl:rounded-r-lg text-black/50 border-black/10 dark:bg-transparent dark:text-darkmuted dark:border-darkborder"
+                                                             @onclick="async () => await PreviousPage(LoadData)"
+                                                             disabled="@(Page <= 1)">Trước</MudLink>
+                                                </li>
+                                                @{
+                                                    var startPage = Math.Max(1, Page - 1);
+                                                    var endPage = Math.Min(TotalPages, Page + 1);
+
+                                                    // First page
+                                                    <li>
+                                                        <a href="#"
+                                                           class="px-3 py-2 text-black border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple @(Page == 1 ? "bg-purple text-white" : "bg-white")"
+                                                           @onclick="() => SelectedPage(1, LoadData)">1</a>
+                                                    </li>
+
+                                                    // Ellipsis if needed
+                                                    if (startPage > 2)
+                                                    {
+                                                        <li><span class="px-3 py-2">...</span></li>
+                                                    }
+
+                                                    // Pages around current
+                                                    for (int i = startPage; i <= endPage; i++)
+                                                    {
+                                                        if (i > 1 && i < TotalPages)
+                                                        {
+                                                            <li>
+                                                                <a href="#"
+                                                                   class="px-3 py-2 text-black border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple @(Page == i ? "bg-purple text-white" : "bg-white")"
+                                                                   @onclick="() => SelectedPage(i, LoadData)">@i</a>
+                                                            </li>
+                                                        }
+                                                    }
+
+                                                    // Ellipsis if needed
+                                                    if (endPage < TotalPages - 1)
+                                                    {
+                                                        <li><span class="px-3 py-2">...</span></li>
+                                                    }
+
+                                                    // Last page if more than one page
+                                                    if (TotalPages > 1)
+                                                    {
+                                                        <li>
+                                                            <a href="#"
+                                                               class="px-3 py-2 text-black border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple @(Page == TotalPages ? "bg-purple text-white" : "bg-white")"
+                                                               @onclick="() => SelectedPage(TotalPages, LoadData)">@TotalPages</a>
+                                                        </li>
+                                                    }
+                                                }
+                                                <li>
+                                                    <MudLink Href="#"
+                                                             Class="px-3 py-2 bg-white border cursor-not-allowed ltr:ml-0 rtl:mr-0 ltr:rounded-r-lg rtl:rounded-l-lg text-black/50 border-black/10 dark:bg-transparent dark:text-darkmuted dark:border-darkborder"
+                                                             @onclick="async () => await NextPage(LoadData)"
+                                                             disabled="@(Page >= TotalPages)">Sau</MudLink>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tfoot>
                 </table>
-            </div>
-            <!-- Pagination for Mock Data -->
-            <div class="flex items-center justify-between p-4">
-                <div class="flex items-center gap-2">
-                    <span class="text-sm text-gray-700 dark:text-gray-300">Hiển thị</span>
-                    <select class="form-select text-sm">
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                    </select>
-                    <span class="text-sm text-gray-700 dark:text-gray-300">mục</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <div>
-                        <ul class="inline-flex my-2 -space-x-px list-inside">
-                            <li><a href="#" class="px-3 py-2 bg-white border cursor-not-allowed ltr:ml-0 rtl:mr-0 ltr:rounded-l-lg rtl:rounded-r-lg text-black/50 border-black/10 dark:bg-transparent dark:text-darkmuted dark:border-darkborder">Trước</a></li>
-                            <li><a href="#" class="px-3 py-2 text-black border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple bg-purple text-white">1</a></li>
-                            <li><a href="#" class="px-3 py-2 text-black border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple">2</a></li>
-                            <li><a href="#" class="px-3 py-2 text-black border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple">3</a></li>
-                            <li><a href="#" class="px-3 py-2 bg-white border cursor-not-allowed ltr:ml-0 rtl:mr-0 ltr:rounded-r-lg rtl:rounded-l-lg text-black/50 border-black/10 dark:bg-transparent dark:text-darkmuted dark:border-darkborder">Sau</a></li>
-                        </ul>
-                    </div>
-                </div>
             </div>
         </div>
     </div>

@@ -1,0 +1,474 @@
+﻿@page "/dl-cac-kenh-quang-ba-xuc-tien-thuong-mai"
+@using CoreAdminWeb.Extensions
+@using CoreAdminWeb.Model
+@using CoreAdminWeb.Services.BaseServices
+@using CoreAdminWeb.Shared.Base
+@using CoreAdminWeb.Commons.Utils
+@using CoreAdminWeb.Enums
+@inherits BlazorCoreBase
+@layout MainLayout
+
+<PageHeader Title="Dữ liệu các kênh quảng bá xúc tiến thương mại" pTitle="Dữ liệu các kênh quảng bá xúc tiến thương mại"></PageHeader>
+
+<!-- Start All Card -->
+<div class="flex flex-col gap-4 min-h-[calc(100vh-212px)]">
+    <div class="grid grid-cols-1 gap-4">
+        <div class="card">
+            @if (IsLoading)
+            {
+                <div class="flex flex-col items-center justify-center gap-3">
+                    <div class="w-full h-4 rounded-full bg-gray-200">
+                        <div class="h-4 rounded-full bg-success animate-progress"
+                             style="background-image: linear-gradient(45deg,hsla(0,0%,100%,.15) 25%,transparent 0,transparent 50%,hsla(0,0%,100%,.15) 0,hsla(0,0%,100%,.15) 75%,transparent 0,transparent); background-size: 1rem 1rem;">
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class="flex items-end justify-between flex-1 gap-2 sm:gap-4">
+                <!-- Left: Filter Area -->
+                <div class="w-full grid grid-cols-1 gap-4 md:grid-cols-4 xl:grid-cols-4 sm:gap-4 md:w-4/5 pb-2">
+                    <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
+                        <MudForm>
+                            <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Tỉnh thành</MudText>
+                            <BlazoredTypeahead EnableDropDown="true"
+                                               ShowDropDownOnFocus="true"
+                                               MinimumLength="0"
+                                               TItem="TinhModel"
+                                               TValue="TinhModel"
+                                               SearchMethod="LoadTinhData"
+                                               @bind-Value="@_selectedTinhFilter"
+                                               placeholder="Chọn tỉnh thành"
+                                               Class="form-select">
+                                <SelectedTemplate Context="item">
+                                    @item.name
+                                </SelectedTemplate>
+                                <ResultTemplate Context="item">
+                                    @item.name
+                                </ResultTemplate>
+                                <NotFoundTemplate Context="item">
+                                    Không tìm thấy dữ liệu
+                                </NotFoundTemplate>
+                            </BlazoredTypeahead>
+                        </MudForm>
+                    </div>
+                    <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
+                        <MudForm>
+                            <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Xã phường</MudText>
+                            <BlazoredTypeahead EnableDropDown="true"
+                                               ShowDropDownOnFocus="true"
+                                               MinimumLength="0"
+                                               TItem="XaPhuongModel"
+                                               TValue="XaPhuongModel"
+                                               SearchMethod="LoadXaFilterData"
+                                               @bind-Value="@_selectedXaFilter"
+                                               placeholder="Chọn xã phường"
+                                               Class="form-select">
+                                <SelectedTemplate Context="item">
+                                    @item.name
+                                </SelectedTemplate>
+                                <ResultTemplate Context="item">
+                                    @item.name
+                                </ResultTemplate>
+                                <NotFoundTemplate Context="item">
+                                    Không tìm thấy dữ liệu
+                                </NotFoundTemplate>
+                            </BlazoredTypeahead>
+                        </MudForm>
+                    </div>
+                    <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
+                        <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Từ ngày tổ chức</MudText>
+                         <input type="text" 
+                                   class="form-input date-picker"
+                                   placeholder="Từ ngày tổ chức"
+                                   value="@(_fromDate?.ToString("dd/MM/yyyy"))"
+                                   @onchange="@(e => OnDateChanged(e, "fromDate"))" />
+                    </div>
+                    <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
+                        <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Đến ngày tổ chức</MudText>
+                        <input type="text" 
+                               class="form-input date-picker"
+                               placeholder="Đến ngày tổ chức"
+                               value="@(_toDate?.ToString("dd/MM/yyyy"))"
+                               @onchange="@(e => OnDateChanged(e, "toDate"))" />
+                    </div>
+
+                    <div class="xs:col-span-4 sm:col-span-4 md:col-span-3">
+                        <MudForm class="flex-1">
+                            <div class="relative">
+                                <input type="text" id="search"
+                                       class="border-black/10 dark:text-white/80 dark:placeholder:text-white/30 dark:border-darkborder dark:bg-dark dark:focus:border-white/30 focus:border-black/30 placeholder:text-black/50 border text-black text-sm rounded block w-full ltr:pl-3 rtl:pr-3 ltr:pr-7 rtl:pl-7 h-10 bg-[#f9fbfd] focus:ring-0 focus:outline-0"
+                                       placeholder="Tìm kiếm..."
+                                       required=""
+                                       @bind-value="@_searchString"
+                                       @bind-value:event="oninput"
+                                       @onkeydown="async (e) => await OnInputKeyDownSearch(e, LoadData)">
+
+                                <MudButton OnClick="LoadData" type="button" Class="absolute inset-y-0 flex items-center text-black ltr:right-0 rtl:left-0 ltr:pr-2 rtl:pl-2 dark:text-white/80">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-4 h-4">
+                                        <path d="M11 2C15.968 2 20 6.032 20 11C20 15.968 15.968 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2ZM11 18C14.8675 18 18 14.8675 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18ZM19.4853 18.0711L22.3137 20.8995L20.8995 22.3137L18.0711 19.4853L19.4853 18.0711Z" fill="currentColor"></path>
+                                    </svg>
+                                </MudButton>
+                            </div>
+                        </MudForm>
+                    </div>
+
+                    <div class="flex items-end xs:col-span-4 sm:col-span-4 md:col-span-1 justify-end">
+                        <div>
+                            <MudButton Class="xs:w-full sm:w-auto md:w-auto btn flex items-center gap-1.5
+                            bg-success border-success text-white hover:bg-success/[0.85]
+                            hover:border-success/[0.85] text-nowrap" @onclick="@(e => OpenAddOrUpdateModal(null))">
+                                <i class="ri-add-line"></i>
+                                Thêm mới
+                            </MudButton>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+                <table id="example" class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400" style="width:100%">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
+                            <th>STT</th>
+                            <th>Mã số chương trình</th>
+                            <th>Ngày tổ chức</th>
+                            <th>Tên chương trình</th>
+                            <th>Địa điểm</th>
+                            <th>Kênh quảng bá</th>
+                            <th>Sản phẩm</th>
+                            <th>Hình thức quảng bá</th>
+                            <th>Phạm vi tiếp cận</th>
+                            <th>Đối tượng tiếp cận</th>
+                            <th>Số lượng chủ thể</th>
+                            <th>Lượt khách tham quan</th>
+                            <th>Số hợp đồng ký kết</th>
+                            <th>Giá trị giao dịch (VNĐ)</th>
+                            <th>Ghi chú</th>
+                            <th>Trạng thái</th>
+                            <th>Tác vụ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < MainModels.Count; i++)
+                        {
+                            var currentIndex = i;
+                            <tr>
+                                <td>@(((Page - 1) * PageSize) + i + 1)</td>
+                                <td>@MainModels[i].code</td>
+                                <td>@MainModels[i].ngay_to_chuc?.ToString("dd/MM/yyyy")</td>
+                                <td>@MainModels[i].name</td>
+                                <td>@MainModels[i].dia_diem_to_chuc</td>
+                                <td>@MainModels[i].kenh_quang_ba?.GetDescription()</td>
+                                <td>@MainModels[i].san_pham_tham_gia</td>
+                                <td>@MainModels[i].hinh_thuc_quang_ba?.GetDescription()</td>
+                                <td>@MainModels[i].pham_vi_tiep_can?.GetDescription()</td>
+                                <td>@MainModels[i].doi_tuong_tiep_can?.GetDescription()</td>
+                                <td>@MainModels[i].so_luong_chu_the_tham_gia</td>
+                                <td>@MainModels[i].luot_khach_tham_quan</td>
+                                <td>@MainModels[i].so_hop_dong_ky_ket</td>
+                                <td>@MainModels[i].gia_tri_giao_dich</td>
+                                <td>@MainModels[i].description</td>
+                                <td>@((MarkupString)MainModels[i].status.GetDescription())</td>
+                                <td class="flex items-center gap-2">
+                                    <MudButton Class="transition-all duration-300 border btn-crud rounded-md btn text-purple border-purple hover:bg-purple hover:text-white"
+                                               @onclick="@(e => OpenAddOrUpdateModal(MainModels[currentIndex]))">
+                                        <i class="ri-edit-line"></i>
+                                    </MudButton>
+                                    <MudButton Class="transition-all duration-300 border btn-crud rounded-md btn text-danger border-danger hover:bg-danger hover:text-white"
+                                               @onclick="@(e => OpenDeleteModal(MainModels[currentIndex]))">
+                                        <i class="ri-delete-bin-line"></i>
+                                    </MudButton>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="9">
+                                <div class="flex items-center justify-between p-4">
+                                    <div class="flex items-center gap-2">
+                                        <span>Hiển thị</span>
+                                        <select class="form-select" @bind="PageSize" @bind:event="oninput" @onchange="OnPageSizeChanged">
+                                            <option value="10">10</option>
+                                            <option value="25">25</option>
+                                            <option value="50">50</option>
+                                            <option value="100">100</option>
+                                        </select>
+                                        <span>mục</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <div>
+                                            <ul class="inline-flex my-2 -space-x-px list-inside">
+                                                <li>
+                                                    <MudLink Href="#"
+                                                             Class="px-3 py-2 bg-white border cursor-not-allowed ltr:ml-0 rtl:mr-0 ltr:rounded-l-lg rtl:rounded-r-lg text-black/50 border-black/10 dark:bg-transparent dark:text-darkmuted dark:border-darkborder"
+                                                             @onclick="async () => await PreviousPage(LoadData)"
+                                                             disabled="@(Page <= 1)">Trước</MudLink>
+                                                </li>
+                                                @{
+                                                    var startPage = Math.Max(1, Page - 1);
+                                                    var endPage = Math.Min(TotalPages, Page + 1);
+
+                                                    // First page
+                                                    <li>
+                                                        <a href="#"
+                                                           class="px-3 py-2 text-black border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple @(Page == 1 ? "bg-purple text-white" : "bg-white")"
+                                                           @onclick="() => SelectedPage(1, LoadData)">1</a>
+                                                    </li>
+
+                                                    // Ellipsis if needed
+                                                    if (startPage > 2)
+                                                    {
+                                                        <li><span class="px-3 py-2">...</span></li>
+                                                    }
+
+                                                    // Pages around current
+                                                    for (int i = startPage; i <= endPage; i++)
+                                                    {
+                                                        if (i > 1 && i < TotalPages)
+                                                        {
+                                                            <li>
+                                                                <a href="#"
+                                                                   class="px-3 py-2 text-black border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple @(Page == i ? "bg-purple text-white" : "bg-white")"
+                                                                   @onclick="() => SelectedPage(i, LoadData)">@i</a>
+                                                            </li>
+                                                        }
+                                                    }
+
+                                                    // Ellipsis if needed
+                                                    if (endPage < TotalPages - 1)
+                                                    {
+                                                        <li><span class="px-3 py-2">...</span></li>
+                                                    }
+
+                                                    // Last page if more than one page
+                                                    if (TotalPages > 1)
+                                                    {
+                                                        <li>
+                                                            <a href="#"
+                                                               class="px-3 py-2 text-black border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple @(Page == TotalPages ? "bg-purple text-white" : "bg-white")"
+                                                               @onclick="() => SelectedPage(TotalPages, LoadData)">@TotalPages</a>
+                                                        </li>
+                                                    }
+                                                }
+                                                <li>
+                                                    <MudLink Href="#"
+                                                             Class="px-3 py-2 bg-white border cursor-not-allowed ltr:ml-0 rtl:mr-0 ltr:rounded-r-lg rtl:rounded-l-lg text-black/50 border-black/10 dark:bg-transparent dark:text-darkmuted dark:border-darkborder"
+                                                             @onclick="async () => await NextPage(LoadData)"
+                                                             disabled="@(Page >= TotalPages)">Sau</MudLink>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- End All Card -->
+@if (openDeleteModal)
+{
+    <div class="fixed inset-0 bg-black/80 z-[99999] overflow-y-auto dark:bg-dark/90">
+        <div class="flex items-center justify-center min-h-screen px-4" @onclick="CloseDeleteModal">
+            <div class="relative w-full max-w-lg p-0 my-8 overflow-hidden bg-white border rounded-lg border-black/10 dark:bg-darklight dark:border-darkborder" @onclick:stopPropagation>
+                <div class="flex items-center justify-between px-5 py-3 bg-white border-b border-black/10 dark:bg-darklight dark:border-darkborder">
+                    <MudText Typo="Typo.h5" Class="text-lg font-semibold text-slate-800 dark:text-slate-100">Xóa</MudText>
+                    <MudButton Class="text-muted hover:text-black dark:hover:text-white" OnClick="CloseDeleteModal">
+                        <i class="ri-close-line"></i>
+                    </MudButton>
+                </div>
+                <div class="p-5 space-y-4">
+                    <div class="text-black dark:text-muted">
+                        <h3>Bạn có chắc chắn muốn xóa dữ liệu này không?</h3>
+                    </div>
+                    <div class="flex items-center justify-end gap-2">
+                        <MudButton Class="transition-all duration-300 border btn-crud rounded-md btn text-danger border-danger hover:bg-danger hover:text-white" OnClick="CloseDeleteModal">Huỷ</MudButton>
+                        <MudButton OnClick="async () => await OnDelete()" Class="transition-all duration-300 border btn-crud rounded-md btn text-purple border-purple hover:bg-purple hover:text-white">Xóa</MudButton>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@if (openAddOrUpdateModal)
+{
+    <div class="fixed inset-0 bg-black/80 z-[99999] overflow-y-auto dark:bg-dark/90">
+        <div class="flex items-center justify-center min-h-screen px-4" @onclick="CloseAddOrUpdateModal">
+            <div class="relative w-full max-w-5xl p-0 my-8 overflow-hidden bg-white border rounded-lg border-black/10 dark:bg-darklight dark:border-darkborder" @onclick:stopPropagation>
+                <div class="flex items-center justify-between px-5 py-3 bg-white border-b border-black/10 dark:bg-darklight dark:border-darkborder">
+                    <MudText Typo="Typo.h5" Class="text-lg font-semibold text-slate-800 dark:text-slate-100">Thêm mới cơ sở vi phạm ATTP</MudText>
+                    <MudButton Class="text-muted hover:text-black dark:hover:text-white" OnClick="CloseAddOrUpdateModal">
+                        <i class="ri-close-line"></i>
+                    </MudButton>
+                </div>
+                <div class="p-5 space-y-4">
+                    <EditForm Model="@SelectedItem" OnValidSubmit="OnValidSubmit">
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-2 py-2">
+                            <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
+                                <label>Mã số chương trình<span class="text-danger">*</span></label>
+                                <input type="text" class="form-input" @bind-value="@SelectedItem.code" required />
+                            </div>
+                            <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
+                                <label>Ngày tổ chức<span class="text-danger">*</span></label>
+                                <input type="text" 
+                                       class="form-input date-picker"
+                                       placeholder="Chọn ngày tổ chức"
+                                       value="@(SelectedItem.ngay_to_chuc?.ToString("dd/MM/yyyy"))"
+                                       @onchange="@(e => OnDateChanged(e, "ngay_to_chuc"))" required />
+                            </div>
+                            <div class="space-y-2 xs:col-span-2 sm:col-span-2 md:col-span-2 xl:col-span-2">
+                                <label>Tên chương trình<span class="text-danger">*</span></label>
+                                <input type="text" class="form-input" @bind-value="@SelectedItem.name" required />
+                            </div>
+                            <div class="space-y-2 xs:col-span-2 sm:col-span-2 md:col-span-2 xl:col-span-2">
+                                <label>Địa điểm tổ chức<span class="text-danger">*</span></label>
+                                <input type="text" class="form-input" @bind-value="@SelectedItem.dia_diem_to_chuc" required />
+                            </div>
+                            <div class="space-y-2 md:col-span-1">
+                                <label>Tỉnh thành<span class="text-danger">*</span></label>
+                                <BlazoredTypeahead EnableDropDown="true"
+                                            ShowDropDownOnFocus="true"
+                                            MinimumLength="0"
+                                            TItem="TinhModel"
+                                            TValue="TinhModel"
+                                            SearchMethod="LoadTinhData"
+                                            Value="SelectedItem.province"
+                                            ValueExpression="@(() => SelectedItem.province)"
+                                            ValueChanged="@(e => SelectedItem.province = e)"
+                                            placeholder="Chọn tỉnh thành"
+                                            Class="form-select">
+                                    <SelectedTemplate Context="item">
+                                        @item.name
+                                    </SelectedTemplate>
+                                    <ResultTemplate Context="item">
+                                        @item.name
+                                    </ResultTemplate>
+                                    <NotFoundTemplate Context="item">
+                                        Không tìm thấy dữ liệu
+                                    </NotFoundTemplate>
+                                </BlazoredTypeahead>
+                            </div>
+                            <div class="space-y-2 md:col-span-1">
+                                <label>Xã phường<span class="text-danger">*</span></label>
+                                <BlazoredTypeahead EnableDropDown="true"
+                                            ShowDropDownOnFocus="true"
+                                            MinimumLength="0"
+                                            TItem="XaPhuongModel"
+                                            TValue="XaPhuongModel"
+                                            SearchMethod="LoadXaCRUDData"
+                                            Value="SelectedItem.ward"
+                                            ValueExpression="@(() => SelectedItem.ward)"
+                                            ValueChanged="@(e => SelectedItem.ward = e)"
+                                            placeholder="Chọn xã phường"
+                                            Class="form-select">
+                                    <SelectedTemplate Context="item">
+                                        @item.name
+                                    </SelectedTemplate>
+                                    <ResultTemplate Context="item">
+                                        @item.name
+                                    </ResultTemplate>
+                                    <NotFoundTemplate Context="item">
+                                        Không tìm thấy dữ liệu
+                                    </NotFoundTemplate>
+                                </BlazoredTypeahead>
+                            </div>
+                            <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
+                                <label>Kênh quảng bá<span class="text-danger">*</span></label>
+                                <select class="form-select" @bind-value="@SelectedItem.kenh_quang_ba" @bind-value:event="onchange">
+                                    <option value="">Chọn kênh quảng bá</option>
+                                    @foreach (var item in KenhQuangBaList)
+                                    {
+                                        <option value="@item">@item.GetDescription()</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
+                                <label>Hình thức quảng bá<span class="text-danger">*</span></label>
+                                <select class="form-select" @bind-value="@SelectedItem.hinh_thuc_quang_ba" @bind-value:event="onchange">
+                                    <option value="">Chọn hình thức quảng bá</option>
+                                    @foreach (var item in HinhThucQuangBaList)
+                                    {
+                                        <option value="@item">@item.GetDescription()</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
+                                <label>Phạm vi tiếp cận<span class="text-danger">*</span></label>
+                                <select class="form-select" @bind-value="@SelectedItem.pham_vi_tiep_can" @bind-value:event="onchange">
+                                    <option value="">Chọn phạm vi tiếp cận</option>
+                                    @foreach (var item in PhamViTiepCanList)
+                                    {
+                                        <option value="@item">@item.GetDescription()</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
+                                <label>Đối tượng tiếp cận<span class="text-danger">*</span></label>
+                                <select class="form-select" @bind-value="@SelectedItem.doi_tuong_tiep_can" @bind-value:event="onchange">
+                                    <option value="">Chọn đối tượng tiếp cận</option>
+                                    @foreach (var item in DoiTuongTiepCanList)
+                                    {
+                                        <option value="@item">@item.GetDescription()</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
+                                <label>Số lượng chủ thể tham gia</label>
+                                <input type="number" class="form-input" @bind-value="@SelectedItem.so_luong_chu_the_tham_gia" />
+                            </div>
+                            <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
+                                <label>Lượt khách tham quan</label>
+                                <input type="number" class="form-input" @bind-value="@SelectedItem.luot_khach_tham_quan" />
+                            </div>
+                            <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
+                                <label>Số hợp đồng ký kết</label>
+                                <input type="number" class="form-input" @bind-value="@SelectedItem.so_hop_dong_ky_ket" />
+                            </div>
+                            <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
+                                <label>Giá trị giao dịch (VNĐ)</label>
+                                <input type="number" class="form-input" @bind-value="@SelectedItem.gia_tri_giao_dich" />
+                            </div>  
+                            
+                            <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
+                                <label>Sản phẩm tham gia</label>
+                                <input type="text" class="form-input" @bind-value="@SelectedItem.san_pham_tham_gia" />
+                            </div>
+                            <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
+                                <label>Nguồn kinh phí thực hiện</label>
+                                <input type="text" class="form-input" @bind-value="@SelectedItem.nguon_kinh_phi_thuc_hien" />
+                            </div>
+
+                            <div class="space-y-2 md:col-span-2">
+                                <label>Nội dung chương trình</label>
+                                <textarea class="form-input form-textarea" rows="3" @bind="@SelectedItem.noi_dung_chuong_trinh"></textarea>
+                            </div>
+
+                            <div class="space-y-2 md:col-span-2">
+                                <label>Ghi chú</label>
+                                <textarea class="form-input form-textarea" rows="3" @bind="@SelectedItem.description"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-end gap-2 py-4">
+                            <MudButton Class="transition-all duration-300 border btn-crud rounded-md btn text-danger border-danger hover:bg-danger hover:text-white" OnClick="CloseAddOrUpdateModal">
+                                <i class="ri-close-line"></i>
+                                Huỷ
+                            </MudButton>
+                            <MudButton Class="transition-all duration-300 border btn-crud rounded-md btn text-purple border-purple hover:bg-purple hover:text-white"
+                                       OnClick="OnValidSubmit">
+                                <i class="ri-save-line"></i>
+                                Lưu
+                            </MudButton>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+}

@@ -174,7 +174,7 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoViPhamLinhVuc
             // Get all data for export
             string  query  = $"sort=-id";
             
-            int index = 3;
+            int index = 1;
 
             query += "&filter[_and][0][deleted][_eq]=false";
 
