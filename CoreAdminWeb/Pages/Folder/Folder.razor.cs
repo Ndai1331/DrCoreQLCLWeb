@@ -172,7 +172,7 @@ namespace CoreAdminWeb.Pages.Folder
             DeselectAll(MainModels);
             selected.isSelected = true;
             SelectedItem = selected;
-            await ResetPage();
+             ResetPage();
             StateHasChanged();
         }
 
@@ -387,37 +387,6 @@ namespace CoreAdminWeb.Pages.Folder
             {
                 AlertService.ShowAlert($"Lỗi khi xử lý ngày: {ex.Message}", "danger");
             }
-        }
-        
-   
-        private async Task PreviousPage()
-        {
-            if (Page > 1)
-            {
-                Page--;
-                await LoadFiles();
-            }
-        }
-
-        private async Task SelectedPage(int page)
-        {
-            Page = page;
-            await LoadFiles();
-        }
-
-        private async Task NextPage()
-        {
-            if (Page < TotalPages)
-            {
-                Page++;
-                await LoadFiles();
-            }
-        }
-
-        private async Task ResetPage()
-        {
-            Page = 1;
-            await LoadFiles();
         }
 
     }

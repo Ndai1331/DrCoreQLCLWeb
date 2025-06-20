@@ -36,13 +36,13 @@ namespace CoreAdminWeb.Shared.Base
         protected bool IsAuthenticated { get; private set; }
         public bool IsLoading { get; set; } = true;
 
-        public static int Page { get; set; } = 1;
-        public static int PageSize { get; set; } = 10;
-        public static int TotalCount { get; set; }
-        public static int TotalPages { get; set; }
-        public static int TotalItems { get; set; }
-        public static string BuilderQuery { get; set; } = "";
-        public static string AcceptFileTypes { get; set; } = "application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.openxmlformats-officedocument.presentationml.presentation, application/pdf,application/zip, application/x-7z-compressed, application/x-rar-compressed, application/x-tar, application/x-gzip, application/x-bzip2, application/x-compressed, application/x-compressed-tar, application/x-compressed-zip, application/x-compressed-rar, application/x-compressed-7z";
+        public int Page { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
+        public int TotalCount { get; set; }
+        public int TotalPages { get; set; }
+        public int TotalItems { get; set; }
+        public string BuilderQuery { get; set; } = "";
+        public string AcceptFileTypes { get; set; } = "application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.openxmlformats-officedocument.presentationml.presentation, application/pdf,application/zip, application/x-7z-compressed, application/x-rar-compressed, application/x-tar, application/x-gzip, application/x-bzip2, application/x-compressed, application/x-compressed-tar, application/x-compressed-zip, application/x-compressed-rar, application/x-compressed-7z";
 
         public static List<Model.Base.Status> StatusList = new List<
         Model.Base.Status> { Model.Base.Status.active,
@@ -53,8 +53,16 @@ namespace CoreAdminWeb.Shared.Base
         {
             await base.OnInitializedAsync();
             await LoadUserData();
+            ResetPage();
         }
-
+        public void ResetPage()
+        {
+            Page = 1;
+            PageSize = 10;
+            TotalCount = 0;
+            TotalPages = 0;
+            TotalItems = 0;
+        }
         protected virtual async Task LoadUserData()
         {
             try
@@ -127,7 +135,7 @@ namespace CoreAdminWeb.Shared.Base
             return roleNames.Contains(CurrentUser?.role);
         }
 
-        public static void BuildPaginationQuery(int page, int pageSize, string sort = "sort", bool isAsc = true)
+        public void BuildPaginationQuery(int page, int pageSize, string sort = "sort", bool isAsc = true)
         {
             BuilderQuery = $"limit={pageSize}&offset={(page - 1) * pageSize}&meta=filter_count";
             if (!isAsc)
@@ -180,6 +188,7 @@ namespace CoreAdminWeb.Shared.Base
         public async Task OnPageSizeChanged(Func<Task> loadData)
         {
             Page = 1;
+            TotalItems = 0;
             await loadData();
         }
 

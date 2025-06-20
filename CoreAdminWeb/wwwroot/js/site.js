@@ -87,3 +87,7 @@ window.getImageDimensions = async (file) => {
         img.onerror = () => resolve({ width: 0, height: 0 });
     });
 };
+
+
+
+
