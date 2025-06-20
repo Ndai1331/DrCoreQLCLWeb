@@ -1,6 +1,5 @@
 ﻿using CoreAdminWeb.Helpers;
 using CoreAdminWeb.Model;
-using CoreAdminWeb.Model.XuatNhapKhauPhanBon;
 using CoreAdminWeb.Services.BaseServices;
 using CoreAdminWeb.Shared.Base;
 using Microsoft.JSInterop;
@@ -117,13 +116,6 @@ namespace CoreAdminWeb.Pages.Folder
                     TotalPages = (int)Math.Ceiling((double)TotalItems / PageSize);
                 }
             }
-        }
-
-
-        private void OpenDeleteModal(XuatNhapKhauThuocBVTVChiTietModel item)
-        {
-
-            openDeleteModal = true;
         }
 
         private async Task OnDelete()

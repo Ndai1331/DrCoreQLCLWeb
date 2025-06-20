@@ -1,9 +1,7 @@
 ﻿using CoreAdminWeb.Enums;
 using CoreAdminWeb.Model;
-using CoreAdminWeb.Model.DienTichGieoTrongCayHangNam;
 using CoreAdminWeb.Services;
 using CoreAdminWeb.Services.BaseServices;
-using CoreAdminWeb.Services.DienTichGieoTrongCayHangNam;
 using CoreAdminWeb.Shared.Base;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
