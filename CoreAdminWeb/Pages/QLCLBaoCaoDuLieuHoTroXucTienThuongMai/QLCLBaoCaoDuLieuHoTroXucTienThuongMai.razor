@@ -158,7 +158,7 @@ pTitle="Báo cáo dữ liệu hỗ trợ xúc tiến thương mại"></PageHeade
                                 <div class="flex items-center justify-between p-4">
                                     <div class="flex items-center gap-2">
                                         <span>Hiển thị</span>
-                                        <select class="form-select" @bind="PageSize" @bind:event="oninput" @onchange="OnPageSizeChanged">
+                                        <select class="form-select" @bind="PageSize" @bind:event="oninput" @onchange="async () => await OnPageSizeChanged(LoadData)">
                                             <option value="10">10</option>
                                             <option value="25">25</option>
                                             <option value="50">50</option>

@@ -114,36 +114,6 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuHoTroXucTienThuongMai
             return await LoadBlazorTypeaheadData(searchText, XaPhuongService, query);
         }
 
-        private async Task OnPageSizeChanged()
-        {
-            Page = 1;
-            await LoadData();
-        }
-
-        private async Task PreviousPage()
-        {
-            if (Page > 1)
-            {
-                Page--;
-                await LoadData();
-            }
-        }
-
-        private async Task SelectedPage(int page)
-        {
-            Page = page;
-            await LoadData();
-        }
-
-        private async Task NextPage()
-        {
-            if (Page < TotalPages)
-            {
-                Page++;
-                await LoadData();
-            }
-        }
-
         private async Task OnDateChanged(ChangeEventArgs e, string fieldName)
         {
             try

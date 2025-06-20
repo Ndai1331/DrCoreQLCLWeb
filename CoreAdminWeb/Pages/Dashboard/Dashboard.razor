@@ -1,65 +1,110 @@
 ﻿@page "/dashboard"
-@using CoreAdminWeb.Model.Dashboard.IndexModel
 @inject IJSRuntime JsRuntime
+@using CoreAdminWeb.Shared.Base
+@inherits BlazorCoreBase
 <PageHeader Title="Dashboard" pTitle="Dashboard"></PageHeader>
-@* 
+
 <!-- Start All Card -->
 <div class="flex flex-col gap-4 min-h-[calc(100vh-212px)]">
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <div class="flex items-center justify-between gap-6 p-5 border rounded dark:border-darkborder border-black/10 bg-white dark:bg-darklight">
-            <div>
-                <MudText Class="text-base dark:text-gray-300">Total Views</MudText>
-                <MudText Typo="Typo.h4" Class="flex items-center gap-4 mt-3 text-2xl font-semibold text-slate-800 dark:text-slate-100">
-                    15102
-                    <span class="p-1 text-sm leading-none rounded-md bg-success/20 text-success">23%</span>
+        <div class="flex items-center justify-center gap-6 p-5 border rounded dark:border-darkborder border-black/10 bg-white dark:bg-darklight">
+            <div class="w-full text-center">
+                <span class="material-symbols-outlined">business</span>
+                <MudText Typo="Typo.h4" Class="flex items-center justify-center gap-4 mt-3 text-2xl font-semibold text-slate-800 dark:text-slate-100">
+                    @MainModel?.so_luong_co_so
                 </MudText>
+                <MudText Class="text-muted">Số doanh nghiệp sản xuất kinh doanh</MudText>
+            </div>
+        </div>
+        <div class="flex items-center justify-center gap-6 p-5 border rounded dark:border-darkborder border-black/10 bg-white dark:bg-darklight">
+            <div class="w-full text-center">
+                <span class="material-symbols-outlined">verified</span>
+                <MudText Typo="Typo.h4" Class="flex items-center justify-center gap-4 mt-3 text-2xl font-semibold text-slate-800 dark:text-slate-100">
+                    @MainModel?.so_luong_co_so_dat_chung_nhan
+                </MudText>
+                <MudText Class="text-muted">Cơ sở đạt chứng nhận</MudText>
+            </div>
+        </div>
+        <div class="flex items-center justify-center gap-6 p-5 border rounded dark:border-darkborder border-black/10 bg-white dark:bg-darklight">
+            <div class="w-full text-center">
+                <span class="material-symbols-outlined">warning</span>
+                <MudText Typo="Typo.h4" Class="flex items-center justify-center gap-4 mt-3 text-2xl font-semibold text-slate-800 dark:text-slate-100">
+                    @MainModel?.so_luong_vu_vi_pham
+                </MudText>
+                <MudText Class="text-muted">Số vụ vi phạm</MudText>
+            </div>
+        </div>
+        <div class="flex items-center justify-center gap-6 p-5 border rounded dark:border-darkborder border-black/10 bg-white dark:bg-darklight">
+            <div class="w-full text-center">
+                <span class="material-symbols-outlined">checklist</span>
+                <MudText Typo="Typo.h4" Class="flex items-center justify-center gap-4 mt-3 text-2xl font-semibold text-slate-800 dark:text-slate-100">
+                    @MainModel?.so_dot_kiem_tra
+                </MudText>
+                <MudText Class="text-muted">Số đợt kiểm tra</MudText>
+            </div>
+            
+        </div>
 
-                <MudText Class="text-muted">Current Month</MudText>
+        <div class="gap-6 p-5 bg-white border rounded dark:bg-darklight dark:border-darkborder md:col-span-2 xl:col-span-2 border-black/10">
+            <div class="flex items-center justify-between gap-4 mb-4">
+                <MudText Typo="Typo.h2" Class="text-base font-semibold text-slate-800 dark:text-slate-100">Số lượt kiểm tra theo tháng</MudText>
             </div>
             <div>
-                <div id="chart" dir="ltr"></div>
-            </div>
-        </div>
-        <div class="flex items-center justify-between gap-6 p-5 border rounded dark:border-darkborder border-black/10 bg-white dark:bg-darklight">
-            <div>
-                <MudText Class="text-base dark:text-white/80">Paid Visits</MudText>
-                <MudText Typo="Typo.h4" Class="flex items-center gap-4 mt-3 text-2xl font-semibold text-slate-800 dark:text-slate-100">
-                    4581
-                    <span class="p-1 text-sm leading-none rounded-md bg-danger/20 text-danger">24%</span>
-                </MudText>
-                <MudText Class="text-muted">Current Month</MudText>
-            </div>
-            <div>
-                <div id="chart2" dir="ltr"></div>
+                <div id="coSoSanXuatChart" dir="ltr"></div>
             </div>
         </div>
-        <div class="flex items-center justify-between gap-6 p-5 border rounded dark:border-darkborder border-black/10 bg-white dark:bg-darklight">
-            <div>
-                <MudText Class="text-base dark:text-white/80">Total Referral</MudText>
-                <h4 class="flex items-center gap-4 mt-3 text-2xl font-semibold text-slate-800 dark:text-slate-100">
-                    2140
-                    <span class="p-1 text-sm leading-none rounded-md bg-danger/20 text-danger">10%</span>
-                </h4>
-                <MudText Class="text-muted">Current Month</MudText>
+        <div class="gap-6 p-5 bg-white border rounded dark:bg-darklight dark:border-darkborder md:col-span-2 xl:col-span-2 border-black/10">
+            <div class="flex items-center justify-between gap-4 mb-4">
+                <MudText Typo="Typo.h2" Class="text-base font-semibold text-slate-800 dark:text-slate-100">Số lượt kiểm tra theo tháng</MudText>
             </div>
             <div>
-                <div id="chart4" dir="ltr"></div>
-            </div>
-        </div>
-        <div class="flex items-center justify-between gap-6 p-5 border rounded dark:border-darkborder border-black/10 bg-white dark:bg-darklight">
-            <div>
-                <MudText Class="text-base dark:text-white/80">This Week</MudText>
-                <MudText Typo="Typo.h4" Class="flex items-center gap-4 mt-3 text-2xl font-semibold text-slate-800 dark:text-slate-100">
-                    7714
-                    <span class="p-1 text-sm leading-none rounded-md bg-success/20 text-success">82%</span>
-                </MudText>
-                <MudText Class="text-muted">Current Month</MudText>
-            </div>
-            <div>
-                <div id="chart3" dir="ltr"></div>
+                <div id="tongDotKiemTraChart" dir="ltr"></div>
             </div>
         </div>
     </div>
+   
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-1">
+        <div class="gap-6 p-5 bg-white border rounded dark:bg-darklight dark:border-darkborder border-black/10">
+            <MudText Typo="Typo.h2"  class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">
+                Danh sách chứng nhận sắp hết hạn
+            </MudText>
+            <div class="overflow-auto">
+
+                <MudTable Class="min-w-[640px] text-left w-full" Items="@MainModel?.gcn_sap_het_han" Hover="true" Breakpoint="Breakpoint.None" LoadingProgressColor="Color.Info">
+                    <HeaderContent>
+                        <MudTh>Tên cơ sở</MudTh>
+                        <MudTh>Loại chứng nhận</MudTh>
+                        <MudTh>Ngày hết hạn</MudTh>
+                        <MudTh>Trạng thái</MudTh>
+                    </HeaderContent>
+
+                    <RowTemplate>
+                        <MudTd DataLabel="Tên cơ sở">@context.name</MudTd>
+                        <MudTd DataLabel="Loại chứng nhận">@context.so_giay_chung_nhan</MudTd>
+                        <MudTd DataLabel="Ngày hết hạn">@context.ngay_het_hieu_luc</MudTd>
+                        <MudTd DataLabel="Trạng thái">
+                            @if(context.so_ngay_con_lai >= 15){
+                                <span class="inline-flex items-center rounded shadow-md text-xs justify-center px-1.5 py-0.5" style="background-color: #28a745; color: #fff;">
+                                    Còn lại @context.so_ngay_con_lai ngày
+                                </span>
+                            }else if(context.so_ngay_con_lai > 0 && context.so_ngay_con_lai < 15){
+                                <span class="inline-flex items-center rounded shadow-md text-xs justify-center px-1.5 py-0.5" style="background-color: #ffc107; color: #212529;">
+                                    Còn lại @context.so_ngay_con_lai ngày
+                                </span>
+                            }else{
+                                <span class="inline-flex items-center rounded shadow-md text-xs justify-center px-1.5 py-0.5" style="background-color: #dc3545; color: #fff;">
+                                    Hết hạn
+                                </span>
+                            }
+                        </MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </div>
+        </div>
+    </div>
+</div>
+
+    @* 
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         <div class="gap-6 p-5 bg-white border rounded dark:bg-darklight dark:border-darkborder md:col-span-2 xl:col-span-2 border-black/10">
             <div class="flex items-center justify-between gap-4 mb-4">

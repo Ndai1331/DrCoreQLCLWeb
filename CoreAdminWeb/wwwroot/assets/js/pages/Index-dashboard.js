@@ -357,4 +357,135 @@ window.indexDashboardChart = function () {
     var chart = new ApexCharts(document.querySelector("#chart6"), options);
     chart.render();
 
+
+
+
+
+
+
+
+
+    // Chart Widget 5
+    var tongDotKiemTraChart = {
+        chart: {
+            height: 300,
+            type: "area",
+            fontFamily: "Inter, sans-serif",
+            zoom: {
+                enabled: false,
+            },
+            toolbar: {
+                show: false,
+            },
+        },
+        series: [
+            {
+                name: "Tổng số điểm kiểm tra",
+                data: [0, 1000, 5000, 10000, 8000, 11000, 15000, 10000, 8000, 11000, 15000, 10000, 8000, 11000, 15000],
+            },
+        ],
+        dataLabels: {
+            enabled: false,
+        },
+        stroke: {
+            show: true,
+            curve: "smooth",
+            width: 2,
+            lineCap: "square",
+        },
+        dropShadow: {
+            enabled: false,
+        },
+        colors: ["#6a69f5"],
+        markers: {
+            discrete: [
+                {
+                    seriesIndex: 0,
+                    dataPointIndex: 4,
+                    fillColor: "#6a69f5",
+                    strokeColor: "#fff",
+                    size: 6,
+                },
+            ],
+        },
+        labels: ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"],
+        xaxis: {
+            axisBorder: {
+                show: false,
+            },
+            axisTicks: {
+                show: false,
+            },
+            crosshairs: {
+                show: true,
+            },
+            labels: {
+                offsetX: 0,
+                offsetY: 5,
+                style: {
+                    fontSize: "12px",
+                    cssClass: "apexcharts-xaxis-title",
+                },
+            },
+        },
+        yaxis: {
+            tickAmount: 12,
+            labels: {
+                formatter: ((value) => {
+                    return value;
+                }),
+                offsetX: -10,
+                offsetY: 0,
+                style: {
+                    fontSize: "12px",
+                    cssClass: "apexcharts-yaxis-title",
+                },
+            },
+            opposite: false,
+        },
+        grid: {
+            borderColor: "#e0e6ed",
+            strokeDashArray: 7,
+            xaxis: {
+                lines: {
+                    show: false,
+                },
+            },
+            yaxis: {
+                lines: {
+                    show: true,
+                },
+            },
+            padding: {
+                top: 0,
+                right: 0,
+                bottom: 0,
+                left: 0,
+            },
+        },
+        legend: {
+            show: false,
+        },
+        tooltip: {
+            marker: {
+                show: true,
+            },
+            x: {
+                show: false,
+            },
+        },
+        fill: {
+            type: "gradient",
+            gradient: {
+                shadeIntensity: 1,
+                inverseColors: !1,
+                opacityFrom: 0,
+                opacityTo: 0,
+                stops: [100, 100],
+            },
+        },
+    };
+    var chart = new ApexCharts(document.querySelector("#tongDotKiemTraChart"), tongDotKiemTraChart);
+    chart.render();
+
 };
