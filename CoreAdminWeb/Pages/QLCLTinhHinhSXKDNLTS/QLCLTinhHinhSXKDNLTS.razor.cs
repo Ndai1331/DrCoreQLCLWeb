@@ -5,6 +5,11 @@ using CoreAdminWeb.Services.BaseServices;
 using CoreAdminWeb.Shared.Base;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using CoreAdminWeb.Extensions;  
+using System.Drawing;   
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
+
 
 namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
 {
@@ -568,5 +573,90 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
         {
             activeDefTab = tab;
         }
+
+
+        private async Task OnExportExcel()
+        {
+            // Get all data for export
+            BuildPaginationQuery(Page, int.MaxValue);
+            int index =1;
+
+            BuilderQuery += "&filter[_and][0][deleted][_eq]=false";
+            if (!string.IsNullOrEmpty(_searchString))
+            {
+                BuilderQuery += $"&filter[_and][{index}][_or][0][su_co_an_toan][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{index}][_or][1][bien_phap_xu_ly_chat_thai][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{index}][_or][2][qlcl_co_so_che_bien_nlts][name][_contains]={_searchString}";
+                index++;
+            }
+            if(_fromDate != null)
+            {
+                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_gte]={_fromDate.Value.ToString("yyyy-MM-dd")}";
+                index++;
+            }
+
+            if(_toDate != null)
+            {
+                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_lte]={_toDate.Value.ToString("yyyy-MM-dd")}";
+            }
+
+
+            var result = await MainService.GetAllAsync(BuilderQuery);
+            if (!result.IsSuccess || result.Data == null)
+            {
+                AlertService.ShowAlert("Không có dữ liệu để xuất Excel", "warning");
+                return;
+            }
+            var data = result.Data;
+
+            ExcelPackage.License.SetNonCommercialPersonal("Ndai1331");
+            // Create Excel package
+            using var package = new ExcelPackage(new FileInfo("MyWorkbook.xlsx"));
+            var ws = package.Workbook.Worksheets.Add("Data");
+
+            // Header
+            ws.Cells[1, 1].Value = "STT";
+            ws.Cells[1, 2].Value = "Ngày ghi nhận";
+            ws.Cells[1, 3].Value = "Tên cơ sở";
+            ws.Cells[1, 4].Value = "Thời gian bắt đầu";
+            ws.Cells[1, 5].Value = "Thời gian kết thúc";
+            ws.Cells[1, 6].Value = "Sản phẩm";
+            ws.Cells[1, 7].Value = "Sự cố an toàn";
+            ws.Cells[1, 8].Value = "Biện pháp xử lý chất thải";
+
+            // Style header
+            using (var range = ws.Cells[1, 1, 1, 8])
+            {
+                range.Style.Font.Bold = true;
+                range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+            }
+
+            // Fill data
+            int row = 2;
+            int stt = 1;
+            foreach (var item in data)
+            {
+                ws.Cells[row, 1].Value = stt;
+                ws.Cells[row, 2].Value = item.ngay_ghi_nhan;
+                ws.Cells[row, 3].Value = item.qlcl_co_so_che_bien_nlts?.name;
+                ws.Cells[row, 4].Value = item.thoi_gian_bat_dau;
+                ws.Cells[row, 5].Value = item.thoi_gian_ket_thuc;
+                // ws.Cells[row, 6].Value = item.qlcl_san_pham_san_xuat_nlts?.name;
+                ws.Cells[row, 7].Value = item.su_co_an_toan;
+                ws.Cells[row, 8].Value = item.bien_phap_xu_ly_chat_thai;
+                row++;
+                stt++;
+            }
+
+            ws.Cells[ws.Dimension.Address].AutoFitColumns();
+
+            // Export to browser
+            var fileName = $"DanhSachTinhHinhSXKDNLTS_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+            var fileBytes = package.GetAsByteArray();
+            // Nếu chưa có hàm saveAsFile trong wwwroot/js, hãy thêm hàm này để hỗ trợ download file từ base64
+            await JsRuntime.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(fileBytes));
+        }
+
     }
 }

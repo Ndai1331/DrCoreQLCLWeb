@@ -1,11 +1,13 @@
-﻿using CoreAdminWeb.Enums;
-using CoreAdminWeb.Helpers;
+﻿using CoreAdminWeb.Helpers;
 using CoreAdminWeb.Model;
 using CoreAdminWeb.Services;
 using CoreAdminWeb.Services.BaseServices;
 using CoreAdminWeb.Shared.Base;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using OfficeOpenXml;
+using CoreAdminWeb.Extensions;
+using OfficeOpenXml.Style;
 
 namespace CoreAdminWeb.Pages.QLCLPhamViKinhDoanh
 {
@@ -246,6 +248,97 @@ namespace CoreAdminWeb.Pages.QLCLPhamViKinhDoanh
         {
             _selectedXaFilter = item;
             await LoadData();
+        }
+
+
+        private async Task OnExportExcel()
+        {
+            // Get all data for export
+            BuildPaginationQuery(Page, int.MaxValue);
+            int intdex =1;
+
+            BuilderQuery += "filter[_and][0][deleted][_eq]=false&sort=sort";
+            if (!string.IsNullOrEmpty(_searchString))
+            {
+                BuilderQuery += $"&filter[_and][{intdex}][_or][0][name][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{intdex}][_or][1][description][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{intdex}][_or][2][code][_contains]={_searchString}";
+                intdex++;
+            }
+
+            if(_selectedTinhFilter != null)
+            {
+                BuilderQuery += $"&filter[_and][{intdex}][province][_eq]={_selectedTinhFilter.id}";
+                intdex++;
+            }
+
+            if(_selectedXaFilter != null)
+            {
+                BuilderQuery += $"&filter[_and][{intdex}][ward][_eq]={_selectedXaFilter.id}";
+                intdex++;
+            }
+
+            if(!string.IsNullOrEmpty(_searchStatusString))
+            {
+                BuilderQuery += $"&filter[_and][{intdex}][status][_eq]={_searchStatusString}";
+                intdex++;
+            }
+
+
+            var result = await MainService.GetAllAsync(BuilderQuery);
+            if (!result.IsSuccess || result.Data == null)
+            {
+                AlertService.ShowAlert("Không có dữ liệu để xuất Excel", "warning");
+                return;
+            }
+            var data = result.Data;
+
+            ExcelPackage.License.SetNonCommercialPersonal("Ndai1331");
+            // Create Excel package
+            using var package = new ExcelPackage(new FileInfo("MyWorkbook.xlsx"));
+            var ws = package.Workbook.Worksheets.Add("Data");
+
+            // Header
+            ws.Cells[1, 1].Value = "STT";
+            ws.Cells[1, 2].Value = "MS khu vực";
+            ws.Cells[1, 3].Value = "Tên khu vực";
+            ws.Cells[1, 4].Value = "Khu vực hoạt động";
+            ws.Cells[1, 5].Value = "Địa chỉ";
+            ws.Cells[1, 6].Value = "Đối tác tiêu thụ";
+            ws.Cells[1, 7].Value = "Phạm vi cung cấp";
+            ws.Cells[1, 8].Value = "Trạng thái";
+            // Style header
+            using (var range = ws.Cells[1, 1, 1, 8])
+            {
+                range.Style.Font.Bold = true;
+                range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+            }
+
+            // Fill data
+            int row = 2;
+            int stt = 1;
+            foreach (var item in data)
+            {
+                ws.Cells[row, 1].Value = stt;
+                ws.Cells[row, 2].Value = item.code;
+                ws.Cells[row, 3].Value = item.name;
+                ws.Cells[row, 4].Value = item.khu_vuc_hoat_dong;
+                ws.Cells[row, 5].Value = item.province?.name + ", " + item.ward?.name;
+                ws.Cells[row, 6].Value = item.doi_tac_tieu_thu;
+                ws.Cells[row, 7].Value = item.pham_vi_noi_dia == true ? "Nội địa," : "" + (item.pham_vi_xuat_khau == true ? "Xuất khẩu" : "");
+                ws.Cells[row, 8].Value = item.status.GetDescription();
+                row++;
+                stt++;
+            }
+
+            ws.Cells[ws.Dimension.Address].AutoFitColumns();
+
+            // Export to browser
+            var fileName = $"DanhSachPhamViKinhDoanh_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+            var fileBytes = package.GetAsByteArray();
+            // Nếu chưa có hàm saveAsFile trong wwwroot/js, hãy thêm hàm này để hỗ trợ download file từ base64
+            await JsRuntime.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(fileBytes));
         }
 
     }
