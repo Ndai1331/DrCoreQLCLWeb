@@ -1,14 +1,10 @@
-using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor.Services;
 using CoreAdminWeb.StateService;
-using CoreAdminWeb.Services.Users;
-using CoreAdminWeb.Services.Auth;
 using CoreAdminWeb.Model.Configuration;
 using CoreAdminWeb.RequestHttp;
-using CoreAdminWeb.Services.Menus;
 using CoreAdminWeb.DIInjections;
-using CoreAdminWeb.Services;
 using CoreAdminWeb.Commons;
+using Blazored.LocalStorage;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +14,10 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddMudServices();
 builder.Services.AddSingleton<ModeStateService>();
 builder.Services.AddRazorComponents();  // Add this line if using Blazor Server
+
+// Add Blazored.LocalStorage before other services that depend on it
+builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddAuthorizationCore();
 
 builder.Services.AddServices();
 builder.Services.Configure<DrCoreApi>(builder.Configuration.GetSection("DrCoreApi"));
@@ -40,7 +40,6 @@ builder.Services.AddHttpClient("DrCoreApiReport", client =>
     client.Timeout = TimeSpan.FromSeconds(30);
 });
 
-builder.Services.AddAuthorizationCore();
 // Load base URL
 GlobalConstant.BaseUrl = builder.Configuration["DrCoreApi:BaseUrl"] ?? "https://core.hpte.vn/";
 

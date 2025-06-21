@@ -6,7 +6,7 @@ namespace CoreAdminWeb.Pages.Users
 {
     public partial class Profile : ComponentBase
     {
-        private IUserService _userService { get; set; } = new UserService();
+        private IUserService _userService { get; set; }
 
         public Profile(IUserService userService)
         {

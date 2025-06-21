@@ -1,7 +1,7 @@
 using CoreAdminWeb.Model.Menus;
 using CoreAdminWeb.Model.User;
+using CoreAdminWeb.Providers;
 using CoreAdminWeb.Services;
-using CoreAdminWeb.Services.Auth;
 using CoreAdminWeb.Services.BaseServices;
 using CoreAdminWeb.Services.Menus;
 using CoreAdminWeb.Services.Users;
@@ -52,7 +52,6 @@ namespace CoreAdminWeb.Shared.Base
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
-            await LoadUserData();
             ResetPage();
         }
         public void ResetPage()
@@ -63,28 +62,11 @@ namespace CoreAdminWeb.Shared.Base
             TotalPages = 0;
             TotalItems = 0;
         }
-        protected virtual async Task LoadUserData()
+
+        public async Task<bool> IsAuthenticatedAsync()
         {
-            try
-            {
-                IsLoading = true;
-                var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-                IsAuthenticated = authState.User.Identity?.IsAuthenticated ?? false;
-                if (IsAuthenticated)
-                {
-                    CurrentUser = await ((AuthStateProvider)AuthStateProvider).GetCurrentUserAsync();
-                }
-            }
-            catch (Exception ex)
-            {
-                // Handle error
-                Console.WriteLine($"Error loading user data: {ex.Message}");
-            }
-            finally
-            {
-                IsLoading = false;
-                StateHasChanged();
-            }
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            return authState?.User?.Identity?.IsAuthenticated ?? false;
         }
 
         protected virtual async Task<List<MenuResponse>> LoadMenuData(int external_system_id = 2)
@@ -112,11 +94,8 @@ namespace CoreAdminWeb.Shared.Base
         {
             try
             {
-                if (CurrentUser != null)
-                {
-                    await ((AuthStateProvider)AuthStateProvider).LogoutAsync();
-                    NavigationManager.NavigateTo("/login", true);
-                }
+                await ((ApiAuthenticationStateProvider)AuthStateProvider).MarkUserAsLoggedOut();
+                NavigationManager?.NavigateTo("/signin", true);
             }
             catch (Exception ex)
             {

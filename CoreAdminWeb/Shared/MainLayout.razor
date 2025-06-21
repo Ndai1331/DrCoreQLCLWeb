@@ -1,12 +1,14 @@
 ﻿@using CoreAdminWeb.Model.Menus
 @using CoreAdminWeb.Model.User
-@using CoreAdminWeb.Services.Auth
 @using CoreAdminWeb.Helpers
 @using CoreAdminWeb.Model
 @using CoreAdminWeb.Model.Settings
 @using CoreAdminWeb.Services.Files
 @using CoreAdminWeb.Services.Menus
 @using CoreAdminWeb.Services.Settings
+@using CoreAdminWeb.Services.Users
+@using CoreAdminWeb.Providers
+@using Microsoft.AspNetCore.Components.Authorization
 @inherits LayoutComponentBase
 @inject IJSRuntime JsRuntime
 @inject AuthenticationStateProvider AuthStateProvider
@@ -55,6 +57,8 @@
     private UserModel currentUser;
     [Inject]
     private ISettingService SettingService { get; set; }
+    [Inject]
+    private IUserService UserService { get; set; }
     [Inject]
     private IFileService FileService { get; set; }
     private SettingModel? Setting { get; set; }
@@ -130,11 +134,14 @@
 
             if (isAuthenticated)
             {
-                currentUser = await ((AuthStateProvider)AuthStateProvider).GetCurrentUserAsync();
-                if (currentUser == null)
+                var resUser = await UserService.GetCurrentUserAsync();
+                if (!resUser.IsSuccess)
                 {
-                    isAuthenticated = false;
                     NavigationManager.NavigateTo("/signin");
+                }
+                else
+                {
+                    currentUser = resUser.Data;
                 }
             }
             else
@@ -158,7 +165,7 @@
     {
         try
         {
-            await ((AuthStateProvider)AuthStateProvider).LogoutAsync();
+            await ((ApiAuthenticationStateProvider)AuthStateProvider).MarkUserAsLoggedOut();
             NavigationManager.NavigateTo("/signin");
         }
         catch (Exception ex)

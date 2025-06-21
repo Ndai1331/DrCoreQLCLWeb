@@ -6,6 +6,7 @@ using System.Text;
 using CoreAdminWeb.Model;
 using CoreAdminWeb.Model.RequestHttps;
 using CoreAdminWeb.Model.User;
+using Blazored.LocalStorage;
 using CoreAdminWeb.Services.Users;
 using LoginResponse = CoreAdminWeb.Model.User.LoginResponse;
 
@@ -17,6 +18,8 @@ namespace CoreAdminWeb.RequestHttp
     public static class RequestClient
     {
         private static HttpClient? _client;
+
+        private static ILocalStorageService _localStorage;
         private static readonly CancellationTokenSource _tokenSource = new();
         private const long UploadLimit = 25214400; // ~24MB
         private static string? _accessToken;
@@ -40,6 +43,13 @@ namespace CoreAdminWeb.RequestHttp
         {
             _tokenSource.Cancel();
         }
+
+
+        public static void InjectServices(ILocalStorageService localStorage)
+        {
+            _localStorage = localStorage;
+        }
+
 
         /// <summary>
         /// Attach authentication token to the client

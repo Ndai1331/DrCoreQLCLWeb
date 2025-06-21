@@ -1,6 +1,5 @@
 using CoreAdminWeb.Model;
 using CoreAdminWeb.Services;
-using CoreAdminWeb.Services.Auth;
 using CoreAdminWeb.Services.BaseServices;
 using CoreAdminWeb.Services.DanhMucDungChung;
 using CoreAdminWeb.Services.Files;
@@ -9,6 +8,7 @@ using CoreAdminWeb.Services.Settings;
 using CoreAdminWeb.Services.Users;
 using CoreAdminWeb.Services.Reports;
 using CoreAdminWeb.Model.Reports;
+using CoreAdminWeb.Providers;
 
 namespace CoreAdminWeb.DIInjections
 {
@@ -25,7 +25,7 @@ namespace CoreAdminWeb.DIInjections
             services.AddScoped<IBaseService<TinhModel>, TinhService>();
             services.AddScoped<IBaseService<XaPhuongModel>, XaPhuongService>();
             services.AddScoped<IBaseService<DonViTinhModel>, DonViTinhService>();
-            services.AddScoped<Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider, AuthStateProvider>();
+            services.AddScoped<Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider, ApiAuthenticationStateProvider>();
             services.AddScoped<IBaseService<LinhVucVanBanModel>, LinhVucVanBanService>();
             services.AddScoped<IBaseService<PhanLoaiVanBanModel>, PhanLoaiVanBanService>();
             services.AddScoped<IBaseService<FolderModel>, FolderService>();

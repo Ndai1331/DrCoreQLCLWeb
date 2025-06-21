@@ -2,6 +2,10 @@ using CoreAdminWeb.Model.RequestHttps;
 using CoreAdminWeb.Model.User;
 using CoreAdminWeb.RequestHttp;
 using LoginResponse = CoreAdminWeb.Model.User.LoginResponse;
+using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components.Authorization;
+using CoreAdminWeb.Providers;
+using CoreAdminWeb.Helpers;
 
 namespace CoreAdminWeb.Services.Users
 {
@@ -19,9 +23,19 @@ namespace CoreAdminWeb.Services.Users
 
     public class UserService : IUserService
     {
+
+        private readonly ILocalStorageService _localStorage;
+        private readonly AuthenticationStateProvider _authenticationStateProvider;
         private string _accessToken;
         private string _refreshToken;
-
+        public UserService(
+            ILocalStorageService localStorage,
+            AuthenticationStateProvider authenticationStateProvider
+        )
+        {
+            _localStorage = localStorage;
+            _authenticationStateProvider = authenticationStateProvider;
+        }
         public async Task<RequestHttpResponse<LoginResponse>> LoginAsync(string email, string password)
         {
             var response = new RequestHttpResponse<LoginResponse>();
@@ -33,6 +47,23 @@ namespace CoreAdminWeb.Services.Users
                     response.Data = result.Data.Data;
                     _accessToken = result.Data.Data.access_token;
                     _refreshToken = result.Data.Data.refresh_token;
+
+                    RequestClient.AttachToken(_accessToken);
+                    RequestClient.InjectServices(_localStorage);
+                    var claim = ClaimHepler.GetListClaim(_accessToken);
+
+                    var currentUserAsync = await GetCurrentUserAsync();
+                    if(currentUserAsync.Data != null)
+                    {
+                        await _localStorage.SetItemAsync("accessToken", _accessToken);
+                        await _localStorage.SetItemAsync("userName", currentUserAsync.Data.email);
+                        await _localStorage.SetItemAsync("claims", claim);
+                        (
+                            (ApiAuthenticationStateProvider)_authenticationStateProvider
+                        ).MarkUserAsAuthenticated(currentUserAsync.Data.email);
+                    }else{
+                        response.Errors = new List<ErrorResponse> { new ErrorResponse { Message = "Không tìm thấy user" } };
+                    }
                 }else{
                     response.Errors = result.Errors;
                 }
