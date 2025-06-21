@@ -31,7 +31,12 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamChatLuongHangHoaVaATTP
         {
             if (firstRender)
             {
-                await LoadData();
+               await LoadData();
+                _ = Task.Run(async () =>
+                {
+                    await Task.Delay(500);
+                    await JsRuntime.InvokeVoidAsync("initializeDatePicker");
+                });
                 await JsRuntime.InvokeAsync<IJSObjectReference>("import", "/assets/js/pages/flatpickr.js");
                 StateHasChanged();
             }
@@ -163,11 +168,11 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamChatLuongHangHoaVaATTP
         private async Task OnExportExcel()
         {
             // Get all data for export
-            string  query  = $"sort=-id";
+            string  BuilderQuery  = $"sort=-id";
             
             int index = 3;
 
-            query += "&filter[_and][0][deleted][_eq]=false";
+            BuilderQuery += "&filter[_and][0][deleted][_eq]=false";
 
             if (!string.IsNullOrEmpty(_searchString))
             {
@@ -199,13 +204,13 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamChatLuongHangHoaVaATTP
 
             if(_fromDate != null)
             {
-                query += $"&filter[_and][{index}][ngay_ghi_nhan][_gte]={_fromDate.Value.ToString("yyyy-MM-dd")}";
+                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_gte]={_fromDate.Value.ToString("yyyy-MM-dd")}";
                 index++;
             }
 
             if(_toDate != null)
             {
-                query += $"&filter[_and][{index}][ngay_ghi_nhan][_lte]={_toDate.Value.ToString("yyyy-MM-dd")}";
+                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_lte]={_toDate.Value.ToString("yyyy-MM-dd")}";
             }
 
 

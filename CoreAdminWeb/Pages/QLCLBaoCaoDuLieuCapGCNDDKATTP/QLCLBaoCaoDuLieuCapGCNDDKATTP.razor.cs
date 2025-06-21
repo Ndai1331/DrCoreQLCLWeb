@@ -38,6 +38,11 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuCapGCNDDKATTP
             if (firstRender)
             {
                 await LoadData();
+                _ = Task.Run(async () =>
+                {
+                    await Task.Delay(500);
+                    await JsRuntime.InvokeVoidAsync("initializeDatePicker");
+                });
                 await JsRuntime.InvokeAsync<IJSObjectReference>("import", "/assets/js/pages/flatpickr.js");
                 StateHasChanged();
             }
