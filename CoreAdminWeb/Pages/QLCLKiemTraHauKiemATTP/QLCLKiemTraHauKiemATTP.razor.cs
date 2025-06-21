@@ -102,13 +102,13 @@ namespace CoreAdminWeb.Pages.QLCLKiemTraHauKiemATTP
                 BuilderQuery += $"&filter[_and][{index}][_or][4][noi_dung_kiem_tra][_contains]={_searchString}";
                 index++;
             }
-            if(_fromDate != null)
+            if (_fromDate != null)
             {
                 BuilderQuery += $"&filter[_and][{index}][ngay_kiem_tra][_gte]={_fromDate.Value.ToString("yyyy-MM-dd")}";
                 index++;
             }
 
-            if(_toDate != null)
+            if (_toDate != null)
             {
                 BuilderQuery += $"&filter[_and][{index}][ngay_kiem_tra][_lte]={_toDate.Value.ToString("yyyy-MM-dd")}";
             }
@@ -147,7 +147,7 @@ namespace CoreAdminWeb.Pages.QLCLKiemTraHauKiemATTP
         {
             string query = $"sort=-id";
             query += $"&filter[_and][][ProvinceId][_eq]={(SelectedItem.province == null ? 0 : SelectedItem.province?.id)}";
-            return await LoadBlazorTypeaheadData(searchText, XaPhuongService,query);
+            return await LoadBlazorTypeaheadData(searchText, XaPhuongService, query);
         }
 
 
@@ -155,7 +155,7 @@ namespace CoreAdminWeb.Pages.QLCLKiemTraHauKiemATTP
         {
             string query = $"sort=-id";
             query += $"&filter[_and][][ProvinceId][_eq]={(_selectedTinhFilter == null ? 0 : _selectedTinhFilter?.id)}";
-            return await LoadBlazorTypeaheadData(searchText, XaPhuongService,query);
+            return await LoadBlazorTypeaheadData(searchText, XaPhuongService, query);
         }
         private async Task<IEnumerable<QLCLLoaiHinhKinhDoanhModel>> LoadLoaiHinhKinhDoanhData(string searchText)
         {
@@ -475,6 +475,95 @@ namespace CoreAdminWeb.Pages.QLCLKiemTraHauKiemATTP
         {
             item.mau_goc = e.Value?.ToString() == "true" ? Enums.MauGoc.MauGoc : Enums.MauGoc.MauKhac;
         }
+        
+        private async Task OnExportExcel()
+        {
+            // Get all data for export
+            BuildPaginationQuery(Page, int.MaxValue, "id", false);
+            int index = 2;
+
+            BuilderQuery += "&filter[_and][0][deleted][_eq]=false";
+            if (!string.IsNullOrEmpty(_searchString))
+            {
+                BuilderQuery += $"&filter[_and][{index}][_or][0][code][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{index}][_or][1][name][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{index}][_or][2][dia_chi_san_xuat_kinh_doanh][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{index}][_or][3][co_quan_kiem_tra][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{index}][_or][4][noi_dung_kiem_tra][_contains]={_searchString}";
+                index++;
+            }
+            if (_fromDate != null)
+            {
+                BuilderQuery += $"&filter[_and][{index}][ngay_kiem_tra][_gte]={_fromDate.Value.ToString("yyyy-MM-dd")}";
+                index++;
+            }
+
+            if (_toDate != null)
+            {
+                BuilderQuery += $"&filter[_and][{index}][ngay_kiem_tra][_lte]={_toDate.Value.ToString("yyyy-MM-dd")}";
+            }
+
+
+            var result = await MainService.GetAllAsync(BuilderQuery);
+            if (!result.IsSuccess || result.Data == null)
+            {
+                AlertService.ShowAlert("Không có dữ liệu để xuất Excel", "warning");
+                return;
+            }
+            var data = result.Data;
+
+            ExcelPackage.License.SetNonCommercialPersonal("Ndai1331");
+            // Create Excel package
+            using var package = new ExcelPackage(new FileInfo("MyWorkbook.xlsx"));
+            var ws = package.Workbook.Worksheets.Add("Data");
+
+            // Header
+            ws.Cells[1, 1].Value = "STT";
+            ws.Cells[1, 2].Value = "Tên cơ sở";
+            ws.Cells[1, 3].Value = "Địa chỉ";
+            ws.Cells[1, 4].Value = "Sản phẩm kiểm tra";
+            ws.Cells[1, 5].Value = "Loại hình kiểm tra";
+            ws.Cells[1, 6].Value = "Hình thức xét nghiệm";
+            ws.Cells[1, 7].Value = "Ngày kiểm tra";
+            ws.Cells[1, 8].Value = "Kết quả kiểm tra";
+            ws.Cells[1, 9].Value = "Tình hình vi phạm";
+
+
+            // Style header
+            using (var range = ws.Cells[1, 1, 1, 9])
+            {
+                range.Style.Font.Bold = true;
+                range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+            }
+
+            // Fill data
+            int row = 2;
+            int stt = 1;
+            foreach (var item in data)
+            {
+                ws.Cells[row, 1].Value = stt;
+                ws.Cells[row, 2].Value = item.co_so?.name; // Tên cơ sở
+                ws.Cells[row, 3].Value = item.dia_chi_san_xuat_kinh_doanh; // Địa chỉ
+                ws.Cells[row, 4].Value = ""; // Sản phẩm kiểm tra
+                ws.Cells[row, 5].Value = item.loai_hinh_kiem_tra; // Loại hình kiểm tra
+                ws.Cells[row, 6].Value = item.hinh_thuc_xet_nghiem; // Hình thức xét nghiệm
+                ws.Cells[row, 7].Value = item.ngay_kiem_tra?.ToString("dd/MM/yyyy"); // Ngày kiểm tra
+                ws.Cells[row, 8].Value = item.ket_qua_kiem_tra; // Kết quả kiểm tra
+                ws.Cells[row, 9].Value = item.tinh_hinh_vi_pham; // Tình hình vi phạm
+                row++;
+                stt++;
+            }
+
+            ws.Cells[ws.Dimension.Address].AutoFitColumns();
+
+            // Export to browser
+            var fileName = $"DanhSachKiemTraHauKiemATTP_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+            var fileBytes = package.GetAsByteArray();
+            // Nếu chưa có hàm saveAsFile trong wwwroot/js, hãy thêm hàm này để hỗ trợ download file từ base64
+            await JsRuntime.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(fileBytes));
+        }
 
     }
+    
 }
