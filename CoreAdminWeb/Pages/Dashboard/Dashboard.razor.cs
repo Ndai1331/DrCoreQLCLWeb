@@ -86,13 +86,37 @@ namespace CoreAdminWeb.Pages.Dashboard
                 
                 int[] chartSeries = chartData?.Select(x => x.so_luong_co_so).ToArray() ?? new int[0];
 
-                // Generate random colors based on number of labels
-                var random = new Random();
+                // Generate predefined beautiful colors for better visual appeal
+                var predefinedColors = new List<string>
+                {
+                    "#3B82F6", // Blue
+                    "#EF4444", // Red
+                    "#10B981", // Green
+                    "#F59E0B", // Yellow
+                    "#8B5CF6", // Purple
+                    "#06B6D4", // Cyan
+                    "#F97316", // Orange
+                    "#EC4899", // Pink
+                    "#84CC16", // Lime
+                    "#6366F1", // Indigo
+                    "#14B8A6", // Teal
+                    "#F43F5E"  // Rose
+                };
+
                 var colors = new List<string>();
                 for (int i = 0; i < chartLabels.Length; i++)
                 {
-                    var color = $"#{random.Next(0x1000000):X6}";
-                    colors.Add(color);
+                    // Use predefined colors first, then generate random colors if needed
+                    if (i < predefinedColors.Count)
+                    {
+                        colors.Add(predefinedColors[i]);
+                    }
+                    else
+                    {
+                        var random = new Random();
+                        var color = $"#{random.Next(0x1000000):X6}";
+                        colors.Add(color);
+                    }
                 }
 
                 await JsRuntime.InvokeVoidAsync("initBassicBarChart", "#coSoSanXuatChart", chartSeries, chartLabels, colors.ToArray());

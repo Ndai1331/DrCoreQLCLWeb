@@ -192,6 +192,7 @@ var barchart = {
         bar: {
             horizontal: false,
             columnWidth: "25%",
+            distributed: true,
         },
     },
     xaxis: {
