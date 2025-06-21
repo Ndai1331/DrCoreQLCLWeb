@@ -43,6 +43,7 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuCapGCNDDKATTP
             }
         }
 
+
         private async Task LoadData()
         {
             BuilderQuery = $"QLCLBaoCaoThamDinhCapGCN?limit={PageSize}&offset={(Page - 1) * PageSize}";
