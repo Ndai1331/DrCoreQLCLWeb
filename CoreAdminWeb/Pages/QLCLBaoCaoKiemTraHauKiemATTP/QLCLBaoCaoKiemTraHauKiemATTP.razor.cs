@@ -50,6 +50,7 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoKiemTraHauKiemATTP
 
         private async Task LoadData()
         {
+            IsLoading = true;
             BuilderQuery = $"QLCLBaoCaoKiemTraHauKiemATTP?limit={PageSize}&offset={(Page - 1) * PageSize}";
            
             if(_selectedTinhFilter != null)
@@ -84,6 +85,7 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoKiemTraHauKiemATTP
             {
                 MainModels = new List<ReportBaoCaoKiemTraHauKiemATTPModel>();
             }
+            IsLoading = false;
         }
 
 

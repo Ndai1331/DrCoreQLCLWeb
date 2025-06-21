@@ -62,6 +62,7 @@ namespace CoreAdminWeb.Pages.QLCLCoSoNLTSDuDieuKienATTP
 
         private async Task LoadData()
         {
+            IsLoading = true;
             BuildPaginationQuery(Page, PageSize, "id", false);
             int index = 2;
 
@@ -116,6 +117,7 @@ namespace CoreAdminWeb.Pages.QLCLCoSoNLTSDuDieuKienATTP
             {
                 MainModels = new List<QLCLCoSoNLTSDuDieuKienATTPModel>();
             }
+            IsLoading = false;
         }
 
         private async Task LoadSanPhamDetailData()
