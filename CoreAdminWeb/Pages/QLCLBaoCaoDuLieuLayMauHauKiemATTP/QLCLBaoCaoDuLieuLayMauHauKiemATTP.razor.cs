@@ -42,6 +42,7 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuLayMauHauKiemATTP
 
         private async Task LoadData()
         {
+            IsLoading = true;
             BuilderQuery = $"QLCLBaoCaoKiemTraHauKiemATTP/chiTiet?limit={PageSize}&offset={(Page - 1) * PageSize}";
 
             if (!string.IsNullOrEmpty(_searchString))
@@ -81,6 +82,7 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuLayMauHauKiemATTP
             {
                 MainModels = new List<ReportBaoCaoKiemTraHauKiemLayMauATTPModel>();
             }
+            IsLoading = false;
         }
         private async Task<IEnumerable<TinhModel>> LoadTinhData(string searchText)
         {

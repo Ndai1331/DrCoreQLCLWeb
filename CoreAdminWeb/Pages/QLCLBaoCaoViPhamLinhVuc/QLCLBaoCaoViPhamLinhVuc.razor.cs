@@ -39,6 +39,7 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoViPhamLinhVuc
 
         private async Task LoadData()
         {
+            IsLoading = true;
             BuildPaginationQuery(Page, PageSize, "id", false);
             int index = 3;
 
@@ -97,6 +98,7 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoViPhamLinhVuc
             {
                 MainModels = new List<QLCLCoSoViPhamATTPModel>();
             }
+            IsLoading = false;
         }
         private async Task<IEnumerable<TinhModel>> LoadTinhData(string searchText)
         {

@@ -56,6 +56,7 @@ namespace CoreAdminWeb.Pages.QLCLCoSoVatTuNongNghiep
 
         private async Task LoadData()
         {
+            IsLoading = true;
             BuildPaginationQuery(Page, PageSize, "id", false);
             int index = 2;
 
@@ -107,6 +108,7 @@ namespace CoreAdminWeb.Pages.QLCLCoSoVatTuNongNghiep
             {
                 MainModels = new List<QLCLCoSoVatTuNongNghiepModel>();
             }
+            IsLoading = false;
         }
 
         private async Task LoadSanPhamDetailData()

@@ -38,8 +38,9 @@ namespace CoreAdminWeb.Pages.QLCLCoSoNLTSDuDieuKienATTPConHieuLuc
 
         private async Task LoadData()
         {
+            IsLoading = true;
             BuildPaginationQuery(Page, PageSize, "id", false);
-            int index = 3;
+            int index = 1;
 
             BuilderQuery += "&filter[_and][0][deleted][_eq]=false";
             BuilderQuery += "&filter[_and][1][loai][_eq]=1";
@@ -91,6 +92,7 @@ namespace CoreAdminWeb.Pages.QLCLCoSoNLTSDuDieuKienATTPConHieuLuc
             {
                 MainModels = new List<QLCLCoSoNLTSDuDieuKienATTPModel>();
             }
+            IsLoading = false;
         }
         private async Task<IEnumerable<TinhModel>> LoadTinhData(string searchText)
         {
@@ -157,47 +159,44 @@ namespace CoreAdminWeb.Pages.QLCLCoSoNLTSDuDieuKienATTPConHieuLuc
         private async Task OnExportExcel()
         {
             // Get all data for export
-            string  query  = $"sort=-id";
-            
-            int index = 3;
+            BuildPaginationQuery(Page, int.MaxValue, "id", false);
+            int index = 1;
 
-            query += "&filter[_and][0][deleted][_eq]=false";
-            query += "&filter[_and][1][loai][_eq]=1";
-            query += "&filter[_and][2][ngay_het_hieu_luc][_gte]=" + DateTime.Now.ToString("yyyy-MM-dd");
-
+            BuilderQuery += "&filter[_and][0][deleted][_eq]=false";
+            BuilderQuery += "&filter[_and][1][loai][_eq]=1";
+            BuilderQuery += "&filter[_and][2][ngay_het_hieu_luc][_gte]=" + DateTime.Now.ToString("yyyy-MM-dd");
             if (!string.IsNullOrEmpty(_searchString))
             {
-                query += $"&filter[_and][{index}][_or][0][code][_contains]={_searchString}";
-                query += $"&filter[_and][{index}][_or][1][name][_contains]={_searchString}";
-                query += $"&filter[_and][{index}][_or][4][so_giay_chung_nhan][_contains]={_searchString}";
-                query += $"&filter[_and][{index}][_or][5][co_quan_cap][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{index}][_or][0][code][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{index}][_or][1][name][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{index}][_or][4][so_giay_chung_nhan][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{index}][_or][5][co_quan_cap][_contains]={_searchString}";
                 index++;
             }
 
 
             if(_selectedTinhFilter != null)
             {
-                query += $"&filter[_and][{index}][province][_eq]={_selectedTinhFilter.id}";
+                BuilderQuery += $"&filter[_and][{index}][province][_eq]={_selectedTinhFilter.id}";
                 index++;
             }
 
             if(_selectedXaFilter != null)
             {
-                query += $"&filter[_and][{index}][ward][_eq]={_selectedXaFilter.id}";
+                BuilderQuery += $"&filter[_and][{index}][ward][_eq]={_selectedXaFilter.id}";
                 index++;
             }
 
             if(_fromDate != null)
             {
-                query += $"&filter[_and][{index}][ngay_het_hieu_luc][_gte]={_fromDate.Value.ToString("yyyy-MM-dd")}";
+                BuilderQuery += $"&filter[_and][{index}][ngay_het_hieu_luc][_gte]={_fromDate.Value.ToString("yyyy-MM-dd")}";
                 index++;
             }
 
             if(_toDate != null)
             {
-                query += $"&filter[_and][{index}][ngay_het_hieu_luc][_lte]={_toDate.Value.ToString("yyyy-MM-dd")}";
+                BuilderQuery += $"&filter[_and][{index}][ngay_het_hieu_luc][_lte]={_toDate.Value.ToString("yyyy-MM-dd")}";
             }
-
 
             var result = await MainService.GetAllAsync(BuilderQuery);
             if (!result.IsSuccess || result.Data == null)

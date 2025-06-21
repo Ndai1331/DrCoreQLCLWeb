@@ -66,6 +66,7 @@ namespace CoreAdminWeb.Pages.QLCLPhatTrienThiTruong
 
         private async Task LoadData()
         {
+            IsLoading = true;
             BuildPaginationQuery(Page, PageSize, "id", false);
             int index = 1;
 
@@ -117,6 +118,8 @@ namespace CoreAdminWeb.Pages.QLCLPhatTrienThiTruong
             {
                 MainModels = new List<QLCLPhatTrienThiTruongModel>();
             }
+            
+            IsLoading = false;
         }
 
         private async Task LoadSanPhamDetailData()

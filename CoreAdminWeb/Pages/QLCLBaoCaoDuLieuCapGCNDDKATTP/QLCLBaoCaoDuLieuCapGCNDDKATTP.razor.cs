@@ -46,6 +46,7 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuCapGCNDDKATTP
 
         private async Task LoadData()
         {
+            IsLoading = true;
             BuilderQuery = $"QLCLBaoCaoThamDinhCapGCN?limit={PageSize}&offset={(Page - 1) * PageSize}";
            
             if(_selectedTinhFilter != null)
@@ -80,6 +81,7 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuCapGCNDDKATTP
             {
                 MainModels = new List<ReportBaoCaoThamDinhCapGCNModel>();
             }
+            IsLoading = false;
         }
 
 

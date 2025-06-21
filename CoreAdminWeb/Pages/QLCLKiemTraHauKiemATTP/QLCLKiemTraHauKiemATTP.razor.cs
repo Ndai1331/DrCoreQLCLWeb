@@ -89,6 +89,7 @@ namespace CoreAdminWeb.Pages.QLCLKiemTraHauKiemATTP
 
         private async Task LoadData()
         {
+            IsLoading = true;
             BuildPaginationQuery(Page, PageSize, "id", false);
             int index = 2;
 
@@ -127,6 +128,7 @@ namespace CoreAdminWeb.Pages.QLCLKiemTraHauKiemATTP
             {
                 MainModels = new List<QLCLKiemTraHauKiemATTPModel>();
             }
+            IsLoading = false;
         }
 
         private async Task LoadSanPhamDetailData()

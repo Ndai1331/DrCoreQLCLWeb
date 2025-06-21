@@ -39,8 +39,9 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamChatLuongHangHoaVaATTP
 
         private async Task LoadData()
         {
+            IsLoading = true;
             BuildPaginationQuery(Page, PageSize, "id", false);
-            int index = 3;
+            int index = 1;
 
             BuilderQuery += "&filter[_and][0][deleted][_eq]=false";
             if (!string.IsNullOrEmpty(_searchString))
@@ -97,6 +98,7 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamChatLuongHangHoaVaATTP
             {
                 MainModels = new List<QLCLCoSoViPhamATTPModel>();
             }
+            IsLoading = false;
         }
         private async Task<IEnumerable<TinhModel>> LoadTinhData(string searchText)
         {
@@ -163,12 +165,10 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamChatLuongHangHoaVaATTP
         private async Task OnExportExcel()
         {
             // Get all data for export
-            string  query  = $"sort=-id";
-            
-            int index = 3;
+            BuildPaginationQuery(Page, int.MaxValue, "id", false);
+            int index = 1;
 
-            query += "&filter[_and][0][deleted][_eq]=false";
-
+            BuilderQuery += "&filter[_and][0][deleted][_eq]=false";
             if (!string.IsNullOrEmpty(_searchString))
             {
                 BuilderQuery += $"&filter[_and][{index}][_or][0][co_so_che_bien_nlts][code][_contains]={_searchString}";
@@ -182,6 +182,7 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamChatLuongHangHoaVaATTP
                 BuilderQuery += $"&filter[_and][{index}][_or][8][xu_ly_khac][_contains]={_searchString}";
                 index++;
             }
+
 
             if(_selectedTinhFilter != null)
             {
@@ -199,15 +200,14 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamChatLuongHangHoaVaATTP
 
             if(_fromDate != null)
             {
-                query += $"&filter[_and][{index}][ngay_ghi_nhan][_gte]={_fromDate.Value.ToString("yyyy-MM-dd")}";
+                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_gte]={_fromDate.Value.ToString("yyyy-MM-dd")}";
                 index++;
             }
 
             if(_toDate != null)
             {
-                query += $"&filter[_and][{index}][ngay_ghi_nhan][_lte]={_toDate.Value.ToString("yyyy-MM-dd")}";
+                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_lte]={_toDate.Value.ToString("yyyy-MM-dd")}";
             }
-
 
             var result = await MainService.GetAllAsync(BuilderQuery);
             if (!result.IsSuccess || result.Data == null)
