@@ -2,9 +2,13 @@
 using CoreAdminWeb.Model;
 using CoreAdminWeb.Services.BaseServices;
 using CoreAdminWeb.Shared.Base;
+using CoreAdminWeb.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using CoreAdminWeb.Enums;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
+using System.Drawing;
 
 namespace CoreAdminWeb.Pages.QLCLCoSoViPhamATTP
 {
@@ -28,7 +32,7 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamATTP
         private bool openAddOrUpdateModal = false;
         private string _titleAddOrUpdate = "Thêm mới";
         private string _searchString = "";
-         private TinhModel? _selectedTinhFilter { get; set; }
+        private TinhModel? _selectedTinhFilter { get; set; }
         private XaPhuongModel? _selectedXaFilter { get; set; }
         private DateTime? _fromDate = null;
         private DateTime? _toDate = null;
@@ -62,7 +66,7 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamATTP
             {
                 IsLoading = true;
                 BuildPaginationQuery(Page, PageSize);
-                int intdex =1;
+                int intdex = 1;
 
                 BuilderQuery += "filter[_and][0][deleted][_eq]=false&sort=sort";
                 if (!string.IsNullOrEmpty(_searchString))
@@ -74,15 +78,15 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamATTP
                     BuilderQuery += $"&filter[_and][{intdex}][_or][4][description][_contains]={_searchString}";
                     intdex++;
                 }
-                
-                if(_selectedTinhFilter != null)
+
+                if (_selectedTinhFilter != null)
                 {
                     BuilderQuery += $"&filter[_and][{intdex}][_or][0][co_so_che_bien_nlts][province][_eq]={_selectedTinhFilter.id}";
                     BuilderQuery += $"&filter[_and][{intdex}][_or][1][co_so_nlts_du_dieu_kien_attp][province][_eq]={_selectedTinhFilter.id}";
                     intdex++;
                 }
 
-                if(_selectedXaFilter != null)
+                if (_selectedXaFilter != null)
                 {
                     BuilderQuery += $"&filter[_and][{intdex}][_or][0][co_so_che_bien_nlts][ward][_eq]={_selectedXaFilter.id}";
                     BuilderQuery += $"&filter[_and][{intdex}][_or][1][co_so_nlts_du_dieu_kien_attp][ward][_eq]={_selectedXaFilter.id}";
@@ -95,12 +99,12 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamATTP
                     intdex++;
                 }
 
-                if(_toDate != null)
+                if (_toDate != null)
                 {
                     BuilderQuery += $"&filter[_and][{intdex}][ngay_ghi_nhan][_lte]={_toDate.Value.ToString("yyyy-MM-dd")}";
                     intdex++;
                 }
-                
+
 
                 var result = await MainService.GetAllAsync(BuilderQuery);
                 if (result.IsSuccess)
@@ -137,8 +141,8 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamATTP
         {
             string query = $"sort=-id";
             query += $"&filter[_and][][ProvinceId][_eq]={(_selectedTinhFilter == null ? 0 : _selectedTinhFilter?.id)}";
-            return await LoadBlazorTypeaheadData(searchText, XaPhuongService,query);
-        }   
+            return await LoadBlazorTypeaheadData(searchText, XaPhuongService, query);
+        }
 
         private void OpenAddOrUpdateModal(QLCLCoSoViPhamATTPModel? item)
         {
@@ -206,8 +210,8 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamATTP
             {
                 var resultCreate = SelectedItem.id == 0 ? await MainService.CreateAsync(SelectedItem) : new();
                 var resultUpdate = SelectedItem.id > 0 ? await MainService.UpdateAsync(SelectedItem) : new();
-                string message =resultCreate.Message ?? resultUpdate.Message;
-                if ((SelectedItem.id == 0 && resultCreate.IsSuccess) || (SelectedItem.id > 0 &&resultUpdate.IsSuccess))
+                string message = resultCreate.Message ?? resultUpdate.Message;
+                if ((SelectedItem.id == 0 && resultCreate.IsSuccess) || (SelectedItem.id > 0 && resultUpdate.IsSuccess))
                 {
                     await LoadData();
                     openAddOrUpdateModal = false;
@@ -215,7 +219,7 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamATTP
                 }
                 else
                 {
-                    AlertService.ShowAlert($"Lỗi khi {(SelectedItem.id == 0 ? "thêm mới" : "cập nhật")} dữ liệu :" + message , "danger");
+                    AlertService.ShowAlert($"Lỗi khi {(SelectedItem.id == 0 ? "thêm mới" : "cập nhật")} dữ liệu :" + message, "danger");
                 }
             }
             catch (Exception ex)
@@ -274,13 +278,13 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamATTP
                 }
 
                 var parts = dateStr.Split('/');
-                if (parts.Length == 3 && 
-                    int.TryParse(parts[0], out int day) && 
-                    int.TryParse(parts[1], out int month) && 
+                if (parts.Length == 3 &&
+                    int.TryParse(parts[0], out int day) &&
+                    int.TryParse(parts[1], out int month) &&
                     int.TryParse(parts[2], out int year))
                 {
                     var date = new DateTime(year, month, day);
-                    
+
                     if (fieldName == "ngay_ghi_nhan")
                         SelectedItem.ngay_ghi_nhan = date;
                     else if (fieldName == "ngay_xu_ly")
@@ -295,7 +299,7 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamATTP
                         _toDate = date;
                         await LoadData();
                     }
-                    
+
                 }
             }
             catch (Exception ex)
@@ -337,6 +341,110 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamATTP
             SelectedItem.loai_co_so = !string.IsNullOrEmpty(value) ? (LoaiCoSoNLTS)Enum.Parse(typeof(LoaiCoSoNLTS), value) : LoaiCoSoNLTS.CoSoCheBien;
             SelectedItem.co_so_che_bien_nlts = null;
             SelectedItem.co_so_nlts_du_dieu_kien_attp = null;
+        }
+        
+        private async Task OnExportExcel()
+        {
+            // Get all data for export
+            BuildPaginationQuery(Page, int.MaxValue);
+            int intdex = 1;
+
+            BuilderQuery += "filter[_and][0][deleted][_eq]=false&sort=sort";
+            if (!string.IsNullOrEmpty(_searchString))
+            {
+                BuilderQuery += $"&filter[_and][{intdex}][_or][0][co_so_che_bien_nlts][name][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{intdex}][_or][1][co_so_nlts_du_dieu_kien_attp][name][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{intdex}][_or][2][hanh_vi_vi_pham][name][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{intdex}][_or][3][huong_xu_ly][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{intdex}][_or][4][description][_contains]={_searchString}";
+                intdex++;
+            }
+
+            if (_selectedTinhFilter != null)
+            {
+                BuilderQuery += $"&filter[_and][{intdex}][_or][0][co_so_che_bien_nlts][province][_eq]={_selectedTinhFilter.id}";
+                BuilderQuery += $"&filter[_and][{intdex}][_or][1][co_so_nlts_du_dieu_kien_attp][province][_eq]={_selectedTinhFilter.id}";
+                intdex++;
+            }
+
+            if (_selectedXaFilter != null)
+            {
+                BuilderQuery += $"&filter[_and][{intdex}][_or][0][co_so_che_bien_nlts][ward][_eq]={_selectedXaFilter.id}";
+                BuilderQuery += $"&filter[_and][{intdex}][_or][1][co_so_nlts_du_dieu_kien_attp][ward][_eq]={_selectedXaFilter.id}";
+                intdex++;
+            }
+
+            if (_fromDate != null)
+            {
+                BuilderQuery += $"&filter[_and][{intdex}][ngay_ghi_nhan][_gte]={_fromDate.Value.ToString("yyyy-MM-dd")}";
+                intdex++;
+            }
+
+            if (_toDate != null)
+            {
+                BuilderQuery += $"&filter[_and][{intdex}][ngay_ghi_nhan][_lte]={_toDate.Value.ToString("yyyy-MM-dd")}";
+                intdex++;
+            }
+
+
+            var result = await MainService.GetAllAsync(BuilderQuery);
+            if (!result.IsSuccess || result.Data == null)
+            {
+                AlertService.ShowAlert("Không có dữ liệu để xuất Excel", "warning");
+                return;
+            }
+            var data = result.Data;
+
+            ExcelPackage.License.SetNonCommercialPersonal("Ndai1331");
+            // Create Excel package
+            using var package = new ExcelPackage(new FileInfo("MyWorkbook.xlsx"));
+            var ws = package.Workbook.Worksheets.Add("Data");
+
+            // Header
+            ws.Cells[1, 1].Value = "STT";
+            ws.Cells[1, 2].Value = "Ngày ghi nhận";
+            ws.Cells[1, 3].Value = "Tên cơ sở";
+            ws.Cells[1, 4].Value = "Hành vi vi phạm";
+            ws.Cells[1, 5].Value = "Hướng xử lý";
+            ws.Cells[1, 6].Value = "Phạt tiền (VNĐ)";
+            ws.Cells[1, 7].Value = "Giá trị tang vật (VNĐ)";
+            ws.Cells[1, 8].Value = "Ghi chú";
+            ws.Cells[1, 9].Value = "Trạng thái";
+
+            // Style header
+            using (var range = ws.Cells[1, 1, 1, 9])
+            {
+                range.Style.Font.Bold = true;
+                range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+            }
+
+            // Fill data
+            int row = 2;
+            int stt = 1;
+            foreach (var item in data)
+            {
+                ws.Cells[row, 1].Value = stt;
+                ws.Cells[row, 2].Value = item.ngay_ghi_nhan?.ToString("dd/MM/yyyy");
+                ws.Cells[row, 3].Value = (item.loai_co_so == Enums.LoaiCoSoNLTS.CoSoCheBien) ? item.co_so_che_bien_nlts?.name : item.co_so_nlts_du_dieu_kien_attp?.name;
+                ws.Cells[row, 4].Value = item.hanh_vi_vi_pham?.name;
+                ws.Cells[row, 5].Value = item.huong_xu_ly;
+                ws.Cells[row, 6].Value = item.phat_tien;
+                ws.Cells[row, 7].Value = item.gia_tri_tang_vat;
+                ws.Cells[row, 8].Value = item.description;
+                ws.Cells[row, 9].Value = item.status?.GetDescription();
+
+                row++;
+                stt++;
+            }
+
+            ws.Cells[ws.Dimension.Address].AutoFitColumns();
+
+            // Export to browser
+            var fileName = $"DanhSachCoSoViPhamATTP_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+            var fileBytes = package.GetAsByteArray();
+            // Nếu chưa có hàm saveAsFile trong wwwroot/js, hãy thêm hàm này để hỗ trợ download file từ base64
+            await JsRuntime.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(fileBytes));
         }
     }
 

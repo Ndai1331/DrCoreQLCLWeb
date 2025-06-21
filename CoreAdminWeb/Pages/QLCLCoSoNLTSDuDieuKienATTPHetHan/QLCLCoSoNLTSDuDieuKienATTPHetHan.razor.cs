@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
-using System.Drawing;
 
 namespace CoreAdminWeb.Pages.QLCLCoSoNLTSDuDieuKienATTPHetHan
 {
@@ -61,25 +60,25 @@ namespace CoreAdminWeb.Pages.QLCLCoSoNLTSDuDieuKienATTPHetHan
             }
 
 
-            if(_selectedTinhFilter != null)
+            if (_selectedTinhFilter != null)
             {
                 BuilderQuery += $"&filter[_and][{index}][province][_eq]={_selectedTinhFilter.id}";
                 index++;
             }
 
-            if(_selectedXaFilter != null)
+            if (_selectedXaFilter != null)
             {
                 BuilderQuery += $"&filter[_and][{index}][ward][_eq]={_selectedXaFilter.id}";
                 index++;
             }
 
-            if(_fromDate != null)
+            if (_fromDate != null)
             {
                 BuilderQuery += $"&filter[_and][{index}][ngay_het_hieu_luc][_gte]={_fromDate.Value.ToString("yyyy-MM-dd")}";
                 index++;
             }
 
-            if(_toDate != null)
+            if (_toDate != null)
             {
                 BuilderQuery += $"&filter[_and][{index}][ngay_het_hieu_luc][_lte]={_toDate.Value.ToString("yyyy-MM-dd")}";
             }
@@ -107,7 +106,7 @@ namespace CoreAdminWeb.Pages.QLCLCoSoNLTSDuDieuKienATTPHetHan
         {
             string query = $"sort=-id";
             query += $"&filter[_and][][ProvinceId][_eq]={(_selectedTinhFilter == null ? 0 : _selectedTinhFilter?.id)}";
-            return await LoadBlazorTypeaheadData(searchText, XaPhuongService,query);
+            return await LoadBlazorTypeaheadData(searchText, XaPhuongService, query);
         }
 
         private async Task OnDateChanged(ChangeEventArgs e, string fieldName)
@@ -164,8 +163,8 @@ namespace CoreAdminWeb.Pages.QLCLCoSoNLTSDuDieuKienATTPHetHan
         private async Task OnExportExcel()
         {
             // Get all data for export
-            string  query  = $"sort=-id";
-            
+            string query = $"sort=-id";
+
             int index = 3;
 
             query += "&filter[_and][0][deleted][_eq]=false";
@@ -186,25 +185,25 @@ namespace CoreAdminWeb.Pages.QLCLCoSoNLTSDuDieuKienATTPHetHan
             }
 
 
-            if(_selectedTinhFilter != null)
+            if (_selectedTinhFilter != null)
             {
                 query += $"&filter[_and][{index}][province][_eq]={_selectedTinhFilter.id}";
                 index++;
             }
 
-            if(_selectedXaFilter != null)
+            if (_selectedXaFilter != null)
             {
                 query += $"&filter[_and][{index}][ward][_eq]={_selectedXaFilter.id}";
                 index++;
             }
 
-            if(_fromDate != null)
+            if (_fromDate != null)
             {
                 query += $"&filter[_and][{index}][ngay_het_hieu_luc][_gte]={_fromDate.Value.ToString("yyyy-MM-dd")}";
                 index++;
             }
 
-            if(_toDate != null)
+            if (_toDate != null)
             {
                 query += $"&filter[_and][{index}][ngay_het_hieu_luc][_lte]={_toDate.Value.ToString("yyyy-MM-dd")}";
             }
