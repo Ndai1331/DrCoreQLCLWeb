@@ -116,7 +116,15 @@ pTitle="Báo cáo dữ liệu lấy mẫu hậu kiểm, giám sát ATTP"></PageH
                         </MudForm>
                     </div>
 
-                    <div class="flex items-end xs:col-span-4 sm:col-span-4 md:col-span-1 justify-end">
+                    <div class="flex items-end xs:col-span-4 sm:col-span-4 md:col-span-1 justify-end gap-2">
+                        <div>
+                            <MudButton type="button" Class="xs:w-full sm:w-auto md:w-auto btn flex items-center gap-1.5
+                            bg-success border-success text-white hover:bg-success/[0.85]
+                            hover:border-success/[0.85] text-nowrap" @onclick="@(e => LoadData())">
+                                <i class="ri-bar-chart-line"></i>
+                                Thống kê
+                            </MudButton>
+                        </div>
                         <div>
                             <MudButton Class="xs:w-full sm:w-auto md:w-auto btn flex items-center gap-1.5
                             bg-success border-success text-white hover:bg-success/[0.85]
