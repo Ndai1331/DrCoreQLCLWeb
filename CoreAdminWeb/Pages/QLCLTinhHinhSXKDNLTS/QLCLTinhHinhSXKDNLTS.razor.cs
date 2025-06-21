@@ -56,6 +56,7 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
 
         private async Task LoadData()
         {
+            IsLoading = true;
             BuildPaginationQuery(Page, PageSize, "id", false);
             int index =1;
 
@@ -93,6 +94,7 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
             {
                 MainModels = new List<QLCLTinhHinhSXKDNLTSModel>();
             }
+            IsLoading = false;
         }
 
         private async Task LoadNguyenLieuDetailData()
