@@ -45,7 +45,7 @@ namespace CoreAdminWeb.Services
                 var response = await RequestClient.GetAPIAsync<RequestHttpResponse<List<FolderModel>>>(url);
 
                 return response.IsSuccess
-                    ? new RequestHttpResponse<List<FolderModel>> { Data = response.Data?.Data }
+                    ? new RequestHttpResponse<List<FolderModel>> { Data = response.Data?.Data, Meta = response.Data?.Meta }
                     : new RequestHttpResponse<List<FolderModel>> { Errors = response.Errors };
             }
             catch (Exception ex)
@@ -73,7 +73,7 @@ namespace CoreAdminWeb.Services
                 var response = await RequestClient.GetAPIAsync<RequestHttpResponse<FolderModel>>($"folders/{id}?fields=*");
 
                 return response.IsSuccess
-                    ? new RequestHttpResponse<FolderModel> { Data = response.Data?.Data }
+                    ? new RequestHttpResponse<FolderModel> { Data = response.Data?.Data, Meta = response.Data?.Meta }
                     : new RequestHttpResponse<FolderModel> { Errors = response.Errors };
             }
             catch (Exception ex)

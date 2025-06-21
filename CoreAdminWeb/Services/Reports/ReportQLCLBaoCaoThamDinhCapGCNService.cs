@@ -14,7 +14,7 @@ namespace CoreAdminWeb.Services.Reports
                 var response = await ReportRequestClient.GetAPIAsync<RequestHttpResponse<List<ReportBaoCaoThamDinhCapGCNModel>>>(query);
 
                 return response.IsSuccess
-                    ? new RequestHttpResponse<List<ReportBaoCaoThamDinhCapGCNModel>> { Data = response.Data?.Data }
+                    ? new RequestHttpResponse<List<ReportBaoCaoThamDinhCapGCNModel>> { Data = response.Data?.Data, Meta = response.Data?.Meta }
                     : new RequestHttpResponse<List<ReportBaoCaoThamDinhCapGCNModel>> { Errors = response.Errors };
             }
             catch (Exception ex)

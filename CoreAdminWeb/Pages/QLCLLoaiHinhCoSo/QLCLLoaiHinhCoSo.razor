@@ -8,6 +8,10 @@
 @using CoreAdminWeb.Services
 @using CoreAdminWeb.Services.BaseServices
 @using CoreAdminWeb.Shared.Base
+@using Microsoft.JSInterop
+@using OfficeOpenXml
+@using OfficeOpenXml.Style
+@using System.Drawing
 @inject IJSRuntime JsRuntime
 @inject IBaseService<QLCLLoaiHinhCoSoModel> MainService
 @inherits BlazorCoreBase
@@ -68,7 +72,15 @@
                     </div>
                 </div>
 
-                <div class="flex items-end md:w-1/5 justify-end py-2">
+                <div class="flex items-end md:w-1/5 justify-end py-2 gap-2">
+                    <div>
+                        <MudButton Class="xs:w-full sm:w-auto md:w-auto btn flex items-center gap-1.5
+                        bg-success border-success text-white hover:bg-success/[0.85]
+                        hover:border-success/[0.85] text-nowrap" @onclick="@(e => OnExportExcel())">
+                            <i class="ri-file-excel-line"></i>
+                            Xuất file excel
+                        </MudButton>
+                    </div>
                     <div>
                         <MudButton Class="xs:w-full sm:w-auto md:w-auto btn flex items-center gap-1.5
                         bg-success border-success text-white hover:bg-success/[0.85]
@@ -427,4 +439,72 @@
             await _module.DisposeAsync();
         }
     }
+
+    
+    private async Task OnExportExcel()
+    {
+        // Get all data for export
+        BuildPaginationQuery(Page, int.MaxValue);
+        if (!string.IsNullOrEmpty(_searchString))
+        {
+            BuilderQuery += $"&filter[_and][0][_or][0][code][_contains]={_searchString}&filter[_and][0][_or][1][name][_contains]={_searchString}";
+        }
+        if (!string.IsNullOrEmpty(_searchStatusString))
+        {
+            BuilderQuery += $"&filter[_and][][status][_eq]={_searchStatusString}";
+        }
+        BuilderQuery += $"&filter[_and][][deleted][_eq]=false";
+
+
+        var result = await MainService.GetAllAsync(BuilderQuery);
+        if (!result.IsSuccess || result.Data == null)
+        {
+            AlertService.ShowAlert("Không có dữ liệu để xuất Excel", "warning");
+            return;
+        }
+        var data = result.Data;
+
+        ExcelPackage.License.SetNonCommercialPersonal("Ndai1331");
+        // Create Excel package
+        using var package = new ExcelPackage(new FileInfo("MyWorkbook.xlsx"));
+        var ws = package.Workbook.Worksheets.Add("Data");
+
+        // Header
+        ws.Cells[1, 1].Value = "STT";
+        ws.Cells[1, 2].Value = "Mã";
+        ws.Cells[1, 3].Value = "Tên";
+        ws.Cells[1, 4].Value = "Ghi chú";
+        ws.Cells[1, 5].Value = "Trạng thái";
+
+        // Style header
+        using (var range = ws.Cells[1, 1, 1, 8])
+        {
+            range.Style.Font.Bold = true;
+            range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+            range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+        }
+
+        // Fill data
+        int row = 2;
+        int stt = 1;
+        foreach (var item in data)
+        {
+            ws.Cells[row, 1].Value = stt;
+            ws.Cells[row, 2].Value = item.code;
+            ws.Cells[row, 3].Value = item.name;
+            ws.Cells[row, 4].Value = item.description;
+            ws.Cells[row, 5].Value = item.status.GetDescription();
+            row++;
+            stt++;
+        }
+
+        ws.Cells[ws.Dimension.Address].AutoFitColumns();
+
+        // Export to browser
+        var fileName = $"DanhSachLoaiHinhCoSo_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+        var fileBytes = package.GetAsByteArray();
+        // Nếu chưa có hàm saveAsFile trong wwwroot/js, hãy thêm hàm này để hỗ trợ download file từ base64
+        await JsRuntime.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(fileBytes));
+    }
+    
 }

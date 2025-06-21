@@ -65,7 +65,7 @@ namespace CoreAdminWeb.Services
                 var response = await RequestClient.GetAPIAsync<RequestHttpResponse<List<QLCLCoSoNLTSDuDieuKienATTPModel>>>(url);
 
                 return response.IsSuccess
-                    ? new RequestHttpResponse<List<QLCLCoSoNLTSDuDieuKienATTPModel>> { Data = response.Data?.Data }
+                    ? new RequestHttpResponse<List<QLCLCoSoNLTSDuDieuKienATTPModel>> { Data = response.Data?.Data, Meta = response.Data?.Meta }
                     : new RequestHttpResponse<List<QLCLCoSoNLTSDuDieuKienATTPModel>> { Errors = response.Errors };
             }
             catch (Exception ex)
@@ -93,7 +93,7 @@ namespace CoreAdminWeb.Services
                 var response = await RequestClient.GetAPIAsync<RequestHttpResponse<QLCLCoSoNLTSDuDieuKienATTPModel>>($"items/{_collection}/{id}?fields={Fields}");
 
                 return response.IsSuccess
-                    ? new RequestHttpResponse<QLCLCoSoNLTSDuDieuKienATTPModel> { Data = response.Data?.Data }
+                    ? new RequestHttpResponse<QLCLCoSoNLTSDuDieuKienATTPModel> { Data = response.Data?.Data, Meta = response.Data?.Meta }
                     : new RequestHttpResponse<QLCLCoSoNLTSDuDieuKienATTPModel> { Errors = response.Errors };
             }
             catch (Exception ex)

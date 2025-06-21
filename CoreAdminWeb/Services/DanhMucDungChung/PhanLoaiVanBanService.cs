@@ -54,7 +54,7 @@ namespace CoreAdminWeb.Services.DanhMucDungChung
                 var response = await RequestClient.GetAPIAsync<RequestHttpResponse<List<PhanLoaiVanBanModel>>>(url);
 
                 return response.IsSuccess
-                    ? new RequestHttpResponse<List<PhanLoaiVanBanModel>> { Data = response.Data?.Data }
+                    ? new RequestHttpResponse<List<PhanLoaiVanBanModel>> { Data = response.Data?.Data, Meta = response.Data?.Meta }
                     : new RequestHttpResponse<List<PhanLoaiVanBanModel>> { Errors = response.Errors };
             }
             catch (Exception ex)
@@ -82,7 +82,7 @@ namespace CoreAdminWeb.Services.DanhMucDungChung
                 var response = await RequestClient.GetAPIAsync<RequestHttpResponse<PhanLoaiVanBanModel>>($"items/{_collection}/{id}?fields={Fields}");
 
                 return response.IsSuccess
-                    ? new RequestHttpResponse<PhanLoaiVanBanModel> { Data = response.Data?.Data }
+                    ? new RequestHttpResponse<PhanLoaiVanBanModel> { Data = response.Data?.Data, Meta = response.Data?.Meta }
                     : new RequestHttpResponse<PhanLoaiVanBanModel> { Errors = response.Errors };
             }
             catch (Exception ex)

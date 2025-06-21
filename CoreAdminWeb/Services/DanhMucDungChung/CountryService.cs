@@ -49,7 +49,7 @@ namespace CoreAdminWeb.Services.DanhMucDungChung
                 var response = await RequestClient.GetAPIAsync<RequestHttpResponse<List<CountryModel>>>(url);
 
                 return response.IsSuccess
-                    ? new RequestHttpResponse<List<CountryModel>> { Data = response.Data?.Data }
+                    ? new RequestHttpResponse<List<CountryModel>> { Data = response.Data?.Data, Meta = response.Data?.Meta }
                     : new RequestHttpResponse<List<CountryModel>> { Errors = response.Errors };
             }
             catch (Exception ex)
@@ -77,7 +77,7 @@ namespace CoreAdminWeb.Services.DanhMucDungChung
                 var response = await RequestClient.GetAPIAsync<RequestHttpResponse<CountryModel>>($"items/{_collection}/{id}?fields={Fields}");
 
                 return response.IsSuccess
-                    ? new RequestHttpResponse<CountryModel> { Data = response.Data?.Data }
+                    ? new RequestHttpResponse<CountryModel> { Data = response.Data?.Data, Meta = response.Data?.Meta }
                     : new RequestHttpResponse<CountryModel> { Errors = response.Errors };
             }
             catch (Exception ex)
