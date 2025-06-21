@@ -9,6 +9,7 @@
 @using CoreAdminWeb.Services.Users
 @using CoreAdminWeb.Providers
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components
 @inherits LayoutComponentBase
 @inject IJSRuntime JsRuntime
 @inject AuthenticationStateProvider AuthStateProvider
@@ -69,6 +70,24 @@
         try
         {
             await base.OnInitializedAsync();
+          
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in initialization: {ex.Message}");
+            // Only navigate if not already on signin page
+            var currentUri = NavigationManager?.Uri ?? "";
+            if (!currentUri.Contains("/signin"))
+            {
+                NavigationManager?.NavigateTo("/signin");
+            }
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
             await CheckAuth();
             if (isAuthenticated)
             {
@@ -77,13 +96,12 @@
                     LoadMenus()
                 );
             }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error in initialization: {ex.Message}");
-            NavigationManager.NavigateTo("/signin");
+
+            StateHasChanged();
         }
     }
+    
+
     private async Task LoadSettings()
     {
         try
@@ -137,7 +155,12 @@
                 var resUser = await UserService.GetCurrentUserAsync();
                 if (!resUser.IsSuccess)
                 {
-                    NavigationManager.NavigateTo("/signin");
+                    // Only navigate if not already on signin page
+                    var currentUri = NavigationManager?.Uri ?? "";
+                    if (!currentUri.Contains("/signin"))
+                    {
+                        NavigationManager?.NavigateTo("/signin");
+                    }
                 }
                 else
                 {
@@ -146,14 +169,24 @@
             }
             else
             {
-                NavigationManager.NavigateTo("/signin");
+                // Only navigate if not already on signin page
+                var currentUri = NavigationManager?.Uri ?? "";
+                if (!currentUri.Contains("/signin"))
+                {
+                    NavigationManager?.NavigateTo("/signin");
+                }
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error checking auth: {ex.Message}");
             isAuthenticated = false;
-            NavigationManager.NavigateTo("/signin");
+            // Only navigate if not already on signin page
+            var currentUri = NavigationManager?.Uri ?? "";
+            if (!currentUri.Contains("/signin"))
+            {
+                NavigationManager?.NavigateTo("/signin");
+            }
         }
         finally
         {
@@ -166,7 +199,12 @@
         try
         {
             await ((ApiAuthenticationStateProvider)AuthStateProvider).MarkUserAsLoggedOut();
-            NavigationManager.NavigateTo("/signin");
+            // Only navigate if not already on signin page
+            var currentUri = NavigationManager?.Uri ?? "";
+            if (!currentUri.Contains("/signin"))
+            {
+                NavigationManager?.NavigateTo("/signin");
+            }
         }
         catch (Exception ex)
         {

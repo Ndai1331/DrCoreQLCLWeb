@@ -34,7 +34,7 @@ namespace CoreAdminWeb.Shared.Base
 
         protected UserModel? CurrentUser { get; private set; }
         protected bool IsAuthenticated { get; private set; }
-        public bool IsLoading { get; set; } = true;
+        public bool IsLoading { get; set; } = false;
 
         public int Page { get; set; } = 1;
         public int PageSize { get; set; } = 10;
@@ -73,7 +73,6 @@ namespace CoreAdminWeb.Shared.Base
         {
             try
             {
-                IsLoading = true;
                 var menus = await MenuService.GetMenusAsync(external_system_id);
 
                 if (menus.Data == null)
