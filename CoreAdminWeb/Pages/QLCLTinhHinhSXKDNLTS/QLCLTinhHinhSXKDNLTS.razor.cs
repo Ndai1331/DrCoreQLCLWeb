@@ -315,6 +315,7 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
                     san_luong_tan = 0,
                     deleted = false,
                 });
+
             }
 
        
