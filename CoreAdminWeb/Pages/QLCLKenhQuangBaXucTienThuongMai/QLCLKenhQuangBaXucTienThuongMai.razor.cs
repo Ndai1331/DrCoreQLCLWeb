@@ -326,6 +326,18 @@ namespace CoreAdminWeb.Pages.QLCLKenhQuangBaXucTienThuongMai
             }
         }
 
+        public async Task OnTinhFilterChanged(TinhModel? tinh)
+        {
+            _selectedTinhFilter = tinh;
+            _selectedXaFilter = null;
+            await LoadData();
+        }
+        public async Task OnXaFilterChanged(XaPhuongModel? xa)
+        {
+            _selectedXaFilter = xa;
+            await LoadData();
+        }
+
         private async Task OnExportExcel()
         {
             // Get all data for export

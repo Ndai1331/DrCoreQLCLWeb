@@ -165,7 +165,19 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuHoTroXucTienThuongMai
                 AlertService.ShowAlert($"Lỗi khi xử lý ngày: {ex.Message}", "danger");
             }
         }
-        
+
+        public async Task OnTinhFilterChanged(TinhModel? tinh)
+        {
+            _selectedTinhFilter = tinh;
+            _selectedXaFilter = null;
+            await LoadData();
+        }
+        public async Task OnXaFilterChanged(XaPhuongModel? xa)
+        {
+            _selectedXaFilter = xa;
+            await LoadData();
+        }
+
         private async Task OnExportExcel()
         {
             // Get all data for export
