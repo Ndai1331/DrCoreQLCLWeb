@@ -5,7 +5,7 @@ using CoreAdminWeb.Services.BaseServices;
 using CoreAdminWeb.Shared.Base;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using CoreAdminWeb.Extensions;  
+using CoreAdminWeb.Helpers;  
 using System.Drawing;   
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
@@ -287,16 +287,17 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
         private async Task OpenAddOrUpdateModal(QLCLTinhHinhSXKDNLTSModel? item)
         {
             _titleAddOrUpdate = item != null ? "Sửa" : "Thêm mới";
-            SelectedItem = item != null ? item : new QLCLTinhHinhSXKDNLTSModel();
+            SelectedItem = item != null ? item.DeepClone() : new QLCLTinhHinhSXKDNLTSModel();
             SelectedNguyenLieuItemsDetail = new List<QLCLTinhHinhSXKDNLTSNguyenLieuModel>();
 
             if (SelectedItem.id is not null && SelectedItem.id > 0)
             {
                 await LoadNguyenLieuDetailData();
                 await LoadSanPhamDetailData();
-            }
+            }else{
+                SelectedNguyenLieuItemsDetail = new List<QLCLTinhHinhSXKDNLTSNguyenLieuModel>();
+                SelectedSanPhamItemsDetail = new List<QLCLTinhHinhSXKDNLTSSanPhamModel>();
 
-            if (!SelectedNguyenLieuItemsDetail.Any())
                 SelectedNguyenLieuItemsDetail.Add(new QLCLTinhHinhSXKDNLTSNguyenLieuModel()
                 {
                     tinh_hinh_san_xuat_kinh_doanh_nlts = SelectedItem,
@@ -305,9 +306,7 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
                     khoi_luong_tan = 0,
                     deleted = false,
                 });
-            
-            
-            if (!SelectedSanPhamItemsDetail.Any())
+
                 SelectedSanPhamItemsDetail.Add(new QLCLTinhHinhSXKDNLTSSanPhamModel()
                 {
                     tinh_hinh_san_xuat_kinh_doanh_nlts = SelectedItem,
@@ -316,7 +315,9 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
                     san_luong_tan = 0,
                     deleted = false,
                 });
+            }
 
+       
             openAddOrUpdateModal = true;
 
             // Wait for modal to render
@@ -329,6 +330,18 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
 
         private async Task OnValidSubmit()
         {
+            if(SelectedNguyenLieuItemsDetail.Count == 0)
+            {
+                AlertService.ShowAlert("Vui lòng nhập nguyên liệu", "warning");
+                return;
+            }
+
+            if(SelectedSanPhamItemsDetail.Count == 0)
+            {
+                AlertService.ShowAlert("Vui lòng nhập sản phẩm", "warning");
+                return;
+            }
+
             if (SelectedItem.id is null || SelectedItem.id <= 0)
             {
                 var result = await MainService.CreateAsync(SelectedItem);

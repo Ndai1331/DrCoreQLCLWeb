@@ -64,10 +64,10 @@ namespace CoreAdminWeb.Pages.QLCLCoSoCheBienNLTS
             try
             {
                 IsLoading = true;
-                BuildPaginationQuery(Page, PageSize);
+                BuildPaginationQuery(Page, PageSize, "id", false);
                 int intdex =1;
 
-                BuilderQuery += "filter[_and][0][deleted][_eq]=false&sort=sort";
+                BuilderQuery += "&filter[_and][0][deleted][_eq]=false";
                 if (!string.IsNullOrEmpty(_searchString))
                 {
                     BuilderQuery += $"&filter[_and][{intdex}][_or][0][so_giay_phep][_contains]={_searchString}";
@@ -80,7 +80,16 @@ namespace CoreAdminWeb.Pages.QLCLCoSoCheBienNLTS
                     BuilderQuery += $"&filter[_and][{intdex}][_or][7][chung_nhan_attp][_contains]={_searchString}";
                     intdex++;
                 }
-
+                if(_selectedTinhFilter != null)
+                {
+                    BuilderQuery += $"&filter[_and][{intdex}][province][_eq]={_selectedTinhFilter.id}";
+                    intdex++;
+                }
+                if(_selectedXaFilter != null)
+                {
+                    BuilderQuery += $"&filter[_and][{intdex}][ward][_eq]={_selectedXaFilter.id}";
+                    intdex++;
+                }
                 if(_fromDate != null)
                 {
                     BuilderQuery += $"&filter[_and][{intdex}][ngay_cap][_gte]={_fromDate.Value.ToString("yyyy-MM-dd")}";
@@ -187,7 +196,7 @@ namespace CoreAdminWeb.Pages.QLCLCoSoCheBienNLTS
                 var resultCreate = SelectedItem.id == 0 ? await MainService.CreateAsync(SelectedItem) : new();
                 var resultUpdate = SelectedItem.id > 0 ? await MainService.UpdateAsync(SelectedItem) : new();
                 string message =resultCreate.Message ?? resultUpdate.Message;
-                if (resultCreate.IsSuccess || resultUpdate.IsSuccess)
+                if ((resultCreate.IsSuccess && SelectedItem.id == 0 ) || (resultUpdate.IsSuccess && SelectedItem.id > 0))
                 {
                     await LoadData();
                     openAddOrUpdateModal = false;
@@ -377,7 +386,7 @@ namespace CoreAdminWeb.Pages.QLCLCoSoCheBienNLTS
             ws.Cells[1, 8].Value = "Chứng nhận về ATTP";
             ws.Cells[1, 9].Value = "Trạng thái";
             // Style header
-            using (var range = ws.Cells[1, 1, 1, 8])
+            using (var range = ws.Cells[1, 1, 1, 9])
             {
                 range.Style.Font.Bold = true;
                 range.Style.Fill.PatternType = ExcelFillStyle.Solid;
