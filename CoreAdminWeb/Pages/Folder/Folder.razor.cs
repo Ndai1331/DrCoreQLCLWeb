@@ -168,6 +168,7 @@ namespace CoreAdminWeb.Pages.Folder
         private async Task OnLinhVucVanBanFilterChanged(LinhVucVanBanModel selected)
         {
             _selectedFilterLinhVucVanBan = selected;
+            
             await LoadFiles();
         }
 
