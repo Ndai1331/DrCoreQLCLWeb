@@ -16,8 +16,6 @@ namespace CoreAdminWeb.Pages.QLCLCongBoCoSoViPham
                                               IBaseService<TinhModel> TinhService,
                                               IBaseService<XaPhuongModel> XaPhuongService) : BlazorCoreBase
     {
-        [Inject]
-        private ApiAuthenticationStateProvider ApiAuthenticationStateProvider { get; set; } = null!;
         private List<QLCLCoSoViPhamATTPModel> MainModels { get; set; } = new();
         private string _searchString = "";
         private TinhModel? _selectedTinhFilter { get; set; }
@@ -37,7 +35,11 @@ namespace CoreAdminWeb.Pages.QLCLCongBoCoSoViPham
         {
             if (firstRender)
             {
-                _userLoginId = await ApiAuthenticationStateProvider.GetUserLoginId();
+                var resUser = await UserService.GetCurrentUserAsync();
+                if(resUser.IsSuccess)
+                {
+                    _userLoginId = resUser.Data?.id ?? "";
+                }
                await LoadData();
                 _ = Task.Run(async () =>
                 {
@@ -301,13 +303,8 @@ namespace CoreAdminWeb.Pages.QLCLCongBoCoSoViPham
                 AlertService.ShowAlert("Vui lòng chọn cơ sở vi phạm để công bố", "warning");
                 return;
             }
-            if(_selectedItem.da_cong_bo.HasValue && _selectedItem.da_cong_bo.Value)
-            {
-                AlertService.ShowAlert("Cơ sở vi phạm đã công bố", "warning");
-                return;
-            }
 
-            _selectedItem.da_cong_bo = true;
+            _selectedItem.da_cong_bo = !_selectedItem.da_cong_bo;
             _selectedItem.user_cong_bo = new UserModel { id = _userLoginId };
             var result = await MainService.UpdateAsync(_selectedItem);
             if(result.IsSuccess)

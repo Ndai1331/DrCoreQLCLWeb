@@ -128,6 +128,7 @@ pTitle="Công bố các cơ sở vi phạm chất lượng hàng hóa và ATTP">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
                             <th>STT</th>
+                            <th>Công bố</th>
                             <th>Mã cơ sở</th>
                             <th>Tên cơ sở</th>
                             <th>Ngày vi phạm</th>
@@ -135,7 +136,6 @@ pTitle="Công bố các cơ sở vi phạm chất lượng hàng hóa và ATTP">
                             <th>Sản phẩm</th>
                             <th>Hành vi vi phạm</th>
                             <th>Hình thức xử lý</th>
-                            <th>Đã công bố</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -143,6 +143,15 @@ pTitle="Công bố các cơ sở vi phạm chất lượng hàng hóa và ATTP">
                         {
                             <tr>
                                 <td>@(((Page - 1) * PageSize) + item.Index + 1)</td>
+                                <td>@if(item.Data.da_cong_bo  != null && item.Data.da_cong_bo == true)
+                                {
+                                    <span class="shadow-success/50 bg-success text-white inline-flex items-center rounded shadow-md text-xs justify-center px-1.5 py-0.5">Đã công bố</span>
+                                }
+                                else
+                                {
+                                    <span @onclick=" (e) =>  OpenCongBoModal(item.Data)" class="shadow-danger/50 bg-danger text-white inline-flex items-center rounded shadow-md text-xs justify-center px-1.5 py-0.5">Chưa công bố</span>
+                                }
+                                </td>
                                 @if (item.Data.loai_co_so == Enums.LoaiCoSoNLTS.CoSoCheBien)
                                 {
                                     <td>@item.Data.co_so_che_bien_nlts?.code</td>
@@ -160,15 +169,7 @@ pTitle="Công bố các cơ sở vi phạm chất lượng hàng hóa và ATTP">
                                 <td>@item.Data.san_pham_vi_pham</td>
                                 <td>@item.Data.hanh_vi_vi_pham?.name</td>
                                 <td>@(item.Data.hinh_thuc_xu_phat != null ? item.Data.hinh_thuc_xu_phat?.name : item.Data.xu_ly_khac?.GetDescription())</td>
-                                <td>@if(item.Data.da_cong_bo  != null && item.Data.da_cong_bo == true)
-                                {
-                                    <span class="shadow-success/50 bg-success text-white inline-flex items-center rounded shadow-md text-xs justify-center px-1.5 py-0.5">Đã công bố</span>
-                                }
-                                else
-                                {
-                                    <span @onclick=" (e) =>  OpenCongBoModal(item.Data)" class="shadow-danger/50 bg-danger text-white inline-flex items-center rounded shadow-md text-xs justify-center px-1.5 py-0.5">Chưa công bố</span>
-                                }
-                                </td>
+                                
                             </tr>
                             }
                     </tbody>
@@ -265,7 +266,7 @@ pTitle="Công bố các cơ sở vi phạm chất lượng hàng hóa và ATTP">
                 </div>
                 <div class="p-5">
                     <div class="text-black dark:text-muted">
-                        <h3>Bạn có chắc chắn muốn công bố dữ liệu này không?</h3>
+                        <h3>Bạn có chắc chắn muốn @(_selectedItem.da_cong_bo == true ? "hủy công bố" : "công bố") dữ liệu này không?</h3>
                     </div>
                     <div class="flex items-center justify-end gap-2">
                         <MudButton Class="transition-all duration-300 border btn-crud rounded-md btn text-danger border-danger hover:bg-danger hover:text-white" OnClick="CloseCongBoModal">Huỷ</MudButton>
