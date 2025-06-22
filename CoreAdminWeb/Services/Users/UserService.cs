@@ -57,6 +57,8 @@ namespace CoreAdminWeb.Services.Users
                     {
                         await _localStorage.SetItemAsync("accessToken", _accessToken);
                         await _localStorage.SetItemAsync("userName", currentUserAsync.Data.email);
+                        await _localStorage.SetItemAsync("userId", currentUserAsync.Data.id);
+                        await _localStorage.SetItemAsync("role", currentUserAsync.Data.role);
                         await _localStorage.SetItemAsync("claims", claim);
                         (
                             (ApiAuthenticationStateProvider)_authenticationStateProvider

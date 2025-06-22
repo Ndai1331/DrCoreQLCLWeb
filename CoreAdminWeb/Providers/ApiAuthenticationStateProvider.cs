@@ -39,6 +39,8 @@ namespace CoreAdminWeb.Providers
                     await _localStorage.RemoveItemAsync("claims");
                     await _localStorage.RemoveItemAsync("accessToken");
                     await _localStorage.RemoveItemAsync("userName");
+                    await _localStorage.RemoveItemAsync("userId");
+                    await _localStorage.RemoveItemAsync("role");
                     return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
                 }
 
@@ -85,9 +87,16 @@ namespace CoreAdminWeb.Providers
             await _localStorage.RemoveItemAsync("accessToken");
             await _localStorage.RemoveItemAsync("claims");
             await _localStorage.RemoveItemAsync("userName");
+            await _localStorage.RemoveItemAsync("userId");
+            await _localStorage.RemoveItemAsync("role");
             var authState = Task.FromResult(new AuthenticationState(anonymousUser));
 
             NotifyAuthenticationStateChanged(authState);
+        }
+
+        public async Task<string> GetUserLoginId()
+        {
+            return await _localStorage.GetItemAsync<string>("userId") ?? "";
         }
 
         private static IEnumerable<Claim> ParseClaimsFromJwt1(string jwt)

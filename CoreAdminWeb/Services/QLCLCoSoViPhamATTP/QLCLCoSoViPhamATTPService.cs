@@ -14,7 +14,7 @@ namespace CoreAdminWeb.Services
             + ",co_so_nlts_du_dieu_kien_attp.id,co_so_nlts_du_dieu_kien_attp.code,co_so_nlts_du_dieu_kien_attp.name,co_so_nlts_du_dieu_kien_attp.dia_chi"
             + ",hanh_vi_vi_pham.id,hanh_vi_vi_pham,hanh_vi_vi_pham.name"
             + ",hinh_thuc_xu_phat.id,hinh_thuc_xu_phat.name"
-            + ",don_vi_tinh.id,don_vi_tinh.name";
+            + ",don_vi_tinh.id,don_vi_tinh.name, user_cong_bo.last_name, user_cong_bo.first_name";
 
         /// <summary>
         /// Creates a response with error handling
@@ -56,7 +56,9 @@ namespace CoreAdminWeb.Services
                 ngay_ghi_nhan = model.ngay_ghi_nhan,
                 ngay_xu_ly = model.ngay_xu_ly,
                 co_quan_xu_ly = model.co_quan_xu_ly,
-                loai_co_so = model.loai_co_so
+                loai_co_so = model.loai_co_so,
+                da_cong_bo = model.da_cong_bo,
+                user_cong_bo = model.user_cong_bo?.id
             };
         }
 

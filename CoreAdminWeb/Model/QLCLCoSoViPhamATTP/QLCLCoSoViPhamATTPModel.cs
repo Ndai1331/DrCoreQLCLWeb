@@ -1,5 +1,6 @@
 ﻿using CoreAdminWeb.Model.Base;
 using CoreAdminWeb.Enums;
+using CoreAdminWeb.Model.User;
 
 namespace CoreAdminWeb.Model
 {
@@ -23,6 +24,9 @@ namespace CoreAdminWeb.Model
         public decimal? gia_tri_tang_vat { get; set; }
         public TrangThaiXuLyKhac? xu_ly_khac { get; set; } = TrangThaiXuLyKhac.DinhChiLuuHanh;
         public new TrangThaiXuLy? status { get; set; } = TrangThaiXuLy.ChuaXuLy;
+        public bool? da_cong_bo { get; set; } = false;
+        public UserModel? user_cong_bo { get; set; }
+
     }
     public class QLCLCoSoViPhamATTPCRUDModel : BaseDetailModel
     {
@@ -44,5 +48,7 @@ namespace CoreAdminWeb.Model
         public DateTime? ngay_xu_ly { get; set; }
         public string? co_quan_xu_ly { get; set; }
         public LoaiCoSoNLTS? loai_co_so { get; set; } = LoaiCoSoNLTS.CoSoCheBien;
+        public bool? da_cong_bo { get; set; } = false;
+        public string? user_cong_bo { get; set; }
     }
 }
