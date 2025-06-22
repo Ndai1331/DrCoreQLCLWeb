@@ -125,6 +125,18 @@ namespace CoreAdminWeb.Pages.QLCLCongBoCoSoViPham
             return await LoadBlazorTypeaheadData(searchText, XaPhuongService,query);
         }
 
+        public async Task OnTinhFilterChanged(TinhModel? tinh)
+        {
+            _selectedTinhFilter = tinh;
+            _selectedXaFilter = null;
+            await LoadData();
+        }
+        public async Task OnXaFilterChanged(XaPhuongModel? xa)
+        {
+            _selectedXaFilter = xa;
+            await LoadData();
+        }
+
         private async Task OnDateChanged(ChangeEventArgs e, string fieldName)
         {
             try
