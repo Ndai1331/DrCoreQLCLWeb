@@ -36,7 +36,9 @@ pTitle="Dữ liệu các cơ sở kiểm tra, hậu kiểm chất lượng, ATTP
                                                TItem="TinhModel"
                                                TValue="TinhModel"
                                                SearchMethod="LoadTinhData"
-                                               @bind-Value="@_selectedTinhFilter"
+                                               Value="@_selectedTinhFilter"
+                                               ValueExpression="@(() => _selectedTinhFilter)"
+                                               ValueChanged="OnTinhFilterChanged"
                                                placeholder="Chọn tỉnh thành"
                                                Class="form-select">
                                 <SelectedTemplate Context="item">
@@ -60,7 +62,9 @@ pTitle="Dữ liệu các cơ sở kiểm tra, hậu kiểm chất lượng, ATTP
                                                TItem="XaPhuongModel"
                                                TValue="XaPhuongModel"
                                                SearchMethod="LoadXaFilterData"
-                                               @bind-Value="@_selectedXaFilter"
+                                               Value="@_selectedXaFilter"
+                                               ValueExpression="@(() => _selectedXaFilter)"
+                                               ValueChanged="OnXaFilterChanged"
                                                placeholder="Chọn xã phường"
                                                Class="form-select">
                                 <SelectedTemplate Context="item">

@@ -95,6 +95,7 @@
                     <tr>
                         <th>Mã</th>
                         <th>Tên</th>
+                        <th>Tên tiếng anh</th>
                         <th>Ghi chú</th>
                         <th>Trạng thái</th>
                         <th class="flex items-center gap-2">Tác vụ</th>
@@ -323,15 +324,20 @@
         IsLoading = true;
 
         BuildPaginationQuery(Page, PageSize);
+        int index = 0;
+
         if (!string.IsNullOrEmpty(_searchString))
         {
-            BuilderQuery += $"&filter[_and][][name][_contains]={_searchString}";
+            BuilderQuery += $"&filter[_and][{index}][_or][0][name][_contains]={_searchString}";
+            BuilderQuery += $"&filter[_and][{index}][_or][1][code][_contains]={_searchString}";
+            index++;
         }
         if (!string.IsNullOrEmpty(_searchStatusString))
-        {
-            BuilderQuery += $"&filter[_and][][status][_eq]={_searchStatusString}";
+        {   
+            BuilderQuery += $"&filter[_and][{index}][status][_eq]={_searchStatusString}";
+            index++;
         }
-        BuilderQuery += $"&filter[_and][][deleted][_eq]=false";
+        BuilderQuery += $"&filter[_and][{index}][deleted][_eq]=false";
         var result = await MainService.GetAllAsync(BuilderQuery);
         if (result.IsSuccess)
         {
@@ -469,17 +475,20 @@
     {
         // Get all data for export
         BuildPaginationQuery(Page, int.MaxValue);
+        int index = 0;
+
         if (!string.IsNullOrEmpty(_searchString))
         {
-             BuilderQuery += $"&filter[_and][][name][_contains]={_searchString}";
+            BuilderQuery += $"&filter[_and][{index}][_or][0][name][_contains]={_searchString}";
+            BuilderQuery += $"&filter[_and][{index}][_or][1][code][_contains]={_searchString}";
+            index++;
         }
         if (!string.IsNullOrEmpty(_searchStatusString))
-        {
-            BuilderQuery += $"&filter[_and][][status][_eq]={_searchStatusString}";
+        {   
+            BuilderQuery += $"&filter[_and][{index}][status][_eq]={_searchStatusString}";
+            index++;
         }
-        BuilderQuery += $"&filter[_and][][deleted][_eq]=false";
-
-
+        BuilderQuery += $"&filter[_and][{index}][deleted][_eq]=false";
         var result = await MainService.GetAllAsync(BuilderQuery);
         if (!result.IsSuccess || result.Data == null)
         {
@@ -501,7 +510,7 @@
         ws.Cells[1, 5].Value = "Trạng thái";
 
         // Style header
-        using (var range = ws.Cells[1, 1, 1, 5])
+        using (var range = ws.Cells[1, 1, 1, 6])
         {
             range.Style.Font.Bold = true;
             range.Style.Fill.PatternType = ExcelFillStyle.Solid;

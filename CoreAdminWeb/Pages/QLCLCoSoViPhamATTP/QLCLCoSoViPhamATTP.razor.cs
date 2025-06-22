@@ -73,7 +73,7 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamATTP
                 BuildPaginationQuery(Page, PageSize);
                 int intdex = 1;
 
-                BuilderQuery += "filter[_and][0][deleted][_eq]=false&sort=sort";
+                BuilderQuery += "&filter[_and][0][deleted][_eq]=false";
                 if (!string.IsNullOrEmpty(_searchString))
                 {
                     BuilderQuery += $"&filter[_and][{intdex}][_or][0][co_so_che_bien_nlts][name][_contains]={_searchString}";
@@ -451,6 +451,18 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamATTP
             // Nếu chưa có hàm saveAsFile trong wwwroot/js, hãy thêm hàm này để hỗ trợ download file từ base64
             await JsRuntime.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(fileBytes));
         }
+
+        private async Task OnTinhFilterChanged(TinhModel? value)
+        {
+            _selectedTinhFilter = value;
+            await LoadData();
+        }
+
+        private async Task OnXaFilterChanged(XaPhuongModel? value)
+        {
+            _selectedXaFilter = value;
+            await LoadData();
+        }   
     }
 
 }

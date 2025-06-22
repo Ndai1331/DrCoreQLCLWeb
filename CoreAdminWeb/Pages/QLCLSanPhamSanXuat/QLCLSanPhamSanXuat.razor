@@ -369,15 +369,22 @@
         IsLoading = true;
 
         BuildPaginationQuery(Page, PageSize);
+        int index = 0;
         if (!string.IsNullOrEmpty(_searchString))
         {
-            BuilderQuery += $"&filter[_and][][name][_contains]={_searchString}";
+            BuilderQuery += $"&filter[_and][{index}][_or][0][name][_contains]={_searchString}";
+            BuilderQuery += $"&filter[_and][{index}][_or][1][code][_contains]={_searchString}";
+            BuilderQuery += $"&filter[_and][{index}][_or][2][english_name][_contains]={_searchString}";
+            BuilderQuery += $"&filter[_and][{index}][_or][3][tieu_chuan_chat_luong][_contains]={_searchString}";
+            BuilderQuery += $"&filter[_and][{index}][_or][4][tieu_chuan_kiem_dich][_contains]={_searchString}";
+            index++;
         }
         if (!string.IsNullOrEmpty(_searchStatusString))
         {
-            BuilderQuery += $"&filter[_and][][status][_eq]={_searchStatusString}";
+            BuilderQuery += $"&filter[_and][{index}][status][_eq]={_searchStatusString}";
+            index++;
         }
-        BuilderQuery += $"&filter[_and][][deleted][_eq]=false";
+        BuilderQuery += $"&filter[_and][{index}][deleted][_eq]=false";
         var result = await MainService.GetAllAsync(BuilderQuery);
         if (result.IsSuccess)
         {

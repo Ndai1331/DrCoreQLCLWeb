@@ -113,7 +113,7 @@ namespace CoreAdminWeb.Shared.Base
             return roleNames.Contains(CurrentUser?.role);
         }
 
-        public void BuildPaginationQuery(int page, int pageSize, string sort = "sort", bool isAsc = true)
+        public void BuildPaginationQuery(int page, int pageSize, string sort = "id", bool isAsc = false)
         {
             BuilderQuery = $"limit={pageSize}&offset={(page - 1) * pageSize}&meta=filter_count";
             if (!isAsc)

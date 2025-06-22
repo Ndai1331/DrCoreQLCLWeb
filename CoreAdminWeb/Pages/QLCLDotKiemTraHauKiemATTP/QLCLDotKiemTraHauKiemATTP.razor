@@ -529,9 +529,11 @@
                         break;
                     case "fromDate":
                         _fromDate = null;
+                        await LoadData();
                         break;
                     case "toDate":
                         _toDate = null;
+                        await LoadData();
                         break;
                 }
                 return;
@@ -555,15 +557,14 @@
                         break;
                     case "fromDate":
                         _fromDate = date;
+                        await LoadData();
                         break;
                     case "toDate":
                         _toDate = date;
+                        await LoadData();
                         break;
                 }
             }
-
-            if (isFilter)
-                await LoadData();
         }
         catch (Exception ex)
         {

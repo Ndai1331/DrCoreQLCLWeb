@@ -272,5 +272,17 @@ namespace CoreAdminWeb.Pages.QLCLCoSoNLTSDuDieuKienATTPHetHan
             // Nếu chưa có hàm saveAsFile trong wwwroot/js, hãy thêm hàm này để hỗ trợ download file từ base64
             await JsRuntime.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(fileBytes));
         }
+
+        private async Task OnTinhFilterChanged(TinhModel? value)
+        {
+            _selectedTinhFilter = value;
+            await LoadData();
+        }
+
+        private async Task OnXaFilterChanged(XaPhuongModel? value)
+        {
+            _selectedXaFilter = value;
+            await LoadData();
+        }
     }
 }
