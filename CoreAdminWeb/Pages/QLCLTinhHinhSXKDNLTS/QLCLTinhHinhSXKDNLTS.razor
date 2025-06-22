@@ -8,7 +8,7 @@
 @inherits BlazorCoreBase
 @layout MainLayout
 
-<PageHeader Title="Dữ liệu tình hình sản xuất kinh doanh NLTS." pTitle="Dữ liệu tình hình sản xuất kinh doanh NLTS."></PageHeader>
+<PageHeader Title="Dữ liệu tình hình sản xuất kinh doanh NLTS" pTitle="Dữ liệu tình hình sản xuất kinh doanh NLTS"></PageHeader>
 
 <!-- Start All Card -->
 <div class="flex flex-col gap-4 min-h-[calc(100vh-212px)]">
@@ -27,8 +27,8 @@
 
             <div class="flex items-end justify-between flex-1 gap-2 sm:gap-4">
                 <!-- Left: Filter Area -->
-                <div class="w-full grid grid-cols-1 gap-4 md:grid-cols-4 xl:grid-cols-4 sm:gap-4 md:w-4/5 pb-2">
-                    <div class="xs:col-span-4 sm:col-span-4 md:col-span-2 xl:col-span-2">
+                <div class="w-full grid grid-cols-1 gap-4 md:grid-cols-4 xl:grid-cols-4 sm:gap-4 pb-2">
+                    <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
                         <MudForm class="flex-1">
                             <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Tìm kiếm</MudText>
                             <div class="relative">
@@ -65,7 +65,7 @@
                                @onchange="@(e => OnDateChanged(e, "toDate"))" />
                     </div>
 
-                    <div class="flex items-end col-span-4 justify-end py-2 gap-2">
+                    <div class="flex items-end justify-end xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1 gap-2">
                         <div>
                             <MudButton Class="xs:w-full sm:w-auto md:w-auto btn flex items-center gap-1.5
                             bg-success border-success text-white hover:bg-success/[0.85]
