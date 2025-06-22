@@ -279,6 +279,13 @@ namespace CoreAdminWeb.Pages.QLCLCoSoNLTSDuDieuKienATTP
 
         private async Task OnValidSubmit()
         {
+
+            if(SelectedSanPhamItemsDetail.Count == 0 || SelectedSanPhamItemsDetail.Any(c => c.san_pham == null || c.san_pham.id == 0))
+            {
+                AlertService.ShowAlert("Vui lòng thêm sản phẩm", "warning");
+                return;
+            }
+
             if (SelectedItem.id <= 0)
             {
                 var result = await MainService.CreateAsync(SelectedItem);
