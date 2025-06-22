@@ -304,7 +304,7 @@ namespace CoreAdminWeb.Pages.QLCLCongBoCoSoViPham
                 return;
             }
 
-            _selectedItem.da_cong_bo = !_selectedItem.da_cong_bo;
+            _selectedItem.da_cong_bo = _selectedItem.da_cong_bo == null ? true : !_selectedItem.da_cong_bo;
             _selectedItem.user_cong_bo = new UserModel { id = _userLoginId };
             var result = await MainService.UpdateAsync(_selectedItem);
             if(result.IsSuccess)

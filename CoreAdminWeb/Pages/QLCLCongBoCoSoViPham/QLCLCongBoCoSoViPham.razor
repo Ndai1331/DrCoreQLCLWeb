@@ -145,7 +145,7 @@ pTitle="Công bố các cơ sở vi phạm chất lượng hàng hóa và ATTP">
                                 <td>@(((Page - 1) * PageSize) + item.Index + 1)</td>
                                 <td>@if(item.Data.da_cong_bo  != null && item.Data.da_cong_bo == true)
                                 {
-                                    <span class="shadow-success/50 bg-success text-white inline-flex items-center rounded shadow-md text-xs justify-center px-1.5 py-0.5">Đã công bố</span>
+                                    <span @onclick=" (e) =>  OpenCongBoModal(item.Data)" class="shadow-success/50 bg-success text-white inline-flex items-center rounded shadow-md text-xs justify-center px-1.5 py-0.5">Đã công bố</span>
                                 }
                                 else
                                 {
