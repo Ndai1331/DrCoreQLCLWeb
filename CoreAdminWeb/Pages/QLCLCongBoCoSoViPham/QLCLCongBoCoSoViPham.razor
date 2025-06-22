@@ -35,7 +35,9 @@ pTitle="Công bố các cơ sở vi phạm chất lượng hàng hóa và ATTP">
                                                TItem="TinhModel"
                                                TValue="TinhModel"
                                                SearchMethod="LoadTinhData"
-                                               @bind-Value="@_selectedTinhFilter"
+                                               Value="@_selectedTinhFilter"
+                                               ValueExpression="@(() => _selectedTinhFilter)"
+                                               ValueChanged="OnTinhFilterChanged"
                                                placeholder="Chọn tỉnh thành"
                                                Class="form-select">
                                 <SelectedTemplate Context="item">
@@ -59,7 +61,9 @@ pTitle="Công bố các cơ sở vi phạm chất lượng hàng hóa và ATTP">
                                                TItem="XaPhuongModel"
                                                TValue="XaPhuongModel"
                                                SearchMethod="LoadXaFilterData"
-                                               @bind-Value="@_selectedXaFilter"
+                                               Value="@_selectedXaFilter"
+                                               ValueExpression="@(() => _selectedXaFilter)"
+                                               ValueChanged="OnXaFilterChanged"
                                                placeholder="Chọn xã phường"
                                                Class="form-select">
                                 <SelectedTemplate Context="item">
