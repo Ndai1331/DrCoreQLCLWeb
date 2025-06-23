@@ -311,7 +311,8 @@
 
         if (!string.IsNullOrEmpty(_searchString))
         {
-            BuilderQuery += $"&filter[_and][2][name][_contains]={_searchString}";
+            BuilderQuery += $"&filter[_and][2][_or][0][code][_contains]={_searchString}";
+            BuilderQuery += $"&filter[_and][2][_or][1][name][_contains]={_searchString}";
         }
         if (!string.IsNullOrEmpty(_searchStatusString))
         {
@@ -372,6 +373,18 @@
 
     private async Task OnValidSubmit()
     {
+        if (string.IsNullOrEmpty(SelectedItem.code))
+        {
+            AlertService.ShowAlert("Mã là bắt buộc", "danger");
+            return;
+        }
+
+        if (string.IsNullOrEmpty(SelectedItem.name))
+        {
+            AlertService.ShowAlert("Tên là bắt buộc", "danger");
+            return;
+        }
+
         if (SelectedItem.id == 0)
         {
             var result = await MainService.CreateAsync(SelectedItem);
