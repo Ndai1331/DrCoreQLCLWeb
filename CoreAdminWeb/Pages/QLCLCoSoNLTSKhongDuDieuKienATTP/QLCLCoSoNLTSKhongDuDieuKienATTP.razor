@@ -420,8 +420,8 @@ pTitle="Dữ liệu các cơ sở sản xuất, kinh doanh NLTS không thuộc d
                                   <input type="text" 
                                         class="form-input date-picker"
                                         placeholder="Chọn ngày ghi nhận"
-                                        value="@(SelectedItem.ngay_cap?.ToString("dd/MM/yyyy"))"
-                                        @onchange="@(e => OnDateChanged(e, "ngay_cap"))" required />
+                                        value="@(SelectedItem.ngay_cap_giay_phep_hoat_dong?.ToString("dd/MM/yyyy"))"
+                                        @onchange="@(e => OnDateChanged(e, "ngay_cap_giay_phep_hoat_dong"))" required />
                                 </div>
 
                                 <div class="space-y-2 md:col-span-1">
@@ -471,7 +471,7 @@ pTitle="Dữ liệu các cơ sở sản xuất, kinh doanh NLTS không thuộc d
                                             case "tab1":
                                                 <div class="text-black dark:text-muted">
                                                     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                                        <div class="relative overflow-x-auto  space-y-2 md:col-span-2">
+                                                        <div class="relative overflow-x-auto overflow-y-visible space-y-2 md:col-span-2">
                                                             <table id="chiTiet" class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400" style="width:100%">
                                                                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                                                     <tr>
@@ -485,26 +485,28 @@ pTitle="Dữ liệu các cơ sở sản xuất, kinh doanh NLTS không thuộc d
                                                                     {
                                                                         <tr>
                                                                             <td>@(item.Index + 1)</td>
-                                                                            <td>
-                                                                                <BlazoredTypeahead EnableDropDown="true"
-                                                                                                ShowDropDownOnFocus="true"
-                                                                                                MinimumLength="0"
-                                                                                                TItem="QLCLSanPhamSanXuatModel"
-                                                                                                TValue="QLCLSanPhamSanXuatModel"
-                                                                                                SearchMethod="LoadSanPhamData"
-                                                                                                @bind-Value="item.Data.san_pham"
-                                                                                                placeholder="Chọn sản phẩm"
-                                                                                                Class="form-select">
-                                                                                    <SelectedTemplate Context="item">
-                                                                                        @item.name
-                                                                                    </SelectedTemplate>
-                                                                                    <ResultTemplate Context="item">
-                                                                                        @item.name
-                                                                                    </ResultTemplate>
-                                                                                    <NotFoundTemplate Context="item">
-                                                                                        Không tìm thấy dữ liệu
-                                                                                    </NotFoundTemplate>
-                                                                                </BlazoredTypeahead>
+                                                                            <td class="relative">
+                                                                                 <div class="relative">
+                                                                                    <BlazoredTypeahead EnableDropDown="true"
+                                                                                                    ShowDropDownOnFocus="true"
+                                                                                                    MinimumLength="0"
+                                                                                                    TItem="QLCLSanPhamSanXuatModel"
+                                                                                                    TValue="QLCLSanPhamSanXuatModel"
+                                                                                                    SearchMethod="LoadSanPhamData"
+                                                                                                    @bind-Value="item.Data.san_pham"
+                                                                                                    placeholder="Chọn sản phẩm"
+                                                                                                    Class="form-select">
+                                                                                        <SelectedTemplate Context="item">
+                                                                                            @item.name
+                                                                                        </SelectedTemplate>
+                                                                                        <ResultTemplate Context="item">
+                                                                                            @item.name
+                                                                                        </ResultTemplate>
+                                                                                        <NotFoundTemplate Context="item">
+                                                                                            Không tìm thấy dữ liệu
+                                                                                        </NotFoundTemplate>
+                                                                                    </BlazoredTypeahead>
+                                                                                </div>
                                                                             </td>
                                                                             <td class="flex items-center gap-2">
                                                                                 <MudButton Class="transition-all duration-300 border btn-crud rounded-md btn text-danger border-danger hover:bg-danger hover:text-white"
