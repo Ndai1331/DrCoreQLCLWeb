@@ -42,6 +42,9 @@ namespace CoreAdminWeb.Services
                 dia_chi = model.dia_chi,
                 dien_thoai = model.dien_thoai,
                 dai_dien = model.dai_dien,
+                loai = model.loai,
+
+                //đủ điều kiện
                 so_giay_chung_nhan = model.so_giay_chung_nhan,
                 loai_hinh_kinh_doanh = model.loai_hinh_kinh_doanh?.id,
                 ngay_cap = model.ngay_cap,
@@ -51,6 +54,16 @@ namespace CoreAdminWeb.Services
                 xu_ly_ket_qua = model.xu_ly_ket_qua,
                 he_thong_quan_ly_chat_luong = model.he_thong_quan_ly_chat_luong,
                 ket_qua_tham_dinh = model.ket_qua_tham_dinh,
+
+
+                //không đủ điều kiện
+                tuan_thu_quy_dinh = model.tuan_thu_quy_dinh,
+                kiem_tra_tuan_thu = model.kiem_tra_tuan_thu,
+                tinh_hinh_vi_pham = model.tinh_hinh_vi_pham,
+                so_giay_phep_hoat_dong = model.so_giay_phep_hoat_dong,
+                ngay_cap_giay_phep_hoat_dong = model.ngay_cap_giay_phep_hoat_dong,
+                co_quan_cap_giay_phep_hoat_dong = model.co_quan_cap_giay_phep_hoat_dong,
+                quy_mo = model.quy_mo,
             };
         }
 
