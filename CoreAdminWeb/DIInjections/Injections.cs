@@ -59,6 +59,8 @@ namespace CoreAdminWeb.DIInjections
             services.AddScoped<IReportService<ReportBaoCaoKiemTraHauKiemLayMauATTPModel>, ReportBaoCaoKiemTraHauKiemLayMauATTPService>();
             services.AddScoped<IReportService<ReportBaoCaoThamDinhCapGCNModel>, ReportBaoCaoThamDinhCapGCNService>();
             services.AddScoped<IReportService<ReportDashboardModel>, ReportDashboardService>();
+            services.AddScoped<IBaseService<QLCLLoaiVatTuModel>, QLCLLoaiVatTuService>();
+            services.AddScoped<IBaseService<QLCLVatTuNongNghiepModel>, QLCLVatTuNongNghiepService>();
             services.AddScoped<AlertService>();
         }
     }

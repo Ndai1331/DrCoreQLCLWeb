@@ -133,5 +133,31 @@ namespace CoreAdminWeb.Model
     }
 
 
+    public class QLCLLoaiVatTuModel : BaseModel<int>
+    {
+    }
+    public class QLCLLoaiVatTuCRUDModel : BaseDetailModel
+    {
+        public new string status { set; get; } = Status.active.ToString();
+    }
+
+    public class QLCLVatTuNongNghiepModel : BaseModel<int>
+    {
+        public QLCLLoaiVatTuModel? loai_vat_tu { set; get; }
+        public DonViTinhModel? don_vi_tinh { set; get; }
+        public string? nha_san_xuat { set; get; }
+        public string? tieu_chuan_chat_luong { set; get; }
+    }
+    public class QLCLVatTuNongNghiepCRUDModel : BaseDetailModel
+    {
+        public int? loai_vat_tu { set; get; }
+        public int? don_vi_tinh { set; get; }
+        public string? nha_san_xuat { set; get; }
+        public string? tieu_chuan_chat_luong { set; get; }
+        public new string status { set; get; } = Status.active.ToString();
+    }
+
+
+
 
 }
