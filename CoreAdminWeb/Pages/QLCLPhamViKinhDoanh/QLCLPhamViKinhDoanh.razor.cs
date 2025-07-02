@@ -58,7 +58,7 @@ namespace CoreAdminWeb.Pages.QLCLPhamViKinhDoanh
                 BuildPaginationQuery(Page, PageSize);
                 int intdex =1;
 
-                BuilderQuery += "filter[_and][0][deleted][_eq]=false&sort=sort";
+                BuilderQuery += "&filter[_and][0][deleted][_eq]=false&sort=sort";
                 if (!string.IsNullOrEmpty(_searchString))
                 {
                     BuilderQuery += $"&filter[_and][{intdex}][_or][0][name][_contains]={_searchString}";
@@ -262,7 +262,7 @@ namespace CoreAdminWeb.Pages.QLCLPhamViKinhDoanh
             BuildPaginationQuery(Page, int.MaxValue);
             int intdex =1;
 
-            BuilderQuery += "filter[_and][0][deleted][_eq]=false&sort=sort";
+            BuilderQuery += "&filter[_and][0][deleted][_eq]=false&sort=sort";
             if (!string.IsNullOrEmpty(_searchString))
             {
                 BuilderQuery += $"&filter[_and][{intdex}][_or][0][name][_contains]={_searchString}";
