@@ -4,13 +4,15 @@ using CoreAdminWeb.RequestHttp;
 using CoreAdminWeb.Services.BaseServices;
 using System.Net;
 
-namespace CoreAdminWeb.Services.DanhMucDungChung
+namespace CoreAdminWeb.Services
 {
-    public class QLCLVatTuNongNghiepService : IBaseService<QLCLVatTuNongNghiepModel>
+    public class QLCLGiaCaVatTuNNService : IBaseService<QLCLGiaCaVatTuNNModel>
     {
-        private readonly string _collection = "QLCL_VatTuNongNghiep";
+        private readonly string _collection = "QLCLGiaCaVatTuNN";
         private const string Fields = "*,user_created.last_name,user_created.first_name,user_updated.last_name,user_updated.first_name"
-            + ",loai_vat_tu.id,loai_vat_tu.name"
+            + ",province.id,province.name"
+            + ",ward.id,ward.name"
+            + ",vat_tu_nong_nghiep.id,vat_tu_nong_nghiep.name"
             + ",don_vi_tinh.id,don_vi_tinh.name";
 
         /// <summary>
@@ -28,50 +30,55 @@ namespace CoreAdminWeb.Services.DanhMucDungChung
         /// <summary>
         /// Maps a model to CRUD model
         /// </summary>
-        private static QLCLVatTuNongNghiepCRUDModel MapToCRUDModel(QLCLVatTuNongNghiepModel model)
+        private static QLCLGiaCaVatTuNNCRUDModel MapToCRUDModel(QLCLGiaCaVatTuNNModel model)
         {
             return new()
             {
                 code = model.code,
                 name = model.name,
                 description = model.description,
-                status = model.status.ToString(),
                 sort = model.sort,
-                loai_vat_tu = model.loai_vat_tu?.id,
+                status = model.status.ToString(),
+                deleted = model.deleted,
+                ngay_ghi_nhan = model.ngay_ghi_nhan,
+                vat_tu_nong_nghiep = model.vat_tu_nong_nghiep?.id,
+                province = model.province?.id,
+                ward = model.ward?.id,
                 don_vi_tinh = model.don_vi_tinh?.id,
-                nha_san_xuat = model.nha_san_xuat,
-                tieu_chuan_chat_luong = model.tieu_chuan_chat_luong
+                nha_cung_cap = model.nha_cung_cap,
+                gia_mua_vao = model.gia_mua_vao,
+                gia_ban_ra = model.gia_ban_ra
             };
         }
 
         /// <summary>
         /// Gets all fertilizer production facilities
         /// </summary>
-        public async Task<RequestHttpResponse<List<QLCLVatTuNongNghiepModel>>> GetAllAsync(string query)
+        public async Task<RequestHttpResponse<List<QLCLGiaCaVatTuNNModel>>> GetAllAsync(string query)
         {
             try
             {
                 string url = $"items/{_collection}?fields={Fields}&{query}";
-                var response = await RequestClient.GetAPIAsync<RequestHttpResponse<List<QLCLVatTuNongNghiepModel>>>(url);
+                var response = await RequestClient.GetAPIAsync<RequestHttpResponse<List<QLCLGiaCaVatTuNNModel>>>(url);
 
                 return response.IsSuccess
-                    ? new RequestHttpResponse<List<QLCLVatTuNongNghiepModel>> { Data = response.Data?.Data, Meta = response.Data?.Meta }
-                    : new RequestHttpResponse<List<QLCLVatTuNongNghiepModel>> { Errors = response.Errors };
+                    ? new RequestHttpResponse<List<QLCLGiaCaVatTuNNModel>> { Data = response.Data?.Data, Meta = response.Data?.Meta }
+                    : new RequestHttpResponse<List<QLCLGiaCaVatTuNNModel>> { Errors = response.Errors };
             }
             catch (Exception ex)
             {
-                return CreateErrorResponse<List<QLCLVatTuNongNghiepModel>>(ex);
+                return CreateErrorResponse<List<QLCLGiaCaVatTuNNModel>>(ex);
             }
         }
 
         /// <summary>
         /// Gets a fertilizer production facility by ID
         /// </summary>
-        public async Task<RequestHttpResponse<QLCLVatTuNongNghiepModel>> GetByIdAsync(string id)
+        public async Task<RequestHttpResponse<QLCLGiaCaVatTuNNModel>> GetByIdAsync(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
-                return new RequestHttpResponse<QLCLVatTuNongNghiepModel>
+                return new RequestHttpResponse<QLCLGiaCaVatTuNNModel>
                 {
                     Errors = new List<ErrorResponse> { new() { Message = "ID không được để trống" } },
                     StatusCode = HttpStatusCode.BadRequest
@@ -80,26 +87,26 @@ namespace CoreAdminWeb.Services.DanhMucDungChung
 
             try
             {
-                var response = await RequestClient.GetAPIAsync<RequestHttpResponse<QLCLVatTuNongNghiepModel>>($"items/{_collection}/{id}?fields={Fields}");
+                var response = await RequestClient.GetAPIAsync<RequestHttpResponse<QLCLGiaCaVatTuNNModel>>($"items/{_collection}/{id}?fields={Fields}");
 
                 return response.IsSuccess
-                    ? new RequestHttpResponse<QLCLVatTuNongNghiepModel> { Data = response.Data?.Data, Meta = response.Data?.Meta }
-                    : new RequestHttpResponse<QLCLVatTuNongNghiepModel> { Errors = response.Errors };
+                    ? new RequestHttpResponse<QLCLGiaCaVatTuNNModel> { Data = response.Data?.Data, Meta = response.Data?.Meta }
+                    : new RequestHttpResponse<QLCLGiaCaVatTuNNModel> { Errors = response.Errors };
             }
             catch (Exception ex)
             {
-                return CreateErrorResponse<QLCLVatTuNongNghiepModel>(ex);
+                return CreateErrorResponse<QLCLGiaCaVatTuNNModel>(ex);
             }
         }
 
         /// <summary>
         /// Creates a new fertilizer production facility
         /// </summary>
-        public async Task<RequestHttpResponse<QLCLVatTuNongNghiepModel>> CreateAsync(QLCLVatTuNongNghiepModel model)
+        public async Task<RequestHttpResponse<QLCLGiaCaVatTuNNModel>> CreateAsync(QLCLGiaCaVatTuNNModel model)
         {
             if (model == null)
             {
-                return new RequestHttpResponse<QLCLVatTuNongNghiepModel>
+                return new RequestHttpResponse<QLCLGiaCaVatTuNNModel>
                 {
                     Errors = new List<ErrorResponse> { new() { Message = "Vui lòng nhập đầy đủ thông tin" } },
                     StatusCode = HttpStatusCode.BadRequest
@@ -109,14 +116,14 @@ namespace CoreAdminWeb.Services.DanhMucDungChung
             try
             {
                 var createModel = MapToCRUDModel(model);
-                var response = await RequestClient.PostAPIAsync<RequestHttpResponse<QLCLVatTuNongNghiepCRUDModel>>($"items/{_collection}", createModel);
+                var response = await RequestClient.PostAPIAsync<RequestHttpResponse<QLCLGiaCaVatTuNNCRUDModel>>($"items/{_collection}", createModel);
 
                 if (!response.IsSuccess)
                 {
-                    return new RequestHttpResponse<QLCLVatTuNongNghiepModel> { Errors = response.Errors };
+                    return new RequestHttpResponse<QLCLGiaCaVatTuNNModel> { Errors = response.Errors };
                 }
 
-                return new RequestHttpResponse<QLCLVatTuNongNghiepModel>
+                return new RequestHttpResponse<QLCLGiaCaVatTuNNModel>
                 {
                     Data = new()
                     {
@@ -127,14 +134,14 @@ namespace CoreAdminWeb.Services.DanhMucDungChung
             }
             catch (Exception ex)
             {
-                return CreateErrorResponse<QLCLVatTuNongNghiepModel>(ex);
+                return CreateErrorResponse<QLCLGiaCaVatTuNNModel>(ex);
             }
         }
 
         /// <summary>
         /// Updates an existing fertilizer production facility
         /// </summary>
-        public async Task<RequestHttpResponse<bool>> UpdateAsync(QLCLVatTuNongNghiepModel model)
+        public async Task<RequestHttpResponse<bool>> UpdateAsync(QLCLGiaCaVatTuNNModel model)
         {
             if (model == null || model.id == 0)
             {
@@ -149,7 +156,7 @@ namespace CoreAdminWeb.Services.DanhMucDungChung
             try
             {
                 var updateModel = MapToCRUDModel(model);
-                var response = await RequestClient.PatchAPIAsync<RequestHttpResponse<QLCLVatTuNongNghiepCRUDModel>>($"items/{_collection}/{model.id}", updateModel);
+                var response = await RequestClient.PatchAPIAsync<RequestHttpResponse<QLCLGiaCaVatTuNNCRUDModel>>($"items/{_collection}/{model.id}", updateModel);
 
                 return new RequestHttpResponse<bool>
                 {
@@ -166,7 +173,7 @@ namespace CoreAdminWeb.Services.DanhMucDungChung
         /// <summary>
         /// Deletes a fertilizer production facility
         /// </summary>
-        public async Task<RequestHttpResponse<bool>> DeleteAsync(QLCLVatTuNongNghiepModel model)
+        public async Task<RequestHttpResponse<bool>> DeleteAsync(QLCLGiaCaVatTuNNModel model)
         {
             if (model == null || model.id == 0)
             {
@@ -180,7 +187,7 @@ namespace CoreAdminWeb.Services.DanhMucDungChung
 
             try
             {
-                var response = await RequestClient.PatchAPIAsync<RequestHttpResponse<QLCLVatTuNongNghiepCRUDModel>>($"items/{_collection}/{model.id}", new { deleted = true });
+                var response = await RequestClient.PatchAPIAsync<RequestHttpResponse<QLCLGiaCaVatTuNNCRUDModel>>($"items/{_collection}/{model.id}", new { deleted = true });
 
                 return new RequestHttpResponse<bool>
                 {

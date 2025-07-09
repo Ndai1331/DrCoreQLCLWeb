@@ -477,7 +477,7 @@
         ws.Cells[1, 5].Value = "Trạng thái";
 
         // Style header
-        using (var range = ws.Cells[1, 1, 1, 8])
+        using (var range = ws.Cells[1, 1, 1, 5])
         {
             range.Style.Font.Bold = true;
             range.Style.Fill.PatternType = ExcelFillStyle.Solid;
@@ -501,7 +501,7 @@
         ws.Cells[ws.Dimension.Address].AutoFitColumns();
 
         // Export to browser
-        var fileName = $"DanhSachLoaiHinhCoSo_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+        var fileName = $"DanhSachLoaiVatTu_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
         var fileBytes = package.GetAsByteArray();
         // Nếu chưa có hàm saveAsFile trong wwwroot/js, hãy thêm hàm này để hỗ trợ download file từ base64
         await JsRuntime.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(fileBytes));
