@@ -8,18 +8,23 @@ using CoreAdminWeb.Services.Reports;
 using CoreAdminWeb.Model.Reports;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
-
+using CoreAdminWeb.Extensions;
 
 namespace CoreAdminWeb.Pages.QLCLBaoCaoBienDongGia
 {
     public partial class QLCLBaoCaoBienDongGia(IReportService<QLCLBienDongGiaModel> MainService) : BlazorCoreBase
     {
         private List<QLCLBienDongGiaModel> MainModels { get; set; } = new();
+
+        private List<Enums.LoaiBienDongGia> LoaiBienDongGiaList { get; set; } = new List<Enums.LoaiBienDongGia>() {
+            Enums.LoaiBienDongGia.NongSan,
+            Enums.LoaiBienDongGia.VatTuNongNghiep,
+        };
       
         private string _searchString = "";
+        private int? _selectedLoaiBienDongGiaFilter { get; set; }
         private DateTime? _fromDate { get; set; }
         private DateTime? _toDate { get; set; }
-
 
         protected override async Task OnInitializedAsync()
         {
@@ -49,7 +54,11 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoBienDongGia
            
             if (!string.IsNullOrEmpty(_searchString))
             {
-                BuilderQuery += $"&stringSearch={_searchString}";
+                BuilderQuery += $"&TenSanPham={_searchString}";
+            }
+            if (_selectedLoaiBienDongGiaFilter != null)
+            {
+                BuilderQuery += $"&loai={_selectedLoaiBienDongGiaFilter}";
             }
             if (_fromDate != null)
             {
@@ -75,6 +84,14 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoBienDongGia
                 MainModels = new List<QLCLBienDongGiaModel>();
             }
             IsLoading = false;
+        }
+
+        private async Task OnLoaiBienDongGiaFilterChanged(ChangeEventArgs e)
+        {
+            var value = e.Value?.ToString();
+            _selectedLoaiBienDongGiaFilter = !string.IsNullOrEmpty(value) ? (int)Enum.Parse(typeof(Enums.LoaiBienDongGia), value) : null;
+            
+            await LoadData();
         }
 
         private async Task OnDateChanged(ChangeEventArgs e, string fieldName)
@@ -134,7 +151,11 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoBienDongGia
             
             if (!string.IsNullOrEmpty(_searchString))
             {
-                BuilderQuery += $"&stringSearch={_searchString}";
+                BuilderQuery += $"&TenSanPham={_searchString}";
+            }
+            if (_selectedLoaiBienDongGiaFilter != null)
+            {
+                BuilderQuery += $"&loai={_selectedLoaiBienDongGiaFilter}";
             }
             if (_fromDate != null)
             {
@@ -186,7 +207,7 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoBienDongGia
             {
                 ws.Cells[row, 1].Value = stt;
                 ws.Cells[row, 2].Value = item.ngay_ghi_nhan?.ToString("dd/MM/yyyy");
-                ws.Cells[row, 3].Value = item.loai;
+                ws.Cells[row, 3].Value = item.loai?.GetDescription();
                 ws.Cells[row, 4].Value = item.ten_san_pham;
                 ws.Cells[row, 5].Value = item.nha_cung_cap;
                 ws.Cells[row, 6].Value = item.dia_diem;

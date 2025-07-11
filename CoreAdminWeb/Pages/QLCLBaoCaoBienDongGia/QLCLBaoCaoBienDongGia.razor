@@ -44,7 +44,16 @@
                                value="@(_toDate?.ToString("dd/MM/yyyy"))"
                                @onchange="@(e => OnDateChanged(e, "toDate"))" />
                     </div>
-
+                    <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
+                        <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Loại</MudText>
+                        <select class="form-select" @onchange="OnLoaiBienDongGiaFilterChanged">
+                            <option value="" selected>Tất cả</option>
+                            @foreach (var item in LoaiBienDongGiaList)
+                            {
+                                <option value="@item">@item.GetDescription()</option>
+                            }
+                        </select>
+                    </div>
                     <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
                         <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Tìm kiếm</MudText>
                         <div class="relative">
@@ -64,7 +73,7 @@
                         </div>
                     </div>
 
-                    <div class="flex items-end justify-end xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1 gap-2">
+                    <div class="flex items-end justify-end xs:col-span-4 sm:col-span-4 md:col-span-4 xl:col-span-4 gap-2">
                         <div>
                             <MudButton Class="xs:w-full sm:w-auto md:w-auto btn flex items-center gap-1.5
                             bg-success border-success text-white hover:bg-success/[0.85]
@@ -108,7 +117,7 @@
                             <tr>
                                 <td>@(((Page - 1) * PageSize) + i + 1)</td>
                                 <td>@MainModels[i].ngay_ghi_nhan?.ToString("dd/MM/yyyy")</td>
-                                <td>@MainModels[i].loai</td>
+                                <td>@MainModels[i].loai?.GetDescription()</td>
                                 <td>@MainModels[i].ten_san_pham</td>
                                 <td>@MainModels[i].nha_cung_cap</td>
                                 <td>@MainModels[i].dia_diem</td>
