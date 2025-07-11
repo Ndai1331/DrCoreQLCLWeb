@@ -2,10 +2,11 @@
 using CoreAdminWeb.Model;
 using CoreAdminWeb.Model.Configuration;
 using CoreAdminWeb.Model.RequestHttps;
-using CoreAdminWeb.RequestHttp;
+using CoreAdminWeb.Services.Http;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Options;
 
+using CoreAdminWeb.RequestHttp;
 namespace CoreAdminWeb.Services.Files
 {
     public interface IFileService
@@ -17,13 +18,8 @@ namespace CoreAdminWeb.Services.Files
         Task<RequestHttpResponse<FileModel>> GetPublicFileAsync(string id);
     }
 
-    public class FileService : IFileService
+    public class FileService(IHttpClientService _httpClientService, IOptions<DrCoreApi> _appSettings) : IFileService
     {
-        private readonly IOptions<DrCoreApi> _appSettings;
-        public FileService(IOptions<DrCoreApi> appSettings)
-        {
-            _appSettings = appSettings;
-        }
 
         public async Task<RequestHttpResponse<List<FileModel>>> GetAllFileAsync(string query)
         {
@@ -36,7 +32,7 @@ namespace CoreAdminWeb.Services.Files
                 +"co_quan_ban_hanh, so_van_ban, so_ky_hieu,ngay_ban_hanh,ngay_hieu_luc,so_luu_tru,"
                 + "linh_vuc_vb.id, linh_vuc_vb.name,"
                 + "phan_loai_vb.id, phan_loai_vb.name";
-                var result = await RequestClient.GetAPIAsync<RequestHttpResponse<List<FileModel>>>($"files?fields={Fields}&sort=-uploaded_on&{query}");
+                var result = await _httpClientService.GetAPIAsync<RequestHttpResponse<List<FileModel>>>($"files?fields={Fields}&sort=-uploaded_on&{query}");
                 response = result.IsSuccess
                     ? new RequestHttpResponse<List<FileModel>> { Data = result.Data.Data, Meta = result.Data.Meta, Errors = result.Errors }
                     : new RequestHttpResponse<List<FileModel>> { Errors = result.Errors };
@@ -69,7 +65,7 @@ namespace CoreAdminWeb.Services.Files
                 + "linh_vuc_vb.id, linh_vuc_vb.name,"
                 + "phan_loai_vb.id, phan_loai_vb.name";
                 
-                var result = await RequestClient.GetAPIAsync<RequestHttpResponse<FileModel>>($"files/{id}?fields={Fields}");
+                var result = await _httpClientService.GetAPIAsync<RequestHttpResponse<FileModel>>($"files/{id}?fields={Fields}");
                 if (result?.Data != null)
                 {
                     response.Data = result.Data.Data;
@@ -121,7 +117,7 @@ namespace CoreAdminWeb.Services.Files
             var response = new RequestHttpResponse<FileModel>();
             try
             {
-                var result = await RequestClient.PostAPIWithFileAsync<RequestHttpResponse<FileModel>>($"files", file);
+                var result = await _httpClientService.PostAPIWithFileAsync<RequestHttpResponse<FileModel>>($"files", file);
                 if (result.IsSuccess)
                 {
                     response.Data = result.Data.Data;
@@ -129,7 +125,7 @@ namespace CoreAdminWeb.Services.Files
                     response.Data.filename_download = $"{_appSettings.Value.BaseUrl}assets/{result.Data.Data.filename_download}";
                     if(model != null)
                     {
-                        await RequestClient.PatchAPIAsync<RequestHttpResponse<FileModel>>($"files/{response.Data.id}", model);
+                        await _httpClientService.PatchAPIAsync<RequestHttpResponse<FileModel>>($"files/{response.Data.id}", model);
                     }
                 }
                 else if (result?.Errors != null)
@@ -149,7 +145,7 @@ namespace CoreAdminWeb.Services.Files
             var response = new RequestHttpResponse<FileCRUDModel>();
             try
             {
-                var result = await RequestClient.PatchAPIAsync<RequestHttpResponse<FileCRUDModel>>($"files/{id}", 
+                var result = await _httpClientService.PatchAPIAsync<RequestHttpResponse<FileCRUDModel>>($"files/{id}", 
                 new {
                     co_quan_ban_hanh = model.co_quan_ban_hanh,
                     so_van_ban = model.so_van_ban,

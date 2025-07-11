@@ -1,9 +1,8 @@
-using System.Text.Json;
 using System.IdentityModel.Tokens.Jwt;
 
-namespace CoreAdminWeb.Helpers
+namespace CoreAdminWeb.Commons.Helpers
 {
-     public static class ClaimHepler
+    public static class ClaimHepler
     {
         public static List<string> GetListClaim(string tokenStr)
         {

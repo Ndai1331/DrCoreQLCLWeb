@@ -1,12 +1,12 @@
 ﻿using CoreAdminWeb.Model;
 using CoreAdminWeb.Model.RequestHttps;
-using CoreAdminWeb.RequestHttp;
+using CoreAdminWeb.Services.Http;
 using CoreAdminWeb.Services.BaseServices;
 using System.Net;
 
 namespace CoreAdminWeb.Services.DanhMucDungChung
 {
-    public class CountryService : IBaseService<CountryModel>
+    public class CountryService(IHttpClientService _httpClientService) : IBaseService<CountryModel>
     {
         private readonly string _collection = "Country";
         private const string Fields = "*,user_created.last_name,user_created.first_name,user_updated.last_name,user_updated.first_name";
@@ -46,7 +46,7 @@ namespace CoreAdminWeb.Services.DanhMucDungChung
             try
             {
                 string url = $"items/{_collection}?fields={Fields}&{query}";
-                var response = await RequestClient.GetAPIAsync<RequestHttpResponse<List<CountryModel>>>(url);
+                var response = await _httpClientService.GetAPIAsync<RequestHttpResponse<List<CountryModel>>>(url);
 
                 return response.IsSuccess
                     ? new RequestHttpResponse<List<CountryModel>> { Data = response.Data?.Data, Meta = response.Data?.Meta }
@@ -74,7 +74,7 @@ namespace CoreAdminWeb.Services.DanhMucDungChung
 
             try
             {
-                var response = await RequestClient.GetAPIAsync<RequestHttpResponse<CountryModel>>($"items/{_collection}/{id}?fields={Fields}");
+                var response = await _httpClientService.GetAPIAsync<RequestHttpResponse<CountryModel>>($"items/{_collection}/{id}?fields={Fields}");
 
                 return response.IsSuccess
                     ? new RequestHttpResponse<CountryModel> { Data = response.Data?.Data, Meta = response.Data?.Meta }
@@ -103,7 +103,7 @@ namespace CoreAdminWeb.Services.DanhMucDungChung
             try
             {
                 var createModel = MapToCRUDModel(model);
-                var response = await RequestClient.PostAPIAsync<RequestHttpResponse<CountryCRUDModel>>($"items/{_collection}", createModel);
+                var response = await _httpClientService.PostAPIAsync<RequestHttpResponse<CountryCRUDModel>>($"items/{_collection}", createModel);
 
                 if (!response.IsSuccess)
                 {
@@ -143,7 +143,7 @@ namespace CoreAdminWeb.Services.DanhMucDungChung
             try
             {
                 var updateModel = MapToCRUDModel(model);
-                var response = await RequestClient.PatchAPIAsync<RequestHttpResponse<CountryCRUDModel>>($"items/{_collection}/{model.id}", updateModel);
+                var response = await _httpClientService.PatchAPIAsync<RequestHttpResponse<CountryCRUDModel>>($"items/{_collection}/{model.id}", updateModel);
 
                 return new RequestHttpResponse<bool>
                 {
@@ -174,7 +174,7 @@ namespace CoreAdminWeb.Services.DanhMucDungChung
 
             try
             {
-                var response = await RequestClient.PatchAPIAsync<RequestHttpResponse<CountryCRUDModel>>($"items/{_collection}/{model.id}", new { deleted = true });
+                var response = await _httpClientService.PatchAPIAsync<RequestHttpResponse<CountryCRUDModel>>($"items/{_collection}/{model.id}", new { deleted = true });
 
                 return new RequestHttpResponse<bool>
                 {

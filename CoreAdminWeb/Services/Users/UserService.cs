@@ -1,18 +1,18 @@
+using Blazored.LocalStorage;
+using CoreAdminWeb.Commons.Helpers;
 using CoreAdminWeb.Model.RequestHttps;
 using CoreAdminWeb.Model.User;
-using CoreAdminWeb.RequestHttp;
-using LoginResponse = CoreAdminWeb.Model.User.LoginResponse;
-using Blazored.LocalStorage;
+using CoreAdminWeb.Services.Http;
+using CoreAdminWeb.Services.Auth;
 using Microsoft.AspNetCore.Components.Authorization;
-using CoreAdminWeb.Providers;
-using CoreAdminWeb.Helpers;
-
+using LoginResponse = CoreAdminWeb.Model.User.LoginResponse;
+using CoreAdminWeb.RequestHttp;
 namespace CoreAdminWeb.Services.Users
 {
     public interface IUserService
     {
         Task<RequestHttpResponse<LoginResponse>> LoginAsync(string email, string password);
-        Task<bool> LogoutAsync(string refreshToken);
+        Task<bool> LogoutAsync();
         Task<RequestHttpResponse<UserModel>> GetCurrentUserAsync();
         Task<RequestHttpResponse<UserModel>> UpdateUserAsync(UserModel req);
         Task<RequestHttpResponse<UserModel>> UpdateCurrentUserAsync(UserModel req);
@@ -23,19 +23,29 @@ namespace CoreAdminWeb.Services.Users
 
     public class UserService : IUserService
     {
-
         private readonly ILocalStorageService _localStorage;
         private readonly AuthenticationStateProvider _authenticationStateProvider;
-        private string _accessToken;
-        private string _refreshToken;
+        private readonly IHttpClientService _httpClientService;
+        private string? _accessToken { get; set; }
+        private string? _refreshToken { get; set; }
+
         public UserService(
             ILocalStorageService localStorage,
-            AuthenticationStateProvider authenticationStateProvider
+            AuthenticationStateProvider authenticationStateProvider,
+            IHttpClientService httpClientService
         )
         {
             _localStorage = localStorage;
             _authenticationStateProvider = authenticationStateProvider;
+            _httpClientService = httpClientService;
+
+            // Set up circular reference for token refresh
+            if (_httpClientService is HttpClientService httpService)
+            {
+                httpService.SetUserService(this);
+            }
         }
+
         public async Task<RequestHttpResponse<LoginResponse>> LoginAsync(string email, string password)
         {
             var response = new RequestHttpResponse<LoginResponse>();
@@ -44,16 +54,15 @@ namespace CoreAdminWeb.Services.Users
                 var result = await PublicRequestClient.PostAPIAsync<RequestHttpResponse<LoginResponse>>("auth/login", new LoginRequest { email = email, password = password });
                 if (result.IsSuccess)
                 {
-                    response.Data = result.Data.Data;
-                    _accessToken = result.Data.Data.access_token;
-                    _refreshToken = result.Data.Data.refresh_token;
+                    response.Data = result.Data?.Data;
+                    _accessToken = result.Data?.Data?.access_token ?? string.Empty;
+                    _refreshToken = result.Data?.Data?.refresh_token ?? string.Empty;
 
-                    RequestClient.AttachToken(_accessToken);
-                    RequestClient.InjectServices(_localStorage);
+                    _httpClientService.AttachToken(_accessToken);
                     var claim = ClaimHepler.GetListClaim(_accessToken);
 
                     var currentUserAsync = await GetCurrentUserAsync();
-                    if(currentUserAsync.Data != null)
+                    if (currentUserAsync.Data != null)
                     {
                         await _localStorage.SetItemAsync("accessToken", _accessToken);
                         await _localStorage.SetItemAsync("userName", currentUserAsync.Data.email);
@@ -63,10 +72,14 @@ namespace CoreAdminWeb.Services.Users
                         (
                             (ApiAuthenticationStateProvider)_authenticationStateProvider
                         ).MarkUserAsAuthenticated(currentUserAsync.Data.email);
-                    }else{
+                    }
+                    else
+                    {
                         response.Errors = new List<ErrorResponse> { new ErrorResponse { Message = "Không tìm thấy user" } };
                     }
-                }else{
+                }
+                else
+                {
                     response.Errors = result.Errors;
                 }
             }
@@ -77,16 +90,19 @@ namespace CoreAdminWeb.Services.Users
             return response;
         }
 
-        public async Task<bool> LogoutAsync(string refreshToken)
+        public async Task<bool> LogoutAsync()
         {
             try
             {
-                if (string.IsNullOrEmpty(_accessToken))
-                    return true;
-
-                await PublicRequestClient.PostAPIAsync("auth/logout", new LogoutRequest { refresh_token = refreshToken });
                 _accessToken = null;
                 _refreshToken = null;
+                _httpClientService.RemoveToken();
+                await _localStorage.RemoveItemAsync("accessToken");
+                await _localStorage.RemoveItemAsync("userName");
+                await _localStorage.RemoveItemAsync("userId");
+                await _localStorage.RemoveItemAsync("role");
+                await _localStorage.RemoveItemAsync("claims");
+                await ((ApiAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsLoggedOut();
                 return true;
             }
             catch
@@ -100,14 +116,23 @@ namespace CoreAdminWeb.Services.Users
             var response = new RequestHttpResponse<UserModel>();
             try
             {
-                var result = await RequestClient.GetAPIAsync<RequestHttpResponse<UserModel>>("users/me");
+                var result = await _httpClientService.GetAPIAsync<RequestHttpResponse<UserModel>>("users/me");
                 if (result.IsSuccess)
                 {
-                    response.Data = result.Data.Data;
+                    response.Data = result.Data?.Data;
                 }
                 else
                 {
                     response.Errors = result.Errors;
+                    _accessToken = null;
+                    _refreshToken = null;
+                    _httpClientService.RemoveToken();
+                    await _localStorage.RemoveItemAsync("accessToken");
+                    await _localStorage.RemoveItemAsync("userName");
+                    await _localStorage.RemoveItemAsync("userId");
+                    await _localStorage.RemoveItemAsync("role");
+                    await _localStorage.RemoveItemAsync("claims");
+                    await ((ApiAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsLoggedOut();
                 }
             }
             catch (Exception ex)
@@ -134,10 +159,10 @@ namespace CoreAdminWeb.Services.Users
                     req.language
                 };
 
-                var result = await RequestClient.PatchAPIAsync<RequestHttpResponse<UserModel>>($"users/{req.id}", request);
+                var result = await _httpClientService.PatchAPIAsync<RequestHttpResponse<UserModel>>($"users/{req.id}", request);
                 if (result.IsSuccess)
                 {
-                    response.Data = result.Data.Data;
+                    response.Data = result.Data?.Data;
                 }
                 else
                 {
@@ -159,8 +184,11 @@ namespace CoreAdminWeb.Services.Users
                 dynamic request;
 
                 if (!string.IsNullOrEmpty(req.password))
+                {
                     request = new { req.password };
+                }
                 else
+                {
                     request = new
                     {
                         req.id,
@@ -173,8 +201,9 @@ namespace CoreAdminWeb.Services.Users
                         req.avatar,
                         req.language
                     };
+                }
 
-                var result = await RequestClient.PatchAPIAsync<RequestHttpResponse<UserModel>>("users/me", request);
+                var result = await _httpClientService.PatchAPIAsync<RequestHttpResponse<UserModel>>("users/me", request);
                 if (result.IsSuccess)
                 {
                     response.Data = result.Data.Data;
@@ -193,11 +222,11 @@ namespace CoreAdminWeb.Services.Users
 
         public string GetAccessTokenAsync()
         {
-            return _accessToken;
+            return _accessToken ?? string.Empty;
         }
         public string GetRefreshTokenAsync()
         {
-            return _refreshToken;
+            return _refreshToken ?? string.Empty;
         }
 
         public async Task<bool> RefreshTokenAsync()
@@ -205,7 +234,9 @@ namespace CoreAdminWeb.Services.Users
             try
             {
                 if (string.IsNullOrEmpty(_refreshToken))
+                {
                     return false;
+                }
 
                 // Call refresh token endpoint
                 var response = await PublicRequestClient.PostAPIAsync<RequestHttpResponse<LoginResponse>>(
@@ -218,9 +249,10 @@ namespace CoreAdminWeb.Services.Users
                     // Update tokens
                     _accessToken = response.Data.Data.access_token;
                     _refreshToken = response.Data.Data.refresh_token;
-                    
-                    // Update token in RequestClient
-                    RequestClient.AttachToken(_accessToken);
+
+                    // Update token in localStorage and HttpClientService
+                    await _localStorage.SetItemAsync("accessToken", _accessToken);
+                    _httpClientService.AttachToken(_accessToken);
                     return true;
                 }
             }

@@ -21,10 +21,9 @@ builder.Services.AddAuthorizationCore();
 
 builder.Services.AddServices();
 builder.Services.Configure<DrCoreApi>(builder.Configuration.GetSection("DrCoreApi"));
-// Configure HttpClient with base URL
-builder.Services.AddHttpClient("DrCoreApi", client =>
+builder.Services.AddHttpClient<CoreAdminWeb.Services.Http.HttpClientService>(client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["DrCoreApi:BaseUrl"]);
+    client.BaseAddress = new Uri(builder.Configuration["DrCoreApi:BaseUrl"] ?? string.Empty);
     client.Timeout = TimeSpan.FromSeconds(30);
 });
 
@@ -45,10 +44,9 @@ GlobalConstant.BaseUrl = builder.Configuration["DrCoreApi:BaseUrl"] ?? "https://
 
 var app = builder.Build();
 
-var httpClient = app.Services.GetRequiredService<IHttpClientFactory>().CreateClient("DrCoreApi");
-RequestClient.Initialize(httpClient);
 var publicHttpClient = app.Services.GetRequiredService<IHttpClientFactory>().CreateClient("DrCoreApiPublic");
-PublicRequestClient.Initialize(publicHttpClient);
+PublicRequestClient.Initialize(publicHttpClient, builder.Configuration);
+
 var reportHttpClient = app.Services.GetRequiredService<IHttpClientFactory>().CreateClient("DrCoreApiReport");
 ReportRequestClient.Initialize(reportHttpClient);
 

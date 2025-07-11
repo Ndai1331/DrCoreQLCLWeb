@@ -1,5 +1,4 @@
 ﻿using CoreAdminWeb.Model;
-using CoreAdminWeb.Services;
 using CoreAdminWeb.Services.BaseServices;
 using CoreAdminWeb.Shared.Base;
 using Microsoft.AspNetCore.Components;
@@ -7,7 +6,6 @@ using Microsoft.JSInterop;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using CoreAdminWeb.Extensions;
-using CoreAdminWeb.Providers;
 using CoreAdminWeb.Model.User;
 
 namespace CoreAdminWeb.Pages.QLCLCongBoCoSoViPham

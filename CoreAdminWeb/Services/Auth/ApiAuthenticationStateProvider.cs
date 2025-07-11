@@ -1,21 +1,23 @@
-﻿using Blazored.LocalStorage;
+using Blazored.LocalStorage;
+using CoreAdminWeb.Services.Http;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using CoreAdminWeb.RequestHttp;
-using CoreAdminWeb.Model.User;
 
-namespace CoreAdminWeb.Providers
+namespace CoreAdminWeb.Services.Auth
 {
     public class ApiAuthenticationStateProvider : AuthenticationStateProvider
     {
         private readonly ILocalStorageService _localStorage;
+        private readonly IHttpClientService _httpClientService;
 
         public ApiAuthenticationStateProvider(
-            ILocalStorageService localStorage
+            ILocalStorageService localStorage,
+            IHttpClientService httpClientService
         )
         {
             _localStorage = localStorage;
+            _httpClientService = httpClientService;
         }
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
@@ -23,14 +25,13 @@ namespace CoreAdminWeb.Providers
             var savedToken = "";
             try
             {
-                InjectServiceForHttpClient();
                 savedToken = await _localStorage.GetItemAsync<string>("accessToken");
 
-                if (string.IsNullOrWhiteSpace(savedToken))
+                if (string.IsNullOrEmpty(savedToken))
                 {
                     return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
                 }
-                RequestClient.AttachToken(savedToken);
+                _httpClientService.AttachToken(savedToken);
 
                 var claims = ParseClaimsFromJwt1(savedToken);
 
@@ -65,11 +66,6 @@ namespace CoreAdminWeb.Providers
             }
 
             return true;
-        }
-
-        private void InjectServiceForHttpClient()
-        {
-            RequestClient.InjectServices(_localStorage);
         }
 
         public void MarkUserAsAuthenticated(string userName)

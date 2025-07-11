@@ -1,9 +1,9 @@
+using CoreAdminWeb.Model.RequestHttps;
 using Microsoft.AspNetCore.Components.Forms;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Http.Headers;
 using System.Text;
-using CoreAdminWeb.Model.RequestHttps;
 
 namespace CoreAdminWeb.RequestHttp
 {
@@ -13,15 +13,17 @@ namespace CoreAdminWeb.RequestHttp
     public static class PublicRequestClient
     {
         private static HttpClient? _client;
-        private static readonly CancellationTokenSource _tokenSource = new();
-        private const long UploadLimit = 25214400; // ~24MB
+        private static readonly CancellationTokenSource cancellationTokenSource = new();
+        private static readonly CancellationTokenSource _tokenSource = cancellationTokenSource;
+        private const long uploadLimit = 25214400; // ~24MB
 
         /// <summary>
         /// Initialize the client with a new HttpClient instance
         /// </summary>
-        public static void Initialize(HttpClient client)
+        public static void Initialize(HttpClient client, IConfiguration configuration)
         {
             _client = client ?? throw new ArgumentNullException(nameof(client));
+            _client.BaseAddress = new Uri(configuration["DrCoreApi:BaseUrl"] ?? string.Empty);
         }
 
         /// <summary>
@@ -126,8 +128,13 @@ namespace CoreAdminWeb.RequestHttp
             try
             {
                 EnsureClientInitialized();
+                // Ensure the upload limit is safe by checking the file size before opening the stream
+                if (file.Size > uploadLimit)
+                {
+                    throw new InvalidOperationException($"File size exceeds the limit of {uploadLimit} bytes.");
+                }
                 using var content = new MultipartFormDataContent();
-                using var stream = file.OpenReadStream(UploadLimit);
+                using var stream = file.OpenReadStream(file.Size); // Use file.Size to ensure the stream is limited to the file's actual size
                 var streamContent = new StreamContent(stream);
                 streamContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
                 content.Add(streamContent, "file", file.Name);
@@ -162,11 +169,11 @@ namespace CoreAdminWeb.RequestHttp
         private static async Task<RequestHttpResponse<T>> ReturnApiResponse<T>(HttpResponseMessage response)
         {
             var result = new RequestHttpResponse<T>();
-            
+
             try
             {
                 var jsonResponse = await response.Content.ReadAsStringAsync();
-                
+
                 if (response.IsSuccessStatusCode)
                 {
                     result.Data = JsonConvert.DeserializeObject<T>(jsonResponse);
@@ -177,8 +184,8 @@ namespace CoreAdminWeb.RequestHttp
                 result.Errors = errorResponse?.errors?.Select(e => new ErrorResponse
                 {
                     Message = e.message,
-                    Code = e.extensions?.code,
-                    Reason = e.extensions?.reason
+                    Code = e.extensions?.code ?? string.Empty,
+                    Reason = e.extensions?.reason ?? string.Empty
                 }).ToList() ?? new List<ErrorResponse>
                 {
                     new()
@@ -203,4 +210,4 @@ namespace CoreAdminWeb.RequestHttp
             return result;
         }
     }
-} 
+}

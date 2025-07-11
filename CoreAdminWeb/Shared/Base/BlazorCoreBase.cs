@@ -1,6 +1,6 @@
 using CoreAdminWeb.Model.Menus;
 using CoreAdminWeb.Model.User;
-using CoreAdminWeb.Providers;
+using CoreAdminWeb.Services.Auth;
 using CoreAdminWeb.Services;
 using CoreAdminWeb.Services.BaseServices;
 using CoreAdminWeb.Services.Menus;

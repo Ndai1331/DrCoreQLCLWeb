@@ -1,12 +1,12 @@
 ﻿using CoreAdminWeb.Model;
 using CoreAdminWeb.Model.RequestHttps;
-using CoreAdminWeb.RequestHttp;
+using CoreAdminWeb.Services.Http;
 using CoreAdminWeb.Services.BaseServices;
 using System.Net;
 
 namespace CoreAdminWeb.Services
 {
-    public class QLCLKiemTraHauKiemATTPService : IBaseService<QLCLKiemTraHauKiemATTPModel>
+    public class QLCLKiemTraHauKiemATTPService(IHttpClientService _httpClientService) : IBaseService<QLCLKiemTraHauKiemATTPModel>
     {
         private readonly string _collection = "QLCLKiemTraHauKiemATTP";
         private const string Fields = "*,user_created.last_name,user_created.first_name,user_updated.last_name,user_updated.first_name"
@@ -62,7 +62,7 @@ namespace CoreAdminWeb.Services
             try
             {
                 string url = $"items/{_collection}?fields={Fields}&{query}";
-                var response = await RequestClient.GetAPIAsync<RequestHttpResponse<List<QLCLKiemTraHauKiemATTPModel>>>(url);
+                var response = await _httpClientService.GetAPIAsync<RequestHttpResponse<List<QLCLKiemTraHauKiemATTPModel>>>(url);
 
                 return response.IsSuccess
                     ? new RequestHttpResponse<List<QLCLKiemTraHauKiemATTPModel>> { Data = response.Data?.Data, Meta = response.Data?.Meta }
@@ -90,7 +90,7 @@ namespace CoreAdminWeb.Services
 
             try
             {
-                var response = await RequestClient.GetAPIAsync<RequestHttpResponse<QLCLKiemTraHauKiemATTPModel>>($"items/{_collection}/{id}?fields={Fields}");
+                var response = await _httpClientService.GetAPIAsync<RequestHttpResponse<QLCLKiemTraHauKiemATTPModel>>($"items/{_collection}/{id}?fields={Fields}");
 
                 return response.IsSuccess
                     ? new RequestHttpResponse<QLCLKiemTraHauKiemATTPModel> { Data = response.Data?.Data, Meta = response.Data?.Meta }
@@ -119,7 +119,7 @@ namespace CoreAdminWeb.Services
             try
             {
                 var createModel = MapToCRUDModel(model);
-                var response = await RequestClient.PostAPIAsync<RequestHttpResponse<QLCLKiemTraHauKiemATTPCRUDResponseModel>>($"items/{_collection}", createModel);
+                var response = await _httpClientService.PostAPIAsync<RequestHttpResponse<QLCLKiemTraHauKiemATTPCRUDResponseModel>>($"items/{_collection}", createModel);
 
                 if (!response.IsSuccess)
                 {
@@ -158,7 +158,7 @@ namespace CoreAdminWeb.Services
             try
             {
                 var updateModel = MapToCRUDModel(model);
-                var response = await RequestClient.PatchAPIAsync<RequestHttpResponse<QLCLKiemTraHauKiemATTPCRUDModel>>($"items/{_collection}/{model.id}", updateModel);
+                var response = await _httpClientService.PatchAPIAsync<RequestHttpResponse<QLCLKiemTraHauKiemATTPCRUDModel>>($"items/{_collection}/{model.id}", updateModel);
 
                 return new RequestHttpResponse<bool>
                 {
@@ -189,7 +189,7 @@ namespace CoreAdminWeb.Services
 
             try
             {
-                var response = await RequestClient.PatchAPIAsync<RequestHttpResponse<QLCLKiemTraHauKiemATTPCRUDModel>>($"items/{_collection}/{model.id}", new { deleted = true });
+                var response = await _httpClientService.PatchAPIAsync<RequestHttpResponse<QLCLKiemTraHauKiemATTPCRUDModel>>($"items/{_collection}/{model.id}", new { deleted = true });
 
                 return new RequestHttpResponse<bool>
                 {

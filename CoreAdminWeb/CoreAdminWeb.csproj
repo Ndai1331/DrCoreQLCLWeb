@@ -4,9 +4,6 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
-    <GenerateRazorAssemblyInfo>false</GenerateRazorAssemblyInfo>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,13 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <AdditionalFiles Include="Pages\LoaiHinhCanhTac\LoaiHinhCanhTac.razor" />
-    <AdditionalFiles Include="Pages\LoaiHinhSanXuat\LoaiHinhSanXuat.razor" />
-    <AdditionalFiles Include="Pages\QuanLyCoSoSanXuatPhanBon\QuanLyCoSoSanXuatPhanBon.razor" />
-    <AdditionalFiles Include="Pages\ViPhamSanXuatKinhDoanhThuocBVTV\ViPhamSanXuatKinhDoanhThuocBVTV.razor" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="postcss.config.js" />
   </ItemGroup>
 
@@ -35,11 +25,6 @@
     <Content Remove="Package.json" />
     <Content Include="Pages\Folder\Folder.razor.cs" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Pages\ViSinhVatGayHai\" />
-  </ItemGroup>
-
   <!-- <ItemGroup>
     <Compile Remove="Pages\Apps\**" />
     <Compile Remove="Pages\Chart\**" />

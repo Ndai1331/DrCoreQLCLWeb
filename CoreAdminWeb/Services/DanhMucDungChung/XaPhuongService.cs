@@ -1,7 +1,7 @@
 using CoreAdminWeb.Model.RequestHttps;
 using CoreAdminWeb.Model.Settings;
 using CoreAdminWeb.Services.BaseServices;
-using CoreAdminWeb.RequestHttp;
+using CoreAdminWeb.Services.Http;
 using System.Net;
 using CoreAdminWeb.Model;
 
@@ -10,7 +10,7 @@ namespace CoreAdminWeb.Services
     /// <summary>
     /// Service for managing fertilizer production facilities
     /// </summary>
-    public class XaPhuongService : IBaseService<XaPhuongModel>
+    public class XaPhuongService(IHttpClientService _httpClientService) : IBaseService<XaPhuongModel>
     {
         private readonly string _collection = "Wards";
         private const string Fields = "*,user_created.last_name,user_created.first_name,user_updated.last_name,user_updated.first_name";
@@ -50,7 +50,7 @@ namespace CoreAdminWeb.Services
             try
             {
                 string url = $"items/{_collection}?fields={Fields}&{query}";
-                var response = await RequestClient.GetAPIAsync<RequestHttpResponse<List<XaPhuongModel>>>(url);
+                var response = await _httpClientService.GetAPIAsync<RequestHttpResponse<List<XaPhuongModel>>>(url);
                 
                 return response.IsSuccess 
                     ? new RequestHttpResponse<List<XaPhuongModel>> { Data = response.Data.Data }
@@ -78,7 +78,7 @@ namespace CoreAdminWeb.Services
 
             try
             {
-                var response = await RequestClient.GetAPIAsync<RequestHttpResponse<XaPhuongModel>>($"items/{_collection}/{id}?fields={Fields}");
+                var response = await _httpClientService.GetAPIAsync<RequestHttpResponse<XaPhuongModel>>($"items/{_collection}/{id}?fields={Fields}");
                 
                 return response.IsSuccess
                     ? new RequestHttpResponse<XaPhuongModel> { Data = response.Data.Data }
@@ -107,7 +107,7 @@ namespace CoreAdminWeb.Services
             try
             {
                 var createModel = MapToCRUDModel(model);
-                var response = await RequestClient.PostAPIAsync<RequestHttpResponse<XaPhuongCRUDModel>>($"items/{_collection}", createModel);
+                var response = await _httpClientService.PostAPIAsync<RequestHttpResponse<XaPhuongCRUDModel>>($"items/{_collection}", createModel);
 
                 if (!response.IsSuccess)
                 {
@@ -147,7 +147,7 @@ namespace CoreAdminWeb.Services
             try
             {
                 var updateModel = MapToCRUDModel(model);
-                var response = await RequestClient.PatchAPIAsync<RequestHttpResponse<XaPhuongCRUDModel>>($"items/{_collection}/{model.id}", updateModel);
+                var response = await _httpClientService.PatchAPIAsync<RequestHttpResponse<XaPhuongCRUDModel>>($"items/{_collection}/{model.id}", updateModel);
 
                 return new RequestHttpResponse<bool>
                 {
@@ -178,7 +178,7 @@ namespace CoreAdminWeb.Services
 
             try
             {
-                var response = await RequestClient.PatchAPIAsync<RequestHttpResponse<XaPhuongCRUDModel>>($"items/{_collection}/{model.id}", new { deleted = true });
+                var response = await _httpClientService.PatchAPIAsync<RequestHttpResponse<XaPhuongCRUDModel>>($"items/{_collection}/{model.id}", new { deleted = true });
 
                 return new RequestHttpResponse<bool>
                 {

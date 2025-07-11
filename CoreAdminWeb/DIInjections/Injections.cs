@@ -8,7 +8,8 @@ using CoreAdminWeb.Services.Settings;
 using CoreAdminWeb.Services.Users;
 using CoreAdminWeb.Services.Reports;
 using CoreAdminWeb.Model.Reports;
-using CoreAdminWeb.Providers;
+using CoreAdminWeb.Services.Auth;   
+using CoreAdminWeb.Services.Http;
 
 namespace CoreAdminWeb.DIInjections
 {
@@ -68,6 +69,7 @@ namespace CoreAdminWeb.DIInjections
             services.AddScoped<IBaseService<QLCLDataTuyenTruyenATTPModel>, QLCLDataTuyenTruyenATTPService>();
             services.AddScoped<IReportService<QLCLBienDongGiaModel>, ReportQLCLBienDongGiaService>();
             services.AddScoped<AlertService>();
+            services.AddScoped<IHttpClientService, HttpClientService>();
         }
     }
 }

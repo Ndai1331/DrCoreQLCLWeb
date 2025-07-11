@@ -1,6 +1,5 @@
 ﻿using CoreAdminWeb.Model.RequestHttps;
 using CoreAdminWeb.RequestHttp;
-using CoreAdminWeb.Model;
 using CoreAdminWeb.Model.Reports;
 
 namespace CoreAdminWeb.Services.Reports

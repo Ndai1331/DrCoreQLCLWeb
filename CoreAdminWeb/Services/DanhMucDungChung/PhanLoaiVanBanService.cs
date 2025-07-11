@@ -1,12 +1,12 @@
 ﻿using CoreAdminWeb.Model;
 using CoreAdminWeb.Model.RequestHttps;
-using CoreAdminWeb.RequestHttp;
+using CoreAdminWeb.Services.Http;
 using CoreAdminWeb.Services.BaseServices;
 using System.Net;
 
 namespace CoreAdminWeb.Services.DanhMucDungChung
 {
-    public class PhanLoaiVanBanService : IBaseService<PhanLoaiVanBanModel>
+    public class PhanLoaiVanBanService(IHttpClientService _httpClientService) : IBaseService<PhanLoaiVanBanModel>
     {
         private readonly string _collection = "PhanLoaiVB";
         private const string Fields = "*,user_created.last_name,user_created.first_name,user_updated.last_name,user_updated.first_name";
@@ -51,7 +51,7 @@ namespace CoreAdminWeb.Services.DanhMucDungChung
                     query = "filter[_and][0][system][_eq]=2&filter[_and][1][deleted][_eq]=false";
                 }
                 string url = $"items/{_collection}?fields={Fields}&{query}";
-                var response = await RequestClient.GetAPIAsync<RequestHttpResponse<List<PhanLoaiVanBanModel>>>(url);
+                var response = await _httpClientService.GetAPIAsync<RequestHttpResponse<List<PhanLoaiVanBanModel>>>(url);
 
                 return response.IsSuccess
                     ? new RequestHttpResponse<List<PhanLoaiVanBanModel>> { Data = response.Data?.Data, Meta = response.Data?.Meta }
@@ -79,7 +79,7 @@ namespace CoreAdminWeb.Services.DanhMucDungChung
 
             try
             {
-                var response = await RequestClient.GetAPIAsync<RequestHttpResponse<PhanLoaiVanBanModel>>($"items/{_collection}/{id}?fields={Fields}");
+                var response = await _httpClientService.GetAPIAsync<RequestHttpResponse<PhanLoaiVanBanModel>>($"items/{_collection}/{id}?fields={Fields}");
 
                 return response.IsSuccess
                     ? new RequestHttpResponse<PhanLoaiVanBanModel> { Data = response.Data?.Data, Meta = response.Data?.Meta }
@@ -108,7 +108,7 @@ namespace CoreAdminWeb.Services.DanhMucDungChung
             try
             {
                 var createModel = MapToCRUDModel(model);
-                var response = await RequestClient.PostAPIAsync<RequestHttpResponse<PhanLoaiVanBanCRUDModel>>($"items/{_collection}", createModel);
+                var response = await _httpClientService.PostAPIAsync<RequestHttpResponse<PhanLoaiVanBanCRUDModel>>($"items/{_collection}", createModel);
 
                 if (!response.IsSuccess)
                 {
@@ -148,7 +148,7 @@ namespace CoreAdminWeb.Services.DanhMucDungChung
             try
             {
                 var updateModel = MapToCRUDModel(model);
-                var response = await RequestClient.PatchAPIAsync<RequestHttpResponse<PhanLoaiVanBanCRUDModel>>($"items/{_collection}/{model.id}", updateModel);
+                var response = await _httpClientService.PatchAPIAsync<RequestHttpResponse<PhanLoaiVanBanCRUDModel>>($"items/{_collection}/{model.id}", updateModel);
 
                 return new RequestHttpResponse<bool>
                 {
@@ -179,7 +179,7 @@ namespace CoreAdminWeb.Services.DanhMucDungChung
 
             try
             {
-                var response = await RequestClient.PatchAPIAsync<RequestHttpResponse<PhanLoaiVanBanCRUDModel>>($"items/{_collection}/{model.id}", new { deleted = true });
+                var response = await _httpClientService.PatchAPIAsync<RequestHttpResponse<PhanLoaiVanBanCRUDModel>>($"items/{_collection}/{model.id}", new { deleted = true });
 
                 return new RequestHttpResponse<bool>
                 {
