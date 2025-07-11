@@ -6,7 +6,6 @@
 <div class=" bg-white dark:bg-darklight dark:border-darkborder flex gap-4 lg:z-10 items-center justify-between px-4 h-[60px] border-b border-black/10 detached-topbar relative">
     <div class="flex items-center flex-1 gap-2 sm:gap-4">
         <MudButton type="button" Class="text-black dark:text-white/80 " @onclick="ToggleSidebar">
-
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6">
                 <path d="M3 4H21V6H3V4ZM3 11H15V13H3V11ZM3 18H21V20H3V18Z" fill="currentColor"></path>
             </svg>
@@ -15,31 +14,9 @@
         <div Class="flex-1 hidden min-420-flex  w-full flex justify-center">
             <span class="text-xl font-bold text-black dark:text-white/80 project-text-color project_name">@Setting?.project_name</span>
         </div>
-        <!-- <MudForm Class="flex-1 hidden min-[420px]:block">
-            <div class="w-full">
-                <input type="text" id="search" class="border-black/10 dark:text-white/80 dark:placeholder:text-white/30 dark:border-darkborder dark:bg-dark dark:focus:border-white/30 focus:border-black/30 placeholder:text-black/50 border text-black text-sm rounded block w-full ltr:pl-3 rtl:pr-3 ltr:pr-7 rtl:pl-7 h-10 bg-[#f9fbfd] focus:ring-0 focus:outline-0" placeholder="Search..." required="">
-                <MudButton type="button" Class="absolute inset-y-0 flex items-center text-black ltr:right-0 rtl:left-0 ltr:pr-2 rtl:pl-2 dark:text-white/80">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-4 h-4">
-                        <path d="M11 2C15.968 2 20 6.032 20 11C20 15.968 15.968 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2ZM11 18C14.8675 18 18 14.8675 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18ZM19.4853 18.0711L22.3137 20.8995L20.8995 22.3137L18.0711 19.4853L19.4853 18.0711Z" fill="currentColor"></path>
-                    </svg>
-                </MudButton>
-            </div>
-        </MudForm> -->
     </div>
     <div class="flex items-center gap-4">
         <div class="h-5">
-            @* <button class="text-black dark:text-white/80  @((fullScreen ? "hidden" : "block"))">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-5 h-5">
-            <path d="M16 3H22V9H20V5H16V3ZM2 3H8V5H4V9H2V3ZM20 19V15H22V21H16V19H20ZM4 19H8V21H2V15H4V19Z" fill="currentColor"></path>
-            </svg >
-            </button>
-            <button class="text-black dark:text-white/80 @((fullScreen ? "block" : "hidden"))">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-5 h-5">
-            <path d="M18 7H22V9H16V3H18V7ZM8 9H2V7H6V3H8V9ZM18 17V21H16V15H22V17H18ZM8 15V21H6V17H2V15H8Z" fill="currentColor"></path>
-            </svg>
-            </button> *@
-
-
             <MudButton Class="text-black dark:text-white/80 " @onclick="ToggleFullScreen">
                 @if (!FullScreen)
                 {

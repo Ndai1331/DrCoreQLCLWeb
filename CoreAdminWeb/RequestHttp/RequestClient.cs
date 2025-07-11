@@ -22,7 +22,6 @@ namespace CoreAdminWeb.RequestHttp
         private static ILocalStorageService _localStorage;
         private static readonly CancellationTokenSource _tokenSource = new();
         private const long UploadLimit = 25214400; // ~24MB
-        private static string? _accessToken;
         private static IUserService? _userService;
 
         // Event để thông báo khi cần logout
@@ -49,20 +48,17 @@ namespace CoreAdminWeb.RequestHttp
         {
             _localStorage = localStorage;
         }
-
-
         /// <summary>
         /// Attach authentication token to the client
         /// </summary>
         public static void AttachToken(string token)
         {
-            _accessToken = token;
             EnsureClientInitialized();
-            
-            if (!string.IsNullOrEmpty(_accessToken))
+            _client!.DefaultRequestHeaders.Clear();
+            _client!.DefaultRequestHeaders.Authorization = null;
+            if (!string.IsNullOrEmpty(token))
             {
-                _client!.DefaultRequestHeaders.Clear();
-                _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
+                _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             }
         }
 
@@ -113,7 +109,6 @@ namespace CoreAdminWeb.RequestHttp
                 EnsureClientInitialized();
                 RemoveToken();
                 var response = await _client!.GetAsync(URL, _tokenSource.Token);
-                AttachToken(_accessToken ?? "");
                 return await ReturnApiResponse<T>(response);
             }
             catch (Exception ex)
@@ -172,15 +167,7 @@ namespace CoreAdminWeb.RequestHttp
                     "application/json"
                 );
 
-                if (URL.Contains("/signin"))
-                {
-                    RemoveToken();
-                }
-                else
-                {
-                    EnsureTokenAttached();
-                }
-
+                EnsureTokenAttached();
                 var response = await _client!.PostAsync(URL, content, _tokenSource.Token);
                 return await ReturnApiResponse<T>(response);
             }
@@ -316,7 +303,6 @@ namespace CoreAdminWeb.RequestHttp
             {
                 EnsureClientInitialized();
                 EnsureTokenAttached();
-
                 var response = await _client!.DeleteAsync(URL, _tokenSource.Token);
                 return await ReturnApiResponse<T>(response);
             }
@@ -336,10 +322,7 @@ namespace CoreAdminWeb.RequestHttp
 
         private static void EnsureTokenAttached()
         {
-            if (_client!.DefaultRequestHeaders.Authorization == null)
-            {
-                AttachToken(_accessToken ?? "");
-            }
+            AttachToken(_localStorage.GetItemAsync<string>("accessToken").Result ?? "");
         }
 
         private static void AddFileMetadata(MultipartFormDataContent content, FileCRUDModel model)
