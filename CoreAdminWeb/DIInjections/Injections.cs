@@ -65,6 +65,7 @@ namespace CoreAdminWeb.DIInjections
             services.AddScoped<IBaseService<QLCLVatTuNongNghiepModel>, QLCLVatTuNongNghiepService>();
             services.AddScoped<IBaseService<QLCLGiaCaVatTuNNModel>, QLCLGiaCaVatTuNNService>();
             services.AddScoped<IBaseService<QLCLGiaCaNongSanModel>, QLCLGiaCaNongSanService>();
+            services.AddScoped<IBaseService<QLCLDataTuyenTruyenATTPModel>, QLCLDataTuyenTruyenATTPService>();
             services.AddScoped<AlertService>();
         }
     }
