@@ -447,7 +447,7 @@
         openDeleteModal = false;
     }
 
-    private void OpenAddOrUpdateModal(QLCLDotKiemTraHauKiemATTPModel? item)
+    private async Task OpenAddOrUpdateModal(QLCLDotKiemTraHauKiemATTPModel? item)
     {
         _titleAddOrUpdate = item != null ? "Sửa" : "Thêm mới";
         SelectedItem = item != null ? item.DeepClone() : new QLCLDotKiemTraHauKiemATTPModel();

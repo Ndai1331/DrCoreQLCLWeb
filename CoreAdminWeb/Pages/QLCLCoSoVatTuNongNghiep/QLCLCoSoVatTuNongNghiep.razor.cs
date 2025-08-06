@@ -252,7 +252,10 @@ namespace CoreAdminWeb.Pages.QLCLCoSoVatTuNongNghiep
         private async Task OpenAddOrUpdateModal(QLCLCoSoVatTuNongNghiepModel? item)
         {
             _titleAddOrUpdate = item != null ? "Sửa" : "Thêm mới";
-            SelectedItem = item != null ? item : new QLCLCoSoVatTuNongNghiepModel();
+            SelectedItem = item != null ? item : new QLCLCoSoVatTuNongNghiepModel()
+                {
+                    province = await LoadDefaultData(TinhService),
+                };
 
             if (SelectedItem.id > 0)
             {

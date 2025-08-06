@@ -134,12 +134,15 @@ namespace CoreAdminWeb.Pages.QLCLGiaCaNongSan
             return await LoadBlazorTypeaheadData(searchText, DonViTinhService);
         }
 
-        private void OpenAddOrUpdateModal(QLCLGiaCaNongSanModel? item)
+        private async Task OpenAddOrUpdateModal(QLCLGiaCaNongSanModel? item)
         {
             try
             {
                 _titleAddOrUpdate = item != null ? "Sửa" : "Thêm mới";
-                SelectedItem = item?.DeepClone() ?? new QLCLGiaCaNongSanModel();
+                SelectedItem = item?.DeepClone() ?? new QLCLGiaCaNongSanModel()
+                {
+                    province = await LoadDefaultData(TinhService),
+                };
                 openAddOrUpdateModal = true;
 
                 // Wait for modal to render

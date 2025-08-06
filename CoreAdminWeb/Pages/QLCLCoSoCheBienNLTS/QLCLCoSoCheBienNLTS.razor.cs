@@ -131,12 +131,15 @@ namespace CoreAdminWeb.Pages.QLCLCoSoCheBienNLTS
             }
         }
 
-        private void OpenAddOrUpdateModal(QLCLCoSoCheBienNLTSModel? item)
+        private async Task OpenAddOrUpdateModal(QLCLCoSoCheBienNLTSModel? item)
         {
             try
             {
                 _titleAddOrUpdate = item != null ? "Sửa" : "Thêm mới";
-                SelectedItem = item?.DeepClone() ?? new QLCLCoSoCheBienNLTSModel();
+                SelectedItem = item?.DeepClone() ?? new QLCLCoSoCheBienNLTSModel()
+                {
+                    province = await LoadDefaultData(TinhService),
+                };
                 openAddOrUpdateModal = true;
 
                 // Wait for modal to render

@@ -262,7 +262,10 @@ namespace CoreAdminWeb.Pages.QLCLChuoiCungUngATTP
         private async Task OpenAddOrUpdateModal(QLCLChuoiCungUngATTPModel? item)
         {
             _titleAddOrUpdate = item != null ? "Sửa" : "Thêm mới";
-            SelectedItem = item != null ? item : new QLCLChuoiCungUngATTPModel();
+            SelectedItem = item != null ? item : new QLCLChuoiCungUngATTPModel(){
+                    province_san_xuat = await LoadDefaultData(TinhService),
+                    province_kinh_doanh = await LoadDefaultData(TinhService),
+                };
 
             if (SelectedItem.id > 0)
             {

@@ -256,7 +256,10 @@ namespace CoreAdminWeb.Pages.QLCLCoSoNLTSDuDieuKienATTP
         private async Task OpenAddOrUpdateModal(QLCLCoSoNLTSDuDieuKienATTPModel? item)
         {
             _titleAddOrUpdate = item != null ? "Sửa" : "Thêm mới";
-            SelectedItem = item != null ? item : new QLCLCoSoNLTSDuDieuKienATTPModel();
+            SelectedItem = item != null ? item : new QLCLCoSoNLTSDuDieuKienATTPModel()
+                {
+                    province = await LoadDefaultData(TinhService),
+                };
 
             if (SelectedItem.id > 0)
             {

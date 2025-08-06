@@ -134,12 +134,15 @@ namespace CoreAdminWeb.Pages.QLCLGiaCaVatTuNN
             return await LoadBlazorTypeaheadData(searchText, DonViTinhService);
         }
 
-        private void OpenAddOrUpdateModal(QLCLGiaCaVatTuNNModel? item)
+        private async Task OpenAddOrUpdateModal(QLCLGiaCaVatTuNNModel? item)
         {
             try
             {
                 _titleAddOrUpdate = item != null ? "Sửa" : "Thêm mới";
-                SelectedItem = item?.DeepClone() ?? new QLCLGiaCaVatTuNNModel();
+                SelectedItem = item?.DeepClone() ?? new QLCLGiaCaVatTuNNModel()
+                {
+                    province = await LoadDefaultData(TinhService),
+                };
                 openAddOrUpdateModal = true;
 
                 // Wait for modal to render

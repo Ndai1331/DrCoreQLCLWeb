@@ -166,12 +166,15 @@ namespace CoreAdminWeb.Pages.QLCLDataTuyenTruyenATTP
             return await LoadBlazorTypeaheadData(searchText, XaPhuongService, query);
         }
 
-        private void OpenAddOrUpdateModal(QLCLDataTuyenTruyenATTPModel? item)
+        private async Task OpenAddOrUpdateModal(QLCLDataTuyenTruyenATTPModel? item)
         {
             try
             {
                 _titleAddOrUpdate = item != null ? "Sửa" : "Thêm mới";
-                SelectedItem = item?.DeepClone() ?? new QLCLDataTuyenTruyenATTPModel();
+                SelectedItem = item?.DeepClone() ?? new QLCLDataTuyenTruyenATTPModel()
+                {
+                    province = await LoadDefaultData(TinhService),
+                }   ;
                 openAddOrUpdateModal = true;
 
                 // Wait for modal to render

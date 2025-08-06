@@ -272,6 +272,7 @@ namespace CoreAdminWeb.Pages.QLCLCoSoNLTSKhongDuDieuKienATTP
             _titleAddOrUpdate = item != null ? "Sửa" : "Thêm mới";
             SelectedItem = item != null ? item.DeepClone() : new QLCLCoSoNLTSDuDieuKienATTPModel() {
                 loai = Enums.LoaiCoSo.KhongDuDieuKien,
+                province = await LoadDefaultData(TinhService),
             };
 
             if (SelectedItem.id > 0)
