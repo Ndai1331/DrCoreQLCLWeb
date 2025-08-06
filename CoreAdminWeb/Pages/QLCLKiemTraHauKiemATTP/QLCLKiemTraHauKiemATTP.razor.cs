@@ -81,6 +81,9 @@ namespace CoreAdminWeb.Pages.QLCLKiemTraHauKiemATTP
         {
             if (firstRender)
             {
+                SelectedItem.province = await LoadDefaultData(TinhService);
+                _selectedTinhFilter = await LoadDefaultData(TinhService);
+
                await LoadData();
                 _ = Task.Run(async () =>
                 {
@@ -221,9 +224,10 @@ namespace CoreAdminWeb.Pages.QLCLKiemTraHauKiemATTP
             }
         }
 
-        private void CloseDeleteModal()
+        private async Task CloseDeleteModal()
         {
             SelectedItem = new QLCLKiemTraHauKiemATTPModel();
+            SelectedItem.province = await LoadDefaultData(TinhService);
             openDeleteModal = false;
         }
 
@@ -294,7 +298,9 @@ namespace CoreAdminWeb.Pages.QLCLKiemTraHauKiemATTP
         private async Task OpenAddOrUpdateModal(QLCLKiemTraHauKiemATTPModel? item)
         {
             _titleAddOrUpdate = item != null ? "Sửa" : "Thêm mới";
-            SelectedItem = item != null ? item : new QLCLKiemTraHauKiemATTPModel();
+            SelectedItem = item != null ? item : new QLCLKiemTraHauKiemATTPModel(){
+                province = await LoadDefaultData(TinhService),
+            };
 
             if (SelectedItem.id > 0)
             {
@@ -430,9 +436,10 @@ namespace CoreAdminWeb.Pages.QLCLKiemTraHauKiemATTP
             }
         }
 
-        private void CloseAddOrUpdateModal()
+        private async Task CloseAddOrUpdateModal()
         {
             SelectedItem = new QLCLKiemTraHauKiemATTPModel();
+            SelectedItem.province = await LoadDefaultData(TinhService);
             openAddOrUpdateModal = false;
         }
         private async Task OnDateChanged(ChangeEventArgs e, string fieldName)

@@ -30,6 +30,7 @@ namespace CoreAdminWeb.Pages.QLCLCoSoNLTSDuDieuKienATTPConHieuLuc
         {
             if (firstRender)
             {
+                _selectedTinhFilter = await LoadDefaultData(TinhService);
                await LoadData();
                 _ = Task.Run(async () =>
                 {

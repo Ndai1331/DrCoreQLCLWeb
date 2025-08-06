@@ -65,6 +65,8 @@ namespace CoreAdminWeb.Pages.QLCLCoSoNLTSKhongDuDieuKienATTP
         {
             if (firstRender)
             {
+                _selectedTinhFilter = await LoadDefaultData(TinhService);
+                SelectedItem.province = await LoadDefaultData(TinhService);
                await LoadData();
                 _ = Task.Run(async () =>
                 {
@@ -197,10 +199,12 @@ namespace CoreAdminWeb.Pages.QLCLCoSoNLTSKhongDuDieuKienATTP
             }
         }
 
-        private void CloseDeleteModal()
+        private async Task CloseDeleteModal()
         {
-            SelectedItem = new QLCLCoSoNLTSDuDieuKienATTPModel() {
+            SelectedItem = new QLCLCoSoNLTSDuDieuKienATTPModel()
+            {
                 loai = Enums.LoaiCoSo.KhongDuDieuKien,
+                province = await LoadDefaultData(TinhService),
             };
             openDeleteModal = false;
         }
@@ -403,10 +407,12 @@ namespace CoreAdminWeb.Pages.QLCLCoSoNLTSKhongDuDieuKienATTP
             }
         }
 
-        private void CloseAddOrUpdateModal()
+        private async Task CloseAddOrUpdateModal()
         {
-            SelectedItem = new QLCLCoSoNLTSDuDieuKienATTPModel() {
+            SelectedItem = new QLCLCoSoNLTSDuDieuKienATTPModel()
+            {
                 loai = Enums.LoaiCoSo.KhongDuDieuKien,
+                province = await LoadDefaultData(TinhService),
             };
             openAddOrUpdateModal = false;
         }

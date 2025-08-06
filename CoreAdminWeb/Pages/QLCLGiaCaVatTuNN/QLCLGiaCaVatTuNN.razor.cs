@@ -37,6 +37,7 @@ namespace CoreAdminWeb.Pages.QLCLGiaCaVatTuNN
         {
             if (firstRender)
             {
+                SelectedItem.province = await LoadDefaultData(TinhService);
                await LoadData();
                 _ = Task.Run(async () =>
                 {
@@ -167,11 +168,13 @@ namespace CoreAdminWeb.Pages.QLCLGiaCaVatTuNN
             }
         }
 
-        private void CloseDeleteModal()
+        private async Task CloseDeleteModal()
         {
             try
             {
                 SelectedItem = new QLCLGiaCaVatTuNNModel();
+                SelectedItem.province = await LoadDefaultData(TinhService);
+
                 openDeleteModal = false;
             }
             catch (Exception ex)
@@ -180,11 +183,13 @@ namespace CoreAdminWeb.Pages.QLCLGiaCaVatTuNN
             }
         }
 
-        private void CloseAddOrUpdateModal()
+        private async Task CloseAddOrUpdateModal()
         {
             try
             {
                 SelectedItem = new QLCLGiaCaVatTuNNModel();
+                SelectedItem.province = await LoadDefaultData(TinhService);
+
                 openAddOrUpdateModal = false;
             }
             catch (Exception ex)

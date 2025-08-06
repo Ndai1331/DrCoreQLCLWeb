@@ -67,6 +67,8 @@ namespace CoreAdminWeb.Pages.QLCLKenhQuangBaXucTienThuongMai
         {
             if (firstRender)
             {
+                SelectedItem.province = await LoadDefaultData(TinhService);
+
                await LoadData();
                 _ = Task.Run(async () =>
                 {
@@ -200,11 +202,13 @@ namespace CoreAdminWeb.Pages.QLCLKenhQuangBaXucTienThuongMai
             }
         }
 
-        private void CloseDeleteModal()
+        private async Task CloseDeleteModal()
         {
             try
             {
                 SelectedItem = new QLCLKenhQuangBaXucTienThuongMaiModel();
+                SelectedItem.province = await LoadDefaultData(TinhService);
+
                 openDeleteModal = false;
             }
             catch (Exception ex)
@@ -213,11 +217,13 @@ namespace CoreAdminWeb.Pages.QLCLKenhQuangBaXucTienThuongMai
             }
         }
 
-        private void CloseAddOrUpdateModal()
+        private async Task CloseAddOrUpdateModal()
         {
             try
             {
                 SelectedItem = new QLCLKenhQuangBaXucTienThuongMaiModel();
+                SelectedItem.province = await LoadDefaultData(TinhService);
+
                 openAddOrUpdateModal = false;
             }
             catch (Exception ex)

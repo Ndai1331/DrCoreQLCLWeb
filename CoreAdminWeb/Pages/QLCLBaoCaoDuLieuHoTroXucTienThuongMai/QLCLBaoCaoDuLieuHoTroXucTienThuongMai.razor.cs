@@ -31,6 +31,7 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuHoTroXucTienThuongMai
             if (firstRender)
             {
                 await LoadData();
+                _selectedTinhFilter = await LoadDefaultData(TinhService);
                 _ = Task.Run(async () =>
                 {
                     await Task.Delay(500);

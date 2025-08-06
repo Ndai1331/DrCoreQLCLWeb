@@ -49,6 +49,8 @@ namespace CoreAdminWeb.Pages.QLCLCoSoCheBienNLTS
             if (firstRender)
             {
                await LoadData();
+                _selectedTinhFilter = await LoadDefaultData(TinhService);
+                SelectedItem.province = await LoadDefaultData(TinhService);
                 _ = Task.Run(async () =>
                 {
                     await Task.Delay(500);
@@ -163,11 +165,14 @@ namespace CoreAdminWeb.Pages.QLCLCoSoCheBienNLTS
             }
         }
 
-        private void CloseDeleteModal()
+        private async Task CloseDeleteModal()
         {
             try
             {
-                SelectedItem = new QLCLCoSoCheBienNLTSModel();
+                SelectedItem = new QLCLCoSoCheBienNLTSModel()
+                {
+                    province = await LoadDefaultData(TinhService),
+                };
                 openDeleteModal = false;
             }
             catch (Exception ex)
@@ -176,11 +181,14 @@ namespace CoreAdminWeb.Pages.QLCLCoSoCheBienNLTS
             }
         }
 
-        private void CloseAddOrUpdateModal()
+        private async Task CloseAddOrUpdateModal()
         {
             try
             {
-                SelectedItem = new QLCLCoSoCheBienNLTSModel();
+                SelectedItem = new QLCLCoSoCheBienNLTSModel()
+                {
+                    province = await LoadDefaultData(TinhService),
+                };
                 openAddOrUpdateModal = false;
             }
             catch (Exception ex)

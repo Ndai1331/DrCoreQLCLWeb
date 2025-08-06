@@ -38,6 +38,7 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuCapGCNDDKATTP
             if (firstRender)
             {
                 await LoadData();
+                _selectedTinhFilter = await LoadDefaultData(TinhService);
                 _ = Task.Run(async () =>
                 {
                     await Task.Delay(500);
@@ -88,8 +89,6 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuCapGCNDDKATTP
             }
             IsLoading = false;
         }
-
-
         private async Task<IEnumerable<TinhModel>> LoadTinhData(string searchText)
         {
             return await LoadBlazorTypeaheadData(searchText, TinhService);

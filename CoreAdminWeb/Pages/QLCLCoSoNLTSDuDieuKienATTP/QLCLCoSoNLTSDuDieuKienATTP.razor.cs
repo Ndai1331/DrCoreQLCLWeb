@@ -50,6 +50,8 @@ namespace CoreAdminWeb.Pages.QLCLCoSoNLTSDuDieuKienATTP
             if (firstRender)
             {
                await LoadData();
+                _selectedTinhFilter = await LoadDefaultData(TinhService);
+                SelectedItem.province = await LoadDefaultData(TinhService);
                 _ = Task.Run(async () =>
                 {
                     await Task.Delay(500);
@@ -184,9 +186,12 @@ namespace CoreAdminWeb.Pages.QLCLCoSoNLTSDuDieuKienATTP
             }
         }
 
-        private void CloseDeleteModal()
+        private async Task CloseDeleteModal()
         {
-            SelectedItem = new QLCLCoSoNLTSDuDieuKienATTPModel();
+            SelectedItem = new QLCLCoSoNLTSDuDieuKienATTPModel()
+            {
+                province = await LoadDefaultData(TinhService),
+            };
             openDeleteModal = false;
         }
 
@@ -386,9 +391,12 @@ namespace CoreAdminWeb.Pages.QLCLCoSoNLTSDuDieuKienATTP
             }
         }
 
-        private void CloseAddOrUpdateModal()
+        private async Task CloseAddOrUpdateModal()
         {
-            SelectedItem = new QLCLCoSoNLTSDuDieuKienATTPModel();
+            SelectedItem = new QLCLCoSoNLTSDuDieuKienATTPModel()
+            {
+                province = await LoadDefaultData(TinhService),
+            };
             openAddOrUpdateModal = false;
         }
         private async Task OnDateChanged(ChangeEventArgs e, string fieldName)

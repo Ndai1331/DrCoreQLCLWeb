@@ -39,6 +39,7 @@ namespace CoreAdminWeb.Pages.QLCLCongBoCoSoViPham
                     _userLoginId = resUser.Data?.id ?? "";
                 }
                await LoadData();
+                _selectedTinhFilter = await LoadDefaultData(TinhService);
                 _ = Task.Run(async () =>
                 {
                     await Task.Delay(500);

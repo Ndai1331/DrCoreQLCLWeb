@@ -62,6 +62,9 @@ namespace CoreAdminWeb.Pages.QLCLDataTuyenTruyenATTP
         {
             if (firstRender)
             {
+                _selectedTinhFilter = await LoadDefaultData(TinhService);
+
+                SelectedItem.province = await LoadDefaultData(TinhService);
                await LoadData();
                 _ = Task.Run(async () =>
                 {
@@ -197,11 +200,14 @@ namespace CoreAdminWeb.Pages.QLCLDataTuyenTruyenATTP
             }
         }
 
-        private void CloseDeleteModal()
+        private async Task CloseDeleteModal()
         {
             try
             {
-                SelectedItem = new QLCLDataTuyenTruyenATTPModel();
+                SelectedItem = new QLCLDataTuyenTruyenATTPModel()
+                {
+                    province = await LoadDefaultData(TinhService),
+                };
                 openDeleteModal = false;
             }
             catch (Exception ex)
@@ -210,11 +216,14 @@ namespace CoreAdminWeb.Pages.QLCLDataTuyenTruyenATTP
             }
         }
 
-        private void CloseAddOrUpdateModal()
+        private async Task CloseAddOrUpdateModal()
         {
             try
             {
-                SelectedItem = new QLCLDataTuyenTruyenATTPModel();
+                SelectedItem = new QLCLDataTuyenTruyenATTPModel()
+                {
+                    province = await LoadDefaultData(TinhService),
+                };
                 openAddOrUpdateModal = false;
             }
             catch (Exception ex)

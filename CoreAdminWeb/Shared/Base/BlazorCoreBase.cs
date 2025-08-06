@@ -138,6 +138,15 @@ namespace CoreAdminWeb.Shared.Base
         }
 
 
+        public async Task<T?> LoadDefaultData<T>(IBaseService<T> service)
+        {
+            var query = BuildBaseQuery(string.Empty, false);
+            var result = await service.GetAllAsync(query);
+            return result != null && result.IsSuccess ? result.Data!.FirstOrDefault() : default;
+        }
+
+
+
         public async Task<IEnumerable<T>> LoadBlazorTypeaheadData<T>(string searchText, IBaseService<T> service, string? otherQuery = "", bool isIgnoreCheck = false)
         {
             var query = BuildBaseQuery(searchText, isIgnoreCheck);

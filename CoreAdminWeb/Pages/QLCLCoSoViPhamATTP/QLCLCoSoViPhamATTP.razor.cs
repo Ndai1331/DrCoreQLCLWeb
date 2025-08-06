@@ -54,6 +54,7 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamATTP
         {
             if (firstRender)
             {
+                _selectedTinhFilter = await LoadDefaultData(TinhService);
                await LoadData();
                 _ = Task.Run(async () =>
                 {

@@ -31,16 +31,16 @@ pTitle="Báo cáo dữ liệu thẩm định cấp giấy chứng nhận đủ �
                         <MudForm>
                             <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Tỉnh thành</MudText>
                             <BlazoredTypeahead EnableDropDown="true"
-                                               ShowDropDownOnFocus="true"
-                                               MinimumLength="0"
-                                               TItem="TinhModel"
-                                               TValue="TinhModel"
-                                               SearchMethod="LoadTinhData"
-                                               Value="@_selectedTinhFilter"
+                                                ShowDropDownOnFocus="true"
+                                                MinimumLength="0"
+                                                TItem="TinhModel"
+                                                TValue="TinhModel"
+                                                SearchMethod="LoadTinhData"
+                                                Value="@_selectedTinhFilter"
                                                 ValueExpression="@(() => _selectedTinhFilter)"
                                                 ValueChanged="OnTinhFilterChanged"
-                                               placeholder="Chọn tỉnh thành"
-                                               Class="form-select">
+                                                placeholder="Chọn tỉnh thành"
+                                                Class="form-select">
                                 <SelectedTemplate Context="item">
                                     @item.name
                                 </SelectedTemplate>

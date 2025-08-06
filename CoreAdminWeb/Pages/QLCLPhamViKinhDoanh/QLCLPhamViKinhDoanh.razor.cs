@@ -39,6 +39,8 @@ namespace CoreAdminWeb.Pages.QLCLPhamViKinhDoanh
         {
             if (firstRender)
             {
+                _selectedTinhFilter = await LoadDefaultData(TinhService);
+                SelectedItem.province = await LoadDefaultData(TinhService);
                await LoadData();
                 _ = Task.Run(async () =>
                 {
@@ -112,12 +114,14 @@ namespace CoreAdminWeb.Pages.QLCLPhamViKinhDoanh
             }
         }
 
-        private void OpenAddOrUpdateModal(QLCLPhamViHoatDongModel? item)
+        private async Task OpenAddOrUpdateModal(QLCLPhamViHoatDongModel? item)
         {
             try
             {
                 _titleAddOrUpdate = item != null ? "Sửa" : "Thêm mới";
-                SelectedItem = item?.DeepClone() ?? new QLCLPhamViHoatDongModel();
+                SelectedItem = item?.DeepClone() ?? new QLCLPhamViHoatDongModel(){
+                    province = await LoadDefaultData(TinhService),
+                };
                 openAddOrUpdateModal = true;
 
                 // Wait for modal to render
@@ -146,11 +150,13 @@ namespace CoreAdminWeb.Pages.QLCLPhamViKinhDoanh
             }
         }
 
-        private void CloseDeleteModal()
+        private async Task CloseDeleteModal()
         {
             try
             {
-                SelectedItem = new QLCLPhamViHoatDongModel();
+                SelectedItem = new QLCLPhamViHoatDongModel(){
+                    province = await LoadDefaultData(TinhService),
+                };
                 openDeleteModal = false;
             }
             catch (Exception ex)
@@ -159,11 +165,13 @@ namespace CoreAdminWeb.Pages.QLCLPhamViKinhDoanh
             }
         }
 
-        private void CloseAddOrUpdateModal()
+        private async Task CloseAddOrUpdateModal()
         {
             try
             {
-                SelectedItem = new QLCLPhamViHoatDongModel();
+                SelectedItem = new QLCLPhamViHoatDongModel(){
+                    province = await LoadDefaultData(TinhService),
+                };
                 openAddOrUpdateModal = false;
             }
             catch (Exception ex)

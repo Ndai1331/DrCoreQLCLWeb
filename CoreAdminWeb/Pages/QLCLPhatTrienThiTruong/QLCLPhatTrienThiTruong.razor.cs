@@ -58,6 +58,9 @@ namespace CoreAdminWeb.Pages.QLCLPhatTrienThiTruong
         {
             if (firstRender)
             {
+                
+                SelectedItem.province = await LoadDefaultData(TinhService);
+                _selectedTinhFilter = await LoadDefaultData(TinhService);
                await LoadData();
                 _ = Task.Run(async () =>
                 {
@@ -187,9 +190,11 @@ namespace CoreAdminWeb.Pages.QLCLPhatTrienThiTruong
             }
         }
 
-        private void CloseDeleteModal()
+        private async Task CloseDeleteModal()
         {
-            SelectedItem = new QLCLPhatTrienThiTruongModel();
+            SelectedItem = new QLCLPhatTrienThiTruongModel(){
+                province = await LoadDefaultData(TinhService),
+            };
             openDeleteModal = false;
         }
 
@@ -257,7 +262,9 @@ namespace CoreAdminWeb.Pages.QLCLPhatTrienThiTruong
         private async Task OpenAddOrUpdateModal(QLCLPhatTrienThiTruongModel? item)
         {
             _titleAddOrUpdate = item != null ? "Sửa" : "Thêm mới";
-            SelectedItem = item != null ? item : new QLCLPhatTrienThiTruongModel();
+            SelectedItem = item != null ? item : new QLCLPhatTrienThiTruongModel(){
+                province = await LoadDefaultData(TinhService),
+            };
 
             if (SelectedItem.id > 0)
             {
@@ -387,9 +394,11 @@ namespace CoreAdminWeb.Pages.QLCLPhatTrienThiTruong
             }
         }
 
-        private void CloseAddOrUpdateModal()
+        private async Task CloseAddOrUpdateModal()
         {
-            SelectedItem = new QLCLPhatTrienThiTruongModel();
+            SelectedItem = new QLCLPhatTrienThiTruongModel(){
+                province = await LoadDefaultData(TinhService),
+            };
             openAddOrUpdateModal = false;
         }
         private async Task OnDateChanged(ChangeEventArgs e, string fieldName)
