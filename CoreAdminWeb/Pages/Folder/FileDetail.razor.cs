@@ -1,10 +1,11 @@
-﻿using CoreAdminWeb.Model;
+﻿using CoreAdminWeb.Helpers;
+using CoreAdminWeb.Model;
 using CoreAdminWeb.Services.BaseServices;
-using CoreAdminWeb.Shared.Base;
-using Microsoft.JSInterop;
 using CoreAdminWeb.Services.Files;
+using CoreAdminWeb.Shared.Base;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.JSInterop;
 
 namespace CoreAdminWeb.Pages.Folder
 {
@@ -47,16 +48,16 @@ namespace CoreAdminWeb.Pages.Folder
         private async Task LoadFile(string fileId)
         {
             var result = await FileService.GetFileAsync(fileId);
-            if(result.IsSuccess)
+            if (result.IsSuccess)
             {
-                SelectedFile = result.Data;
-                if(SelectedFile.phan_loai_vb != null)
+                SelectedFile = result.Data ?? new FileModel();
+                if (SelectedFile.phan_loai_vb != null)
                 {
                     _selectedPhanLoaiVanBan = SelectedFile.phan_loai_vb;
                 }
-                if(SelectedFile.linh_vuc_vb != null)
+                if (SelectedFile.linh_vuc_vb != null)
                 {
-                    _selectedLinhVucVanBan = SelectedFile.linh_vuc_vb;  
+                    _selectedLinhVucVanBan = SelectedFile.linh_vuc_vb;
                 }
                 SelectedFile.GetFileType();
                 UploadFileCRUD = MapToCRUDModel(SelectedFile);
@@ -92,7 +93,7 @@ namespace CoreAdminWeb.Pages.Folder
             try
             {
                 var result = await FileService.EditFileAsync(FileId, UploadFileCRUD);
-                if(result.IsSuccess)
+                if (result.IsSuccess)
                 {
                     AlertService.ShowAlert("Cập nhật file thành công!", "success");
                 }
@@ -118,34 +119,18 @@ namespace CoreAdminWeb.Pages.Folder
                 var dateStr = e.Value?.ToString();
                 if (string.IsNullOrEmpty(dateStr))
                 {
-                    switch (fieldName)
-                    {
-                        case nameof(UploadFileCRUD.ngay_ban_hanh):
-                            UploadFileCRUD.ngay_ban_hanh = null;
-                            break;
-                        case nameof(UploadFileCRUD.ngay_hieu_luc):
-                            UploadFileCRUD.ngay_hieu_luc = null;
-                            break;
-                    }
-                    return;
+                    ReflectionHelper.SetDateFieldValue(this, UploadFileCRUD, fieldName, null);
                 }
-
-                var parts = dateStr.Split('/');
-                if (parts.Length == 3 &&
-                    int.TryParse(parts[0], out int day) &&
-                    int.TryParse(parts[1], out int month) &&
-                    int.TryParse(parts[2], out int year))
+                else
                 {
-                    var date = new DateTime(year, month, day);
-
-                    switch (fieldName)
+                    var parts = dateStr.Split('/');
+                    if (parts.Length == 3 &&
+                        int.TryParse(parts[0], out int day) &&
+                        int.TryParse(parts[1], out int month) &&
+                        int.TryParse(parts[2], out int year))
                     {
-                        case nameof(UploadFileCRUD.ngay_ban_hanh):
-                            UploadFileCRUD.ngay_ban_hanh = date;
-                            break;
-                        case nameof(UploadFileCRUD.ngay_hieu_luc):
-                            UploadFileCRUD.ngay_hieu_luc = date;
-                            break;
+                        var date = new DateTime(year, month, day, 0, 0, 0, DateTimeKind.Local);
+                        ReflectionHelper.SetDateFieldValue(this, UploadFileCRUD, fieldName, date);
                     }
                 }
             }
@@ -161,7 +146,7 @@ namespace CoreAdminWeb.Pages.Folder
         }
 
 
-        private FileCRUDModel MapToCRUDModel(FileModel file)
+        private static FileCRUDModel MapToCRUDModel(FileModel file)
         {
             FileCRUDModel fileCRUD = new FileCRUDModel();
 
@@ -191,7 +176,6 @@ namespace CoreAdminWeb.Pages.Folder
             fileCRUD.description = file.description;
             fileCRUD.location = file.location;
             fileCRUD.tags = file.tags;
-            //fileCRUD.metadata = file.metadata;
             fileCRUD.focal_point_x = file.focal_point_x;
             fileCRUD.focal_point_y = file.focal_point_y;
             fileCRUD.tus_id = file.tus_id;

@@ -1,16 +1,16 @@
 using CoreAdminWeb.Model;
 using CoreAdminWeb.Model.RequestHttps;
-using CoreAdminWeb.Services.Http;
 using CoreAdminWeb.Services.BaseServices;
+using CoreAdminWeb.Services.Http;
 
 namespace CoreAdminWeb.Services
 {
-   
+
     public class QLCLLoaiHinhKinhDoanhService(IHttpClientService _httpClientService) : IBaseService<QLCLLoaiHinhKinhDoanhModel>
     {
         private readonly string _collection = "QLCLLoaiHinhKinhDoanh";
         private readonly string Fields = "*,user_created.last_name,user_created.first_name,user_updated.last_name,user_updated.first_name";
-        
+
         public async Task<RequestHttpResponse<List<QLCLLoaiHinhKinhDoanhModel>>> GetAllAsync(string query)
         {
             var response = new RequestHttpResponse<List<QLCLLoaiHinhKinhDoanhModel>>();
@@ -20,7 +20,8 @@ namespace CoreAdminWeb.Services
                 var res = await _httpClientService.GetAPIAsync<RequestHttpResponse<List<QLCLLoaiHinhKinhDoanhModel>>>(url);
                 if (res.IsSuccess)
                 {
-                    response.Data = res.Data.Data;
+                    response.Data = res.Data?.Data ?? new List<QLCLLoaiHinhKinhDoanhModel>();
+                    response.Meta = res.Data?.Meta;
                 }
                 else
                 {
@@ -32,7 +33,7 @@ namespace CoreAdminWeb.Services
                 response.Errors = new List<ErrorResponse> { new ErrorResponse { Message = ex.Message } };
             }
             return response;
-        }   
+        }
 
         public async Task<RequestHttpResponse<QLCLLoaiHinhKinhDoanhModel>> GetByIdAsync(string id)
         {
@@ -42,7 +43,8 @@ namespace CoreAdminWeb.Services
                 var result = await _httpClientService.GetAPIAsync<RequestHttpResponse<QLCLLoaiHinhKinhDoanhModel>>($"items/{_collection}/{id}?fields={Fields}");
                 if (result.IsSuccess)
                 {
-                    response.Data = result.Data.Data;
+                    response.Data = result.Data?.Data ?? new QLCLLoaiHinhKinhDoanhModel();
+                    response.Meta = result.Data?.Meta;
                 }
                 else if (result?.Errors != null)
                 {
@@ -55,26 +57,28 @@ namespace CoreAdminWeb.Services
             }
             return response;
         }
-        
+
         public async Task<RequestHttpResponse<QLCLLoaiHinhKinhDoanhModel>> CreateAsync(QLCLLoaiHinhKinhDoanhModel model)
         {
             var response = new RequestHttpResponse<QLCLLoaiHinhKinhDoanhModel>();
             try
             {
-                QLCLLoaiHinhKinhDoanhCRUDModel createModel = new QLCLLoaiHinhKinhDoanhCRUDModel(){
+                QLCLLoaiHinhKinhDoanhCRUDModel createModel = new QLCLLoaiHinhKinhDoanhCRUDModel()
+                {
                     code = model.code,
                     name = model.name,
                     description = model.description,
                     status = model.status.ToString(),
                     sort = model.sort,
                 };
-                
-                var result = await _httpClientService.PostAPIAsync<RequestHttpResponse<QLCLLoaiHinhKinhDoanhCRUDModel>>("items/" + _collection, createModel);    
+
+                var result = await _httpClientService.PostAPIAsync<RequestHttpResponse<QLCLLoaiHinhKinhDoanhCRUDModel>>("items/" + _collection, createModel);
                 if (result.IsSuccess)
                 {
-                    response.Data = new QLCLLoaiHinhKinhDoanhModel(){
-                        code = result.Data.Data.code,
-                        name = result.Data.Data.name
+                    response.Data = new QLCLLoaiHinhKinhDoanhModel()
+                    {
+                        code = result.Data?.Data?.code,
+                        name = result.Data?.Data?.name
                     };
                 }
                 else if (result?.Errors != null)
@@ -88,20 +92,21 @@ namespace CoreAdminWeb.Services
             }
             return response;
         }
-        
+
         public async Task<RequestHttpResponse<bool>> UpdateAsync(QLCLLoaiHinhKinhDoanhModel model)
         {
-            var response = new RequestHttpResponse<bool>(){Data =false};
+            var response = new RequestHttpResponse<bool>() { Data = false };
             try
             {
-                QLCLLoaiHinhKinhDoanhCRUDModel updateModel = new QLCLLoaiHinhKinhDoanhCRUDModel(){
+                QLCLLoaiHinhKinhDoanhCRUDModel updateModel = new QLCLLoaiHinhKinhDoanhCRUDModel()
+                {
                     code = model.code,
                     name = model.name,
                     description = model.description,
                     status = model.status.ToString(),
                     sort = model.sort,
                 };
-                var result = await _httpClientService.PatchAPIAsync<RequestHttpResponse<QLCLLoaiHinhKinhDoanhCRUDModel>>("items/" + _collection + "/" + model.id, updateModel);    
+                var result = await _httpClientService.PatchAPIAsync<RequestHttpResponse<QLCLLoaiHinhKinhDoanhCRUDModel>>("items/" + _collection + "/" + model.id, updateModel);
                 if (result?.Data != null)
                 {
                     response.Data = true;
@@ -117,13 +122,13 @@ namespace CoreAdminWeb.Services
             }
             return response;
         }
-        
+
         public async Task<RequestHttpResponse<bool>> DeleteAsync(QLCLLoaiHinhKinhDoanhModel model)
         {
             var response = new RequestHttpResponse<bool>();
             try
             {
-                var result = await _httpClientService.PatchAPIAsync<RequestHttpResponse<QLCLLoaiHinhKinhDoanhCRUDModel>>("items/" + _collection + "/" + model.id, new { deleted = true });    
+                var result = await _httpClientService.PatchAPIAsync<RequestHttpResponse<QLCLLoaiHinhKinhDoanhCRUDModel>>("items/" + _collection + "/" + model.id, new { deleted = true });
                 if (result?.Data != null)
                 {
                     response.Data = true;
@@ -131,13 +136,13 @@ namespace CoreAdminWeb.Services
                 else if (result?.Errors != null)
                 {
                     response.Errors = result.Errors;
-                }   
+                }
             }
             catch (Exception ex)
             {
                 response.Errors = new List<ErrorResponse> { new ErrorResponse { Message = ex.Message } };
             }
-            return response;    
+            return response;
         }
     }
 }

@@ -1,11 +1,10 @@
-﻿using CoreAdminWeb.Model;
+﻿using CoreAdminWeb.Helpers;
+using CoreAdminWeb.Model;
 using CoreAdminWeb.Services;
-using CoreAdminWeb.Services.BaseServices;
+using CoreAdminWeb.Services.Reports;
 using CoreAdminWeb.Shared.Base;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using CoreAdminWeb.Services.Reports;
-using CoreAdminWeb.Model.Reports;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 
@@ -15,7 +14,7 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoBienDongGia
     public partial class QLCLBaoCaoBienDongGia(IReportService<QLCLBienDongGiaModel> MainService) : BlazorCoreBase
     {
         private List<QLCLBienDongGiaModel> MainModels { get; set; } = new();
-      
+
         private string _searchString = "";
         private DateTime? _fromDate { get; set; }
         private DateTime? _toDate { get; set; }
@@ -41,23 +40,22 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoBienDongGia
             }
         }
 
-
         private async Task LoadData()
         {
             IsLoading = true;
             BuilderQuery = $"QLCLBaoCaoBienDongGia?limit={PageSize}&offset={(Page - 1) * PageSize}";
-           
+
             if (!string.IsNullOrEmpty(_searchString))
             {
                 BuilderQuery += $"&stringSearch={_searchString}";
             }
             if (_fromDate != null)
             {
-                BuilderQuery += $"&fromDate={_fromDate.Value.ToString("yyyy-MM-dd")}";
+                BuilderQuery += $"&fromDate={_fromDate.Value:yyyy-MM-dd}";
             }
-            if(_toDate != null)
+            if (_toDate != null)
             {
-                BuilderQuery += $"&toDate={_toDate.Value.ToString("yyyy-MM-dd")}";
+                BuilderQuery += $"&toDate={_toDate.Value:yyyy-MM-dd}";
             }
 
             var result = await MainService.GetAllAsync(BuilderQuery);
@@ -84,66 +82,45 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoBienDongGia
                 var dateStr = e.Value?.ToString();
                 if (string.IsNullOrEmpty(dateStr))
                 {
-                    switch (fieldName)
-                    {
-                        case "fromDate":
-                            _fromDate = null;
-                            await LoadData();
-                            break;
-
-                        case "toDate":
-                            _toDate = null;
-                            await LoadData();
-                            break;
-                    }
-                    return;
+                    ReflectionHelper.SetDateFieldValue(this, fieldName, null);
                 }
-
-                var parts = dateStr.Split('/');
-                if (parts.Length == 3 &&
-                    int.TryParse(parts[0], out int day) &&
-                    int.TryParse(parts[1], out int month) &&
-                    int.TryParse(parts[2], out int year))
+                else
                 {
-                    var date = new DateTime(year, month, day);
-
-                    switch (fieldName)
+                    var parts = dateStr.Split('/');
+                    if (parts.Length == 3 &&
+                        int.TryParse(parts[0], out int day) &&
+                        int.TryParse(parts[1], out int month) &&
+                        int.TryParse(parts[2], out int year))
                     {
-                        case "fromDate":
-                            _fromDate = date;
-                            await LoadData();
-                            break;
-
-                        case "toDate":
-                            _toDate = date;
-                            await LoadData();
-                            break;
+                        var date = new DateTime(year, month, day, 0, 0, 0, DateTimeKind.Local);
+                        ReflectionHelper.SetDateFieldValue(this, fieldName, date);
                     }
                 }
+                await LoadData();
             }
             catch (Exception ex)
             {
                 AlertService.ShowAlert($"Lỗi khi xử lý ngày: {ex.Message}", "danger");
             }
         }
-        
+
         private async Task OnExportExcel()
         {
             // Get all data for export
             BuilderQuery = $"QLCLBaoCaoBienDongGia?";
-            
+
             if (!string.IsNullOrEmpty(_searchString))
             {
                 BuilderQuery += $"&stringSearch={_searchString}";
             }
             if (_fromDate != null)
             {
-                BuilderQuery += $"&fromDate={_fromDate.Value.ToString("yyyy-MM-dd")}";
+                BuilderQuery += $"&fromDate={_fromDate.Value:yyyy-MM-dd}";
             }
 
             if (_toDate != null)
             {
-                BuilderQuery += $"&toDate={_toDate.Value.ToString("yyyy-MM-dd")}";
+                BuilderQuery += $"&toDate={_toDate.Value:yyyy-MM-dd}";
             }
 
             var result = await MainService.GetAllAsync(BuilderQuery);
@@ -202,7 +179,7 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoBienDongGia
 
             // Export to browser
             var fileName = $"BaoCaoBienDongGia_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
-            var fileBytes = package.GetAsByteArray();
+            var fileBytes = await package.GetAsByteArrayAsync();
             // Nếu chưa có hàm saveAsFile trong wwwroot/js, hãy thêm hàm này để hỗ trợ download file từ base64
             await JsRuntime.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(fileBytes));
         }

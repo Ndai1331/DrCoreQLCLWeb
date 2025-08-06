@@ -1,11 +1,12 @@
-﻿using CoreAdminWeb.Model;
+﻿using CoreAdminWeb.Helpers;
+using CoreAdminWeb.Model;
+using CoreAdminWeb.Model.Reports;
 using CoreAdminWeb.Services;
 using CoreAdminWeb.Services.BaseServices;
+using CoreAdminWeb.Services.Reports;
 using CoreAdminWeb.Shared.Base;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using CoreAdminWeb.Services.Reports;
-using CoreAdminWeb.Model.Reports;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 
@@ -19,12 +20,11 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuCapGCNDDKATTP
     {
         private List<ReportBaoCaoThamDinhCapGCNModel> MainModels { get; set; } = new();
         private List<QLCLCoSoNLTSDuDieuKienATTPModel> DetailModels { get; set; } = new();
-      
-        private string _searchString = "";
+
         private TinhModel? _selectedTinhFilter { get; set; }
         private XaPhuongModel? _selectedXaFilter { get; set; }
-        private DateTime? _fromDate { get; set; }
-        private DateTime? _toDate { get; set; }
+        private DateTime? _fromDate { get; set; } = null;
+        private DateTime? _toDate { get; set; } = null;
 
         private bool openDetailModal { get; set; } = false;
 
@@ -54,23 +54,23 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuCapGCNDDKATTP
         {
             IsLoading = true;
             BuilderQuery = $"QLCLBaoCaoThamDinhCapGCN?limit={PageSize}&offset={(Page - 1) * PageSize}";
-           
-            if(_selectedTinhFilter != null)
+
+            if (_selectedTinhFilter != null)
             {
                 BuilderQuery += $"&province={_selectedTinhFilter.id}";
             }
-            if(_selectedXaFilter != null)
+            if (_selectedXaFilter != null)
             {
                 BuilderQuery += $"&ward={_selectedXaFilter.id}";
             }
-            if(_fromDate != null)
+            if (_fromDate != null)
             {
-                BuilderQuery += $"&fromDate={_fromDate.Value.ToString("yyyy-MM-dd")}";
+                BuilderQuery += $"&fromDate={_fromDate.Value:yyyy-MM-dd}";
             }
 
-            if(_toDate != null)
+            if (_toDate != null)
             {
-                BuilderQuery += $"&toDate={_toDate.Value.ToString("yyyy-MM-dd")}";
+                BuilderQuery += $"&toDate={_toDate.Value:yyyy-MM-dd}";
             }
 
             var result = await MainService.GetAllAsync(BuilderQuery);
@@ -99,7 +99,7 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuCapGCNDDKATTP
         {
             string query = $"sort=-id";
             query += $"&filter[_and][][ProvinceId][_eq]={(_selectedTinhFilter == null ? 0 : _selectedTinhFilter?.id)}";
-            return await LoadBlazorTypeaheadData(searchText, XaPhuongService,query);
+            return await LoadBlazorTypeaheadData(searchText, XaPhuongService, query);
         }
 
 
@@ -110,42 +110,21 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuCapGCNDDKATTP
                 var dateStr = e.Value?.ToString();
                 if (string.IsNullOrEmpty(dateStr))
                 {
-                    switch (fieldName)
-                    {
-                        case "fromDate":
-                            _fromDate = null;
-                            await LoadData();
-                            break;
-
-                        case "toDate":
-                            _toDate = null;
-                            await LoadData();
-                            break;
-                    }
-                    return;
+                    ReflectionHelper.SetDateFieldValue(this, fieldName, null);
                 }
-
-                var parts = dateStr.Split('/');
-                if (parts.Length == 3 &&
-                    int.TryParse(parts[0], out int day) &&
-                    int.TryParse(parts[1], out int month) &&
-                    int.TryParse(parts[2], out int year))
+                else
                 {
-                    var date = new DateTime(year, month, day);
-
-                    switch (fieldName)
+                    var parts = dateStr.Split('/');
+                    if (parts.Length == 3 &&
+                        int.TryParse(parts[0], out int day) &&
+                        int.TryParse(parts[1], out int month) &&
+                        int.TryParse(parts[2], out int year))
                     {
-                        case "fromDate":
-                            _fromDate = date;
-                            await LoadData();
-                            break;
-
-                        case "toDate":
-                            _toDate = date;
-                            await LoadData();
-                            break;
+                        var date = new DateTime(year, month, day, 0, 0, 0, DateTimeKind.Local);
+                        ReflectionHelper.SetDateFieldValue(this, fieldName, date);
                     }
                 }
+                await LoadData();
             }
             catch (Exception ex)
             {
@@ -173,11 +152,11 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuCapGCNDDKATTP
         private async Task OnRowClick(string thang)
         {
             string query = $"QLCLBaoCaoThamDinhCapGCN/coSoKhongCapGCN?thangNam={thang}";
-            if(_selectedTinhFilter != null)
+            if (_selectedTinhFilter != null)
             {
                 query += $"&province={_selectedTinhFilter.id}";
             }
-            if(_selectedXaFilter != null)
+            if (_selectedXaFilter != null)
             {
                 query += $"&ward={_selectedXaFilter.id}";
             }
@@ -193,23 +172,23 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuCapGCNDDKATTP
         {
             // Get all data for export
             BuilderQuery = $"QLCLBaoCaoThamDinhCapGCN?";
-           
-            if(_selectedTinhFilter != null)
+
+            if (_selectedTinhFilter != null)
             {
                 BuilderQuery += $"&province={_selectedTinhFilter.id}";
             }
-            if(_selectedXaFilter != null)
+            if (_selectedXaFilter != null)
             {
                 BuilderQuery += $"&ward={_selectedXaFilter.id}";
             }
-            if(_fromDate != null)
+            if (_fromDate != null)
             {
-                BuilderQuery += $"&fromDate={_fromDate.Value.ToString("yyyy-MM-dd")}";
+                BuilderQuery += $"&fromDate={_fromDate.Value:yyyy-MM-dd}";
             }
 
-            if(_toDate != null)
+            if (_toDate != null)
             {
-                BuilderQuery += $"&toDate={_toDate.Value.ToString("yyyy-MM-dd")}";
+                BuilderQuery += $"&toDate={_toDate.Value:yyyy-MM-dd}";
             }
 
             var result = await MainService.GetAllAsync(BuilderQuery);
@@ -262,7 +241,7 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuCapGCNDDKATTP
 
             // Export to browser
             var fileName = $"BaoCaoThamDinhCapGCN_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
-            var fileBytes = package.GetAsByteArray();
+            var fileBytes = await package.GetAsByteArrayAsync();
             // Nếu chưa có hàm saveAsFile trong wwwroot/js, hãy thêm hàm này để hỗ trợ download file từ base64
             await JsRuntime.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(fileBytes));
         }
