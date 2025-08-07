@@ -47,7 +47,7 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoBienDongGia
 
             if (!string.IsNullOrEmpty(_searchString))
             {
-                BuilderQuery += $"&stringSearch={_searchString}";
+                BuilderQuery += $"&tenSanPham={_searchString}";
             }
             if (_fromDate != null)
             {
