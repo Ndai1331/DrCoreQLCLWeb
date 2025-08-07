@@ -19,8 +19,11 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamChatLuongHangHoaVaATTP
         private string _searchString = "";
         private TinhModel? _selectedTinhFilter { get; set; }
         private XaPhuongModel? _selectedXaFilter { get; set; }
-        private DateTime? _fromDate { get; set; }
-        private DateTime? _toDate { get; set; }
+        private DateTime? _fromDate { get; set; } = default;
+        private DateTime? _toDate { get; set; } = default;
+
+        private Dictionary<int, List<XaPhuongModel>> SelectedXaPhuongItems { get; set; } = new();
+        private List<XaPhuongModel> XaPhuongItems { get; set; } = new();
 
         protected override async Task OnInitializedAsync()
         {
@@ -78,6 +81,14 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamChatLuongHangHoaVaATTP
                 BuilderQuery += $"&filter[_and][{index}][_or][0][co_so_che_bien_nlts][ward][_eq]={_selectedXaFilter.id}";
                 BuilderQuery += $"&filter[_and][{index}][_or][1][co_so_nlts_du_dieu_kien_attp][ward][_eq]={_selectedXaFilter.id}";
             }
+            else
+            {
+                index++;
+                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
+                string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
+                BuilderQuery += $"&filter[_and][{index}][_or][0][co_so_che_bien_nlts][ward][_in]={xaFilterIds}";
+                BuilderQuery += $"&filter[_and][{index}][_or][1][co_so_nlts_du_dieu_kien_attp][ward][_in]={xaFilterIds}";
+            }
 
             if (_fromDate != null)
             {
@@ -111,11 +122,15 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamChatLuongHangHoaVaATTP
         {
             return await LoadBlazorTypeaheadData(searchText, TinhService);
         }
-        private async Task<IEnumerable<XaPhuongModel>> LoadXaFilterData(string searchText)
+
+        private async Task<List<XaPhuongModel>> FilterFunctionXaPhuongData(IEnumerable<XaPhuongModel> allItems, string filter,
+            CancellationToken token)
         {
             string query = $"sort=-id";
             query += $"&filter[_and][][ProvinceId][_eq]={(_selectedTinhFilter == null ? 0 : _selectedTinhFilter?.id)}";
-            return await LoadBlazorTypeaheadData(searchText, XaPhuongService, query);
+            XaPhuongItems = await LoadDataInTable(allItems, filter, token, XaPhuongService, query);
+            StateHasChanged();
+            return XaPhuongItems;
         }
 
         private async Task OnDateChanged(ChangeEventArgs e, string fieldName)
@@ -154,11 +169,6 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamChatLuongHangHoaVaATTP
             _selectedXaFilter = null;
             await LoadData();
         }
-        public async Task OnXaFilterChanged(XaPhuongModel? xa)
-        {
-            _selectedXaFilter = xa;
-            await LoadData();
-        }
 
         private async Task OnExportExcel()
         {
@@ -194,6 +204,14 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamChatLuongHangHoaVaATTP
                 index++;
                 BuilderQuery += $"&filter[_and][{index}][_or][0][co_so_che_bien_nlts][ward][_eq]={_selectedXaFilter.id}";
                 BuilderQuery += $"&filter[_and][{index}][_or][1][co_so_nlts_du_dieu_kien_attp][ward][_eq]={_selectedXaFilter.id}";
+            }
+            else
+            {
+                index++;
+                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
+                string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
+                BuilderQuery += $"&filter[_and][{index}][_or][0][co_so_che_bien_nlts][ward][_in]={xaFilterIds}";
+                BuilderQuery += $"&filter[_and][{index}][_or][1][co_so_nlts_du_dieu_kien_attp][ward][_in]={xaFilterIds}";
             }
 
             if (_fromDate != null)

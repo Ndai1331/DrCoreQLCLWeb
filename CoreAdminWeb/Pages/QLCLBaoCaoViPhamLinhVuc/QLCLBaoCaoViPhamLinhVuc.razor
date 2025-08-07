@@ -1,6 +1,7 @@
 ﻿@page "/bao-cao-du-lieu-vi-pham"
 @using CoreAdminWeb.Commons.Utils
 @using CoreAdminWeb.Extensions
+@using CoreAdminWeb.Helpers
 @using CoreAdminWeb.Model
 @using CoreAdminWeb.Shared.Base
 @using CoreAdminWeb.Enums
@@ -57,27 +58,14 @@
                     <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
                         <MudForm>
                             <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Xã phường</MudText>
-                            <BlazoredTypeahead EnableDropDown="true"
-                                               ShowDropDownOnFocus="true"
-                                               MinimumLength="0"
-                                               TItem="XaPhuongModel"
-                                               TValue="XaPhuongModel"
-                                               SearchMethod="LoadXaFilterData"
-                                               Value="@_selectedXaFilter"
-                                               ValueExpression="@(() => _selectedXaFilter)"
-                                               ValueChanged="OnXaFilterChanged"
-                                               placeholder="Chọn xã phường"
-                                               Class="form-select">
-                                <SelectedTemplate Context="item">
-                                    @item.name
-                                </SelectedTemplate>
-                                <ResultTemplate Context="item">
-                                    @item.name
-                                </ResultTemplate>
-                                <NotFoundTemplate Context="item">
-                                    Không tìm thấy dữ liệu
-                                </NotFoundTemplate>
-                            </BlazoredTypeahead>
+                            <Select2 IdSelector="c => c != null ? c.id.ToString() : String.Empty"
+                                     TextSelector="c => c != null ? c.name : String.Empty"
+                                     FilterFunction="FilterFunctionXaPhuongData"
+                                     GetElementById="async (items, id, token) => Select2Helper.GetElementByIdGeneric(items, id, c => c.id) ?? new XaPhuongModel()"
+                                     Datasource="XaPhuongItems"
+                                     Value="@(Select2Helper.GetCurrentSelectionGeneric<XaPhuongModel>(_selectedXaFilter, 0, SelectedXaPhuongItems))"
+                                     OnValueChanged="@(e => Select2Helper.OnSelect2ChangedGeneric<XaPhuongModel>(e, v => _selectedXaFilter = v, 0, SelectedXaPhuongItems, async () => await LoadData()))"
+                                     Multiselect="false" />
                         </MudForm>
                     </div>
 

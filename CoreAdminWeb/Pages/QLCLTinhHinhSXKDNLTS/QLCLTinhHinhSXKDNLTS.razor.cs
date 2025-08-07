@@ -311,17 +311,16 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
             _titleAddOrUpdate = item != null ? "Sửa" : "Thêm mới";
             SelectedItem = item != null ? item.DeepClone() : new QLCLTinhHinhSXKDNLTSModel();
             SelectedNguyenLieuItemsDetail = new List<QLCLTinhHinhSXKDNLTSNguyenLieuModel>();
+            SelectedSanPhamItemsDetail = new List<QLCLTinhHinhSXKDNLTSSanPhamModel>();
 
             if (SelectedItem.id is not null && SelectedItem.id > 0)
             {
                 await LoadNguyenLieuDetailData();
                 await LoadSanPhamDetailData();
             }
-            else
-            {
-                SelectedNguyenLieuItemsDetail = new List<QLCLTinhHinhSXKDNLTSNguyenLieuModel>();
-                SelectedSanPhamItemsDetail = new List<QLCLTinhHinhSXKDNLTSSanPhamModel>();
 
+            if (!SelectedNguyenLieuItemsDetail.Any())
+            {
                 SelectedNguyenLieuItemsDetail.Add(new QLCLTinhHinhSXKDNLTSNguyenLieuModel()
                 {
                     tinh_hinh_san_xuat_kinh_doanh_nlts = SelectedItem,
@@ -330,7 +329,10 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
                     khoi_luong_tan = 0,
                     deleted = false,
                 });
+            }
 
+            if (!SelectedSanPhamItemsDetail.Any())
+            {
                 SelectedSanPhamItemsDetail.Add(new QLCLTinhHinhSXKDNLTSSanPhamModel()
                 {
                     tinh_hinh_san_xuat_kinh_doanh_nlts = SelectedItem,
@@ -339,9 +341,7 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
                     san_luong_tan = 0,
                     deleted = false,
                 });
-
             }
-
 
             openAddOrUpdateModal = true;
 
@@ -420,7 +420,7 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
                     if (result.IsSuccess)
                     {
                         var addNewNguyenLieuChiTietList = SelectedNguyenLieuItemsDetail
-                            .Where(c => (c.deleted == false || c.deleted == null) && c.id == 0)
+                            .Where(c => (c.deleted == false || c.deleted == null) && (c.id ?? 0) == 0)
                             .Select(c =>
                             {
                                 c.tinh_hinh_san_xuat_kinh_doanh_nlts = SelectedItem;
@@ -474,7 +474,7 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
 
 
                         var addNewSanPhamChiTietList = SelectedSanPhamItemsDetail
-                            .Where(c => (c.deleted == false || c.deleted == null) && c.id == 0)
+                            .Where(c => (c.deleted == false || c.deleted == null) && (c.id ?? 0) == 0)
                             .Select(c =>
                             {
                                 c.tinh_hinh_san_xuat_kinh_doanh_nlts = SelectedItem;
@@ -646,8 +646,8 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
                 ws.Cells[row, 1].Value = stt;
                 ws.Cells[row, 2].Value = item.ngay_ghi_nhan?.ToString("dd/MM/yyyy");
                 ws.Cells[row, 3].Value = item.qlcl_co_so_che_bien_nlts?.name;
-                ws.Cells[row, 4].Value = item.thoi_gian_bat_dau;
-                ws.Cells[row, 5].Value = item.thoi_gian_ket_thuc;
+                ws.Cells[row, 4].Value = item.thoi_gian_bat_dau?.ToString("dd/MM/yyyy");
+                ws.Cells[row, 5].Value = item.thoi_gian_ket_thuc?.ToString("dd/MM/yyyy");
                 //ws.Cells[row, 6].Value = item.qlcl_san_pham_san_xuat_nlts?.name;
                 ws.Cells[row, 7].Value = item.su_co_an_toan;
                 ws.Cells[row, 8].Value = item.bien_phap_xu_ly_chat_thai;

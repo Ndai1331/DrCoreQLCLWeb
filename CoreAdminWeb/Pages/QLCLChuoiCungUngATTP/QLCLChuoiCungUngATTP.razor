@@ -57,27 +57,14 @@
                     <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
                         <MudForm>
                             <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Xã phường</MudText>
-                            <BlazoredTypeahead EnableDropDown="true"
-                                               ShowDropDownOnFocus="true"
-                                               MinimumLength="0"
-                                               TItem="XaPhuongModel"
-                                               TValue="XaPhuongModel"
-                                               SearchMethod="LoadXaFilterData"
-                                               Value="@_selectedXaFilter"
-                                               ValueExpression="@(() => _selectedXaFilter)"
-                                               ValueChanged="OnXaFilterChanged"
-                                               placeholder="Chọn xã phường"
-                                               Class="form-select">
-                                <SelectedTemplate Context="item">
-                                    @item.name
-                                </SelectedTemplate>
-                                <ResultTemplate Context="item">
-                                    @item.name
-                                </ResultTemplate>
-                                <NotFoundTemplate Context="item">
-                                    Không tìm thấy dữ liệu
-                                </NotFoundTemplate>
-                            </BlazoredTypeahead>
+                            <Select2 IdSelector="c => c != null ? c.id.ToString() : String.Empty"
+                                     TextSelector="c => c != null ? c.name : String.Empty"
+                                     FilterFunction="FilterFunctionXaPhuongData"
+                                     GetElementById="async (items, id, token) => Select2Helper.GetElementByIdGeneric(items, id, c => c.id) ?? new XaPhuongModel()"
+                                     Datasource="XaPhuongItems"
+                                     Value="@(Select2Helper.GetCurrentSelectionGeneric<XaPhuongModel>(_selectedXaFilter, 0, SelectedXaPhuongItems))"
+                                     OnValueChanged="@(e => Select2Helper.OnSelect2ChangedGeneric<XaPhuongModel>(e, v => _selectedXaFilter = v, 0, SelectedXaPhuongItems, async () => await LoadData()))"
+                                     Multiselect="false" />
                         </MudForm>
                     </div>
                     <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
@@ -283,27 +270,14 @@
                                 </div>
                                 <div class="space-y-2 md:col-span-1">
                                     <label>Xã phường</label>
-                                    <BlazoredTypeahead EnableDropDown="true"
-                                                       ShowDropDownOnFocus="true"
-                                                       MinimumLength="0"
-                                                       TItem="XaPhuongModel"
-                                                       TValue="XaPhuongModel"
-                                                       SearchMethod="LoadXaSanXuatCRUDData"
-                                                       Value="SelectedItem.ward_san_xuat"
-                                                       ValueExpression="@(() => SelectedItem.ward_san_xuat)"
-                                                       ValueChanged="@(e => SelectedItem.ward_san_xuat = e)"
-                                                       placeholder="Chọn xã phường"
-                                                       Class="form-select">
-                                        <SelectedTemplate Context="item">
-                                            @item.name
-                                        </SelectedTemplate>
-                                        <ResultTemplate Context="item">
-                                            @item.name
-                                        </ResultTemplate>
-                                        <NotFoundTemplate Context="item">
-                                            Không tìm thấy dữ liệu
-                                        </NotFoundTemplate>
-                                    </BlazoredTypeahead>
+                                    <Select2 IdSelector="c => c != null ? c.id.ToString() : String.Empty"
+                                             TextSelector="c => c != null ? c.name : String.Empty"
+                                             FilterFunction="FilterFunctionXaPhuongSanXuatData"
+                                             GetElementById="async (items, id, token) => Select2Helper.GetElementByIdGeneric(items, id, c => c.id) ?? new XaPhuongModel()"
+                                             Datasource="XaPhuongSanXuatItems"
+                                             Value="@(Select2Helper.GetCurrentSelectionGeneric<XaPhuongModel>(SelectedItem.ward_san_xuat, 0, SelectedXaPhuongSanXuatItems))"
+                                             OnValueChanged="@(e => Select2Helper.OnSelect2ChangedGeneric<XaPhuongModel>(e, v => SelectedItem.ward_san_xuat = v, 0, SelectedXaPhuongSanXuatItems))"
+                                             Multiselect="false" />
                                 </div>
 
                                 <MudText Typo="Typo.h2" Class="md:col-span-2 mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Thông tin địa chỉ kinh doanh:</MudText>
@@ -340,27 +314,14 @@
 
                                 <div class="space-y-2 md:col-span-1">
                                     <label>Xã phường</label>
-                                    <BlazoredTypeahead EnableDropDown="true"
-                                                       ShowDropDownOnFocus="true"
-                                                       MinimumLength="0"
-                                                       TItem="XaPhuongModel"
-                                                       TValue="XaPhuongModel"
-                                                       SearchMethod="LoadXaKinhDoanhCRUDData"
-                                                       Value="SelectedItem.ward_kinh_doanh"
-                                                       ValueExpression="@(() => SelectedItem.ward_kinh_doanh)"
-                                                       ValueChanged="@(e => SelectedItem.ward_kinh_doanh = e)"
-                                                       placeholder="Chọn xã phường"
-                                                       Class="form-select">
-                                        <SelectedTemplate Context="item">
-                                            @item.name
-                                        </SelectedTemplate>
-                                        <ResultTemplate Context="item">
-                                            @item.name
-                                        </ResultTemplate>
-                                        <NotFoundTemplate Context="item">
-                                            Không tìm thấy dữ liệu
-                                        </NotFoundTemplate>
-                                    </BlazoredTypeahead>
+                                    <Select2 IdSelector="c => c != null ? c.id.ToString() : String.Empty"
+                                             TextSelector="c => c != null ? c.name : String.Empty"
+                                             FilterFunction="FilterFunctionXaPhuongKinhDoanhData"
+                                             GetElementById="async (items, id, token) => Select2Helper.GetElementByIdGeneric(items, id, c => c.id) ?? new XaPhuongModel()"
+                                             Datasource="XaPhuongKinhDoanhItems"
+                                             Value="@(Select2Helper.GetCurrentSelectionGeneric<XaPhuongModel>(SelectedItem.ward_kinh_doanh, 0, SelectedXaPhuongKinhDoanhItems))"
+                                             OnValueChanged="@(e => Select2Helper.OnSelect2ChangedGeneric<XaPhuongModel>(e, v => SelectedItem.ward_kinh_doanh = v, 0, SelectedXaPhuongKinhDoanhItems))"
+                                             Multiselect="false" />
                                 </div>
 
                                 <MudText Typo="Typo.h2" Class="md:col-span-2 mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Thông tin xác nhận:</MudText>

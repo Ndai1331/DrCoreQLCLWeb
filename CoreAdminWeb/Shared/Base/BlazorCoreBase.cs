@@ -225,17 +225,17 @@ namespace CoreAdminWeb.Shared.Base
             return query;
         }
 
-        public async Task OnPageSizeChanged(int newSize, Func<Task> loadData)
+        public async Task OnPageSizeChanged((int page, Func<Task> loadData) args)
         {
             Page = 1;
-            PageSize = newSize;
-            await loadData();
+            PageSize = args.page;
+            await args.loadData();
         }
 
-        public async Task SelectedPage(int page, Func<Task> loadData)
+        public async Task SelectedPage((int page, Func<Task> loadData) args)
         {
-            Page = page;
-            await loadData();
+            Page = args.page;
+            await args.loadData();
         }
     }
 }

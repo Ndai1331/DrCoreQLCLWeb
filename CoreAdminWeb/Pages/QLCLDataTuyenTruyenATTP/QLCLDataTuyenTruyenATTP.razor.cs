@@ -53,6 +53,9 @@ namespace CoreAdminWeb.Pages.QLCLDataTuyenTruyenATTP
 
         private QLCLDataTuyenTruyenATTPModel SelectedItem { get; set; } = new QLCLDataTuyenTruyenATTPModel();
 
+        private Dictionary<int, List<XaPhuongModel>> SelectedXaPhuongItems { get; set; } = new();
+        private List<XaPhuongModel> XaPhuongItems { get; set; } = new();
+
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
@@ -108,6 +111,13 @@ namespace CoreAdminWeb.Pages.QLCLDataTuyenTruyenATTP
                     index++;
                     BuilderQuery += $"&filter[_and][{index}][ward][_eq]={_selectedXaFilter.id}";
                 }
+                else
+                {
+                    index++;
+                    XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
+                    string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
+                    BuilderQuery += $"&filter[_and][{index}][ward][_in]={xaFilterIds}";
+                }
 
                 if (_fromDate != null)
                 {
@@ -152,11 +162,14 @@ namespace CoreAdminWeb.Pages.QLCLDataTuyenTruyenATTP
             return await LoadBlazorTypeaheadData(searchText, TinhService);
         }
 
-        private async Task<IEnumerable<XaPhuongModel>> LoadXaFilterData(string searchText)
+        private async Task<List<XaPhuongModel>> FilterFunctionXaPhuongData(IEnumerable<XaPhuongModel> allItems, string filter,
+            CancellationToken token)
         {
             string query = $"sort=-id";
             query += $"&filter[_and][][ProvinceId][_eq]={(_selectedTinhFilter == null ? 0 : _selectedTinhFilter?.id)}";
-            return await LoadBlazorTypeaheadData(searchText, XaPhuongService, query);
+            XaPhuongItems = await LoadDataInTable(allItems, filter, token, XaPhuongService, query);
+            StateHasChanged();
+            return XaPhuongItems;
         }
 
         private async Task<IEnumerable<XaPhuongModel>> LoadXaCRUDData(string searchText)
@@ -327,12 +340,6 @@ namespace CoreAdminWeb.Pages.QLCLDataTuyenTruyenATTP
             await LoadData();
         }
 
-        private async Task OnXaFilterChanged(XaPhuongModel? xa)
-        {
-            _selectedXaFilter = xa;
-            await LoadData();
-        }
-
         private async Task OnExportExcel()
         {
             // Get all data for export
@@ -362,6 +369,13 @@ namespace CoreAdminWeb.Pages.QLCLDataTuyenTruyenATTP
             {
                 index++;
                 BuilderQuery += $"&filter[_and][{index}][ward][_eq]={_selectedXaFilter.id}";
+            }
+            else
+            {
+                index++;
+                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
+                string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
+                BuilderQuery += $"&filter[_and][{index}][ward][_in]={xaFilterIds}";
             }
 
             if (_fromDate != null)

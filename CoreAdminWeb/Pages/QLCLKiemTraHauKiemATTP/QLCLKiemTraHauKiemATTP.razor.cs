@@ -75,6 +75,9 @@ namespace CoreAdminWeb.Pages.QLCLKiemTraHauKiemATTP
         private List<QLCLSanPhamSanXuatModel> QLCLSanPhamSanXuatItems = new List<QLCLSanPhamSanXuatModel>();
         private Dictionary<int, List<QLCLSanPhamSanXuatModel>> SelectedQLCLSanPhamSanXuatItems = new Dictionary<int, List<QLCLSanPhamSanXuatModel>>();
 
+        private Dictionary<int, List<XaPhuongModel>> SelectedXaPhuongItems { get; set; } = new();
+        private List<XaPhuongModel> XaPhuongItems { get; set; } = new();
+
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
@@ -108,8 +111,6 @@ namespace CoreAdminWeb.Pages.QLCLKiemTraHauKiemATTP
             if (!string.IsNullOrEmpty(_searchString))
             {
                 index++;
-                BuilderQuery += $"&filter[_and][{index}][_or][0][code][_contains]={_searchString}";
-                BuilderQuery += $"&filter[_and][{index}][_or][1][name][_contains]={_searchString}";
                 BuilderQuery += $"&filter[_and][{index}][_or][2][dia_chi_san_xuat_kinh_doanh][_contains]={_searchString}";
                 BuilderQuery += $"&filter[_and][{index}][_or][3][co_quan_kiem_tra][_contains]={_searchString}";
                 BuilderQuery += $"&filter[_and][{index}][_or][4][noi_dung_kiem_tra][_contains]={_searchString}";
@@ -123,6 +124,13 @@ namespace CoreAdminWeb.Pages.QLCLKiemTraHauKiemATTP
             {
                 index++;
                 BuilderQuery += $"&filter[_and][{index}][ward][_eq]={_selectedXaFilter.id}";
+            }
+            else
+            {
+                index++;
+                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
+                string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
+                BuilderQuery += $"&filter[_and][{index}][ward][_in]={xaFilterIds}";
             }
             if (_fromDate != null)
             {
@@ -173,12 +181,14 @@ namespace CoreAdminWeb.Pages.QLCLKiemTraHauKiemATTP
             return await LoadBlazorTypeaheadData(searchText, XaPhuongService, query);
         }
 
-
-        private async Task<IEnumerable<XaPhuongModel>> LoadXaFilterData(string searchText)
+        private async Task<List<XaPhuongModel>> FilterFunctionXaPhuongData(IEnumerable<XaPhuongModel> allItems, string filter,
+            CancellationToken token)
         {
             string query = $"sort=-id";
             query += $"&filter[_and][][ProvinceId][_eq]={(_selectedTinhFilter == null ? 0 : _selectedTinhFilter?.id)}";
-            return await LoadBlazorTypeaheadData(searchText, XaPhuongService, query);
+            XaPhuongItems = await LoadDataInTable(allItems, filter, token, XaPhuongService, query);
+            StateHasChanged();
+            return XaPhuongItems;
         }
 
         private async Task<List<QLCLSanPhamSanXuatModel>> FilterFunctionQLCLSanPhamSanXuatData(IEnumerable<QLCLSanPhamSanXuatModel> allItems, string filter,
@@ -306,7 +316,8 @@ namespace CoreAdminWeb.Pages.QLCLKiemTraHauKiemATTP
         private async Task OpenAddOrUpdateModal(QLCLKiemTraHauKiemATTPModel? item)
         {
             _titleAddOrUpdate = item != null ? "Sửa" : "Thêm mới";
-            SelectedItem = item != null ? item : new QLCLKiemTraHauKiemATTPModel()
+            SelectedSanPhamItemsDetail = new List<QLCLKiemTraHauKiemATTPChiTietModel>();
+            SelectedItem = item != null ? item.DeepClone() : new QLCLKiemTraHauKiemATTPModel()
             {
                 province = await LoadDefaultData(TinhService),
             };
@@ -527,6 +538,13 @@ namespace CoreAdminWeb.Pages.QLCLKiemTraHauKiemATTP
                 index++;
                 BuilderQuery += $"&filter[_and][{index}][ward][_eq]={_selectedXaFilter.id}";
             }
+            else
+            {
+                index++;
+                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
+                string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
+                BuilderQuery += $"&filter[_and][{index}][ward][_in]={xaFilterIds}";
+            }
             if (_fromDate != null)
             {
                 index++;
@@ -602,12 +620,6 @@ namespace CoreAdminWeb.Pages.QLCLKiemTraHauKiemATTP
         private async Task OnTinhFilterChanged(TinhModel? value)
         {
             _selectedTinhFilter = value;
-            await LoadData();
-        }
-
-        private async Task OnXaFilterChanged(XaPhuongModel? value)
-        {
-            _selectedXaFilter = value;
             await LoadData();
         }
     }

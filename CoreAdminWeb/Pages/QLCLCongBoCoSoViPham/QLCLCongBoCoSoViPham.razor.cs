@@ -25,6 +25,9 @@ namespace CoreAdminWeb.Pages.QLCLCongBoCoSoViPham
         private QLCLCoSoViPhamATTPModel? _selectedItem { get; set; }
         private string _userLoginId = "";
 
+        private Dictionary<int, List<XaPhuongModel>> SelectedXaPhuongItems { get; set; } = new();
+        private List<XaPhuongModel> XaPhuongItems { get; set; } = new();
+
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
@@ -60,6 +63,7 @@ namespace CoreAdminWeb.Pages.QLCLCongBoCoSoViPham
             BuilderQuery += "&filter[_and][0][deleted][_eq]=false";
             if (!string.IsNullOrEmpty(_searchString))
             {
+                index++;
                 BuilderQuery += $"&filter[_and][{index}][_or][0][co_so_che_bien_nlts][code][_contains]={_searchString}";
                 BuilderQuery += $"&filter[_and][{index}][_or][1][co_so_nlts_du_dieu_kien_attp][code][_contains]={_searchString}";
                 BuilderQuery += $"&filter[_and][{index}][_or][2][co_so_che_bien_nlts][name][_contains]={_searchString}";
@@ -69,32 +73,40 @@ namespace CoreAdminWeb.Pages.QLCLCongBoCoSoViPham
                 BuilderQuery += $"&filter[_and][{index}][_or][6][san_pham_vi_pham][_contains]={_searchString}";
                 BuilderQuery += $"&filter[_and][{index}][_or][7][hanh_vi_vi_pham][name][_contains]={_searchString}";
                 BuilderQuery += $"&filter[_and][{index}][_or][8][xu_ly_khac][_contains]={_searchString}";
-                index++;
             }
 
 
             if (_selectedTinhFilter != null)
             {
+                index++;
                 BuilderQuery += $"&filter[_and][{index}][_or][0][co_so_che_bien_nlts][province][_eq]={_selectedTinhFilter.id}";
                 BuilderQuery += $"&filter[_and][{index}][_or][1][co_so_nlts_du_dieu_kien_attp][province][_eq]={_selectedTinhFilter.id}";
-                index++;
             }
 
             if (_selectedXaFilter != null)
             {
+                index++;
                 BuilderQuery += $"&filter[_and][{index}][_or][0][co_so_che_bien_nlts][ward][_eq]={_selectedXaFilter.id}";
                 BuilderQuery += $"&filter[_and][{index}][_or][1][co_so_nlts_du_dieu_kien_attp][ward][_eq]={_selectedXaFilter.id}";
+            }
+            else
+            {
                 index++;
+                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
+                string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
+                BuilderQuery += $"&filter[_and][{index}][_or][0][co_so_che_bien_nlts][ward][_in]={xaFilterIds}";
+                BuilderQuery += $"&filter[_and][{index}][_or][1][co_so_nlts_du_dieu_kien_attp][ward][_in]={xaFilterIds}";
             }
 
             if (_fromDate != null)
             {
-                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_gte]={_fromDate.Value:yyyy-MM-dd}";
                 index++;
+                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_gte]={_fromDate.Value:yyyy-MM-dd}";
             }
 
             if (_toDate != null)
             {
+                index++;
                 BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_lte]={_toDate.Value:yyyy-MM-dd}";
             }
 
@@ -118,22 +130,21 @@ namespace CoreAdminWeb.Pages.QLCLCongBoCoSoViPham
         {
             return await LoadBlazorTypeaheadData(searchText, TinhService);
         }
-        private async Task<IEnumerable<XaPhuongModel>> LoadXaFilterData(string searchText)
+
+        private async Task<List<XaPhuongModel>> FilterFunctionXaPhuongData(IEnumerable<XaPhuongModel> allItems, string filter,
+            CancellationToken token)
         {
             string query = $"sort=-id";
             query += $"&filter[_and][][ProvinceId][_eq]={(_selectedTinhFilter == null ? 0 : _selectedTinhFilter?.id)}";
-            return await LoadBlazorTypeaheadData(searchText, XaPhuongService, query);
+            XaPhuongItems = await LoadDataInTable(allItems, filter, token, XaPhuongService, query);
+            StateHasChanged();
+            return XaPhuongItems;
         }
 
         public async Task OnTinhFilterChanged(TinhModel? tinh)
         {
             _selectedTinhFilter = tinh;
             _selectedXaFilter = null;
-            await LoadData();
-        }
-        public async Task OnXaFilterChanged(XaPhuongModel? xa)
-        {
-            _selectedXaFilter = xa;
             await LoadData();
         }
 
@@ -176,6 +187,7 @@ namespace CoreAdminWeb.Pages.QLCLCongBoCoSoViPham
             BuilderQuery += "&filter[_and][0][deleted][_eq]=false";
             if (!string.IsNullOrEmpty(_searchString))
             {
+                index++;
                 BuilderQuery += $"&filter[_and][{index}][_or][0][co_so_che_bien_nlts][code][_contains]={_searchString}";
                 BuilderQuery += $"&filter[_and][{index}][_or][1][co_so_nlts_du_dieu_kien_attp][code][_contains]={_searchString}";
                 BuilderQuery += $"&filter[_and][{index}][_or][2][co_so_che_bien_nlts][name][_contains]={_searchString}";
@@ -185,32 +197,40 @@ namespace CoreAdminWeb.Pages.QLCLCongBoCoSoViPham
                 BuilderQuery += $"&filter[_and][{index}][_or][6][san_pham_vi_pham][_contains]={_searchString}";
                 BuilderQuery += $"&filter[_and][{index}][_or][7][hanh_vi_vi_pham][name][_contains]={_searchString}";
                 BuilderQuery += $"&filter[_and][{index}][_or][8][xu_ly_khac][_contains]={_searchString}";
-                index++;
             }
 
 
             if (_selectedTinhFilter != null)
             {
+                index++;
                 BuilderQuery += $"&filter[_and][{index}][_or][0][co_so_che_bien_nlts][province][_eq]={_selectedTinhFilter.id}";
                 BuilderQuery += $"&filter[_and][{index}][_or][1][co_so_nlts_du_dieu_kien_attp][province][_eq]={_selectedTinhFilter.id}";
-                index++;
             }
 
             if (_selectedXaFilter != null)
             {
+                index++;
                 BuilderQuery += $"&filter[_and][{index}][_or][0][co_so_che_bien_nlts][ward][_eq]={_selectedXaFilter.id}";
                 BuilderQuery += $"&filter[_and][{index}][_or][1][co_so_nlts_du_dieu_kien_attp][ward][_eq]={_selectedXaFilter.id}";
+            }
+            else
+            {
                 index++;
+                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
+                string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
+                BuilderQuery += $"&filter[_and][{index}][_or][0][co_so_che_bien_nlts][ward][_in]={xaFilterIds}";
+                BuilderQuery += $"&filter[_and][{index}][_or][1][co_so_nlts_du_dieu_kien_attp][ward][_in]={xaFilterIds}";
             }
 
             if (_fromDate != null)
             {
-                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_gte]={_fromDate.Value:yyyy-MM-dd}";
                 index++;
+                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_gte]={_fromDate.Value:yyyy-MM-dd}";
             }
 
             if (_toDate != null)
             {
+                index++;
                 BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_lte]={_toDate.Value:yyyy-MM-dd}";
             }
 

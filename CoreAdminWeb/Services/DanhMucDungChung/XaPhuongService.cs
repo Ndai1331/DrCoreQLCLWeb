@@ -1,9 +1,8 @@
+using CoreAdminWeb.Model;
 using CoreAdminWeb.Model.RequestHttps;
-using CoreAdminWeb.Model.Settings;
 using CoreAdminWeb.Services.BaseServices;
 using CoreAdminWeb.Services.Http;
 using System.Net;
-using CoreAdminWeb.Model;
 
 namespace CoreAdminWeb.Services
 {
@@ -51,8 +50,8 @@ namespace CoreAdminWeb.Services
             {
                 string url = $"items/{_collection}?fields={Fields}&{query}";
                 var response = await _httpClientService.GetAPIAsync<RequestHttpResponse<List<XaPhuongModel>>>(url);
-                
-                return response.IsSuccess 
+
+                return response.IsSuccess
                     ? new RequestHttpResponse<List<XaPhuongModel>> { Data = response.Data.Data }
                     : new RequestHttpResponse<List<XaPhuongModel>> { Errors = response.Errors };
             }
@@ -79,7 +78,7 @@ namespace CoreAdminWeb.Services
             try
             {
                 var response = await _httpClientService.GetAPIAsync<RequestHttpResponse<XaPhuongModel>>($"items/{_collection}/{id}?fields={Fields}");
-                
+
                 return response.IsSuccess
                     ? new RequestHttpResponse<XaPhuongModel> { Data = response.Data.Data }
                     : new RequestHttpResponse<XaPhuongModel> { Errors = response.Errors };

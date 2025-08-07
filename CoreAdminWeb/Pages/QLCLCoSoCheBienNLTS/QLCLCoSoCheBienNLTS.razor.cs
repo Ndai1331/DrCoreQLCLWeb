@@ -1,6 +1,7 @@
 ﻿using CoreAdminWeb.Extensions;
 using CoreAdminWeb.Helpers;
 using CoreAdminWeb.Model;
+using CoreAdminWeb.Services;
 using CoreAdminWeb.Services.BaseServices;
 using CoreAdminWeb.Shared.Base;
 using Microsoft.AspNetCore.Components;
@@ -37,6 +38,9 @@ namespace CoreAdminWeb.Pages.QLCLCoSoCheBienNLTS
 
 
         private QLCLCoSoCheBienNLTSModel SelectedItem { get; set; } = new QLCLCoSoCheBienNLTSModel();
+
+        private Dictionary<int, List<XaPhuongModel>> SelectedXaPhuongItems { get; set; } = new();
+        private List<XaPhuongModel> XaPhuongItems { get; set; } = new();
 
         protected override async Task OnInitializedAsync()
         {
@@ -90,6 +94,13 @@ namespace CoreAdminWeb.Pages.QLCLCoSoCheBienNLTS
                 {
                     intdex++;
                     BuilderQuery += $"&filter[_and][{intdex}][ward][_eq]={_selectedXaFilter.id}";
+                }
+                else
+                {
+                    intdex++;
+                    XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaService);
+                    string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
+                    BuilderQuery += $"&filter[_and][{intdex}][ward][_in]={xaFilterIds}";
                 }
                 if (_fromDate != null)
                 {
@@ -294,10 +305,14 @@ namespace CoreAdminWeb.Pages.QLCLCoSoCheBienNLTS
             return await LoadBlazorTypeaheadData(searchText, XaService, query);
         }
 
-        private async Task<IEnumerable<XaPhuongModel>> LoadXaFilterData(string searchText)
+        private async Task<List<XaPhuongModel>> FilterFunctionXaPhuongData(IEnumerable<XaPhuongModel> allItems, string filter,
+            CancellationToken token)
         {
-            string query = $"&filter[_and][][ProvinceId][_eq]={_selectedTinhFilter?.id ?? 0}";
-            return await LoadBlazorTypeaheadData(searchText, XaService, query);
+            string query = $"sort=-id";
+            query += $"&filter[_and][][ProvinceId][_eq]={(_selectedTinhFilter == null ? 0 : _selectedTinhFilter?.id)}";
+            XaPhuongItems = await LoadDataInTable(allItems, filter, token, XaService, query);
+            StateHasChanged();
+            return XaPhuongItems;
         }
 
         private async Task<IEnumerable<QLCLLoaiHinhCoSoModel>> LoadQLCLLoaiHinhCoSoData(string searchText)
@@ -316,13 +331,6 @@ namespace CoreAdminWeb.Pages.QLCLCoSoCheBienNLTS
             _selectedTinhFilter = item;
             await LoadData();
         }
-
-        public async Task OnXaFilterChanged(XaPhuongModel? item)
-        {
-            _selectedXaFilter = item;
-            await LoadData();
-        }
-
 
         private async Task OnExportExcel()
         {
@@ -352,6 +360,13 @@ namespace CoreAdminWeb.Pages.QLCLCoSoCheBienNLTS
             {
                 intdex++;
                 BuilderQuery += $"&filter[_and][{intdex}][ward][_eq]={_selectedXaFilter.id}";
+            }
+            else
+            {
+                intdex++;
+                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaService);
+                string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
+                BuilderQuery += $"&filter[_and][{intdex}][ward][_in]={xaFilterIds}";
             }
             if (_fromDate != null)
             {

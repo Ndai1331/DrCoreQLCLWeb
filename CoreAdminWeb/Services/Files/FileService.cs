@@ -135,7 +135,8 @@ namespace CoreAdminWeb.Services.Files
                                 ngay_hieu_luc = model.ngay_hieu_luc,
                                 so_luu_tru = model.so_luu_tru,
                                 linh_vuc_vb = model.linh_vuc_vb,
-                                phan_loai_vb = model.phan_loai_vb
+                                phan_loai_vb = model.phan_loai_vb,
+                                folder = model.folder
                             });
                         }
                     }
@@ -167,7 +168,8 @@ namespace CoreAdminWeb.Services.Files
                     ngay_hieu_luc = model.ngay_hieu_luc,
                     so_luu_tru = model.so_luu_tru,
                     linh_vuc_vb = model.linh_vuc_vb,
-                    phan_loai_vb = model.phan_loai_vb
+                    phan_loai_vb = model.phan_loai_vb,
+                    folder = model.folder
                 });
                 if (result.IsSuccess)
                 {
