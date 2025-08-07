@@ -1,7 +1,7 @@
 using CoreAdminWeb.Model.Menus;
 using CoreAdminWeb.Model.User;
-using CoreAdminWeb.Services.Auth;
 using CoreAdminWeb.Services;
+using CoreAdminWeb.Services.Auth;
 using CoreAdminWeb.Services.BaseServices;
 using CoreAdminWeb.Services.Menus;
 using CoreAdminWeb.Services.Users;
@@ -14,7 +14,9 @@ namespace CoreAdminWeb.Shared.Base
 {
     public class BlazorCoreBase : ComponentBase
     {
+
         [Inject]
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
         protected AuthenticationStateProvider AuthStateProvider { get; set; }
 
         [Inject]
@@ -24,7 +26,7 @@ namespace CoreAdminWeb.Shared.Base
         protected IMenuService MenuService { get; set; }
 
         [Inject]
-        protected NavigationManager? NavigationManager { get; set; }
+        protected NavigationManager NavigationManager { get; set; }
 
         [Inject]
         protected AlertService AlertService { get; set; }
@@ -32,8 +34,9 @@ namespace CoreAdminWeb.Shared.Base
         [Inject]
         protected IJSRuntime JsRuntime { get; set; }
 
-        protected UserModel? CurrentUser { get; private set; }
-        protected bool IsAuthenticated { get; private set; }
+        protected UserModel CurrentUser { get; set; }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+        protected bool IsAuthenticated { get; set; }
         public bool IsLoading { get; set; } = false;
 
         public int Page { get; set; } = 1;
@@ -44,9 +47,6 @@ namespace CoreAdminWeb.Shared.Base
         public string BuilderQuery { get; set; } = "";
         public string AcceptFileTypes { get; set; } = "application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.openxmlformats-officedocument.presentationml.presentation, application/pdf,application/zip, application/x-7z-compressed, application/x-rar-compressed, application/x-tar, application/x-gzip, application/x-bzip2, application/x-compressed, application/x-compressed-tar, application/x-compressed-zip, application/x-compressed-rar, application/x-compressed-7z";
 
-        public static List<Model.Base.Status> StatusList = new List<
-        Model.Base.Status> { Model.Base.Status.active,
-         Model.Base.Status.deactive };
         protected List<MenuResponse> Menus { get; set; } = new List<MenuResponse>();
 
         protected override async Task OnInitializedAsync()
@@ -65,6 +65,11 @@ namespace CoreAdminWeb.Shared.Base
 
         public async Task<bool> IsAuthenticatedAsync()
         {
+            if (AuthStateProvider == null)
+            {
+                return false;
+            }
+
             var authState = await AuthStateProvider.GetAuthenticationStateAsync();
             return authState?.User?.Identity?.IsAuthenticated ?? false;
         }
@@ -73,6 +78,12 @@ namespace CoreAdminWeb.Shared.Base
         {
             try
             {
+                if (MenuService == null)
+                {
+                    Console.WriteLine("MenuService is null");
+                    return new List<MenuResponse>(); // Fallback
+                }
+
                 var menus = await MenuService.GetMenusAsync(external_system_id);
 
                 if (menus.Data == null)
@@ -83,16 +94,22 @@ namespace CoreAdminWeb.Shared.Base
 
                 return menus.Data;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Handle error
-                return null;
+                return new List<MenuResponse>();
             }
         }
         protected async Task Logout()
         {
             try
             {
+                if (AuthStateProvider == null)
+                {
+                    Console.WriteLine("AuthStateProvider is null");
+                    return; // Fallback
+                }
+
                 await ((ApiAuthenticationStateProvider)AuthStateProvider).MarkUserAsLoggedOut();
                 NavigationManager?.NavigateTo("/signin", true);
             }
@@ -132,75 +149,93 @@ namespace CoreAdminWeb.Shared.Base
         {
             if (e.Key == "Enter" && !e.ShiftKey)
             {
-                await JsRuntime.InvokeVoidAsync("preventEnterKeyDefault", "search");
+                if (JsRuntime != null)
+                {
+                    await JsRuntime.InvokeVoidAsync("preventEnterKeyDefault", "search");
+                }
                 await loadData.Invoke();
             }
         }
 
 
-        public async Task<T?> LoadDefaultData<T>(IBaseService<T> service)
+        public static async Task<T?> LoadDefaultData<T>(IBaseService<T> service)
         {
-            var query = BuildBaseQuery(string.Empty, false);
+            var query = BuildBaseQuery(string.Empty);
             var result = await service.GetAllAsync(query);
             return result != null && result.IsSuccess ? result.Data!.FirstOrDefault() : default;
         }
 
-
-
-        public async Task<IEnumerable<T>> LoadBlazorTypeaheadData<T>(string searchText, IBaseService<T> service, string? otherQuery = "", bool isIgnoreCheck = false)
+        public static async Task<IEnumerable<T>> LoadBlazorTypeaheadData<T>(string searchText, IBaseService<T> service, string? otherQuery = "")
         {
-            var query = BuildBaseQuery(searchText, isIgnoreCheck);
+            var query = BuildBaseQuery(searchText);
 
             if (!string.IsNullOrEmpty(otherQuery))
+            {
                 query += $"&{otherQuery}";
+            }
 
             var result = await service.GetAllAsync(query);
             return result.IsSuccess ? result.Data ?? new List<T>() : new List<T>();
         }
 
+        public static async Task<List<T>> LoadDataInTable<T>(
+            IEnumerable<T> allItems,
+            string filter,
+            CancellationToken token,
+            IBaseService<T> service,
+            string? otherQuery = default)
+        {
+            try
+            {
+                ArgumentNullException.ThrowIfNull(allItems);
 
-        private string BuildBaseQuery(string searchText = "", bool isIgnoreCheck = false)
+                // Debouncing - wait 300ms before making API call
+                await Task.Delay(300, token);
+
+                // If not in cache, load from API
+                Console.WriteLine($"Loading filter data from API for '{filter}'");
+                var result = await LoadBlazorTypeaheadData(filter ?? string.Empty, service, otherQuery);
+                return result?.ToList() ?? new List<T>();
+            }
+            catch (OperationCanceledException)
+            {
+                // Filter operation was cancelled (user typed more characters)
+                Console.WriteLine($"Filter operation cancelled for '{filter}'");
+                return new List<T>();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in filterFunction: {ex.Message}");
+                return new List<T>();
+            }
+        }
+
+        private static string BuildBaseQuery(string searchText = "")
         {
             var query = "filter[_and][][deleted][_eq]=false&sort=sort";
             if (!string.IsNullOrEmpty(searchText))
             {
                 if (!string.IsNullOrEmpty(query))
+                {
                     query += "&";
+                }
+
                 query += $"filter[_and][][name][_contains]={searchText}";
             }
             return query;
         }
 
-
-        public async Task OnPageSizeChanged(Func<Task> loadData)
+        public async Task OnPageSizeChanged((int page, Func<Task> loadData) args)
         {
             Page = 1;
-            TotalItems = 0;
-            await loadData();
+            PageSize = args.page;
+            await args.loadData();
         }
 
-        public async Task PreviousPage(Func<Task> loadData)
+        public async Task SelectedPage((int page, Func<Task> loadData) args)
         {
-            if (Page > 1)
-            {
-                Page--;
-                await loadData();
-            }
-        }
-
-        public async Task SelectedPage(int page, Func<Task> loadData)
-        {
-            Page = page;
-            await loadData();
-        }
-
-        public async Task NextPage(Func<Task> loadData)
-        {
-            if (Page < TotalPages)
-            {
-                Page++;
-                await loadData();
-            }
+            Page = args.page;
+            await args.loadData();
         }
     }
 }

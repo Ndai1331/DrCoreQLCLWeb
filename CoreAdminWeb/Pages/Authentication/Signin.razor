@@ -4,6 +4,8 @@
 @using CoreAdminWeb.Services.Users
 @layout CoreAdminWeb.Shared.Layout.AuthLayout
 @inject AuthenticationStateProvider AuthStateProvider
+@inject AlertService AlertService
+@inject IUserService UserService
 @inject NavigationManager Navigation
 @inject IJSRuntime JsRuntime
 
@@ -47,10 +49,8 @@
 </div>
 <!-- End Main Content -->
 @code {
-
-    [Inject] AlertService AlertService { get; set; }
-    [Inject] IUserService UserService { get; set; }
-    private string _email, _password;
+    private string _email { get; set; } = string.Empty;
+    private string _password { get; set; } = string.Empty;
     private bool isLoading = false;
 
     private async Task HandleGraphQLSignIn()

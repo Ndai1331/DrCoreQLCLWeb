@@ -1,4 +1,6 @@
-﻿using CoreAdminWeb.Model;
+﻿using CoreAdminWeb.Enums;
+using CoreAdminWeb.Helpers;
+using CoreAdminWeb.Model;
 using CoreAdminWeb.Services;
 using CoreAdminWeb.Services.BaseServices;
 using CoreAdminWeb.Shared.Base;
@@ -6,8 +8,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
-using CoreAdminWeb.Extensions;
-using CoreAdminWeb.Enums;
 
 namespace CoreAdminWeb.Pages.QLCLChuoiCungUngATTP
 {
@@ -37,8 +37,22 @@ namespace CoreAdminWeb.Pages.QLCLChuoiCungUngATTP
         private XaPhuongModel? _selectedXaFilter { get; set; }
         private string _titleAddOrUpdate = "Thêm mới";
         private string activeDefTab { get; set; } = "tab1";
-        private DateTime? _fromDate { get; set; }
-        private DateTime? _toDate { get; set; }
+        private DateTime? _fromDate { get; set; } = null;
+        private DateTime? _toDate { get; set; } = null;
+
+        // Select2 define
+        private Dictionary<int, List<XaPhuongModel>> SelectedXaPhuongItems { get; set; } = new();
+        private List<XaPhuongModel> XaPhuongItems { get; set; } = new();
+        private Dictionary<int, List<XaPhuongModel>> SelectedXaPhuongKinhDoanhItems { get; set; } = new();
+        private List<XaPhuongModel> XaPhuongKinhDoanhItems { get; set; } = new();
+        private Dictionary<int, List<XaPhuongModel>> SelectedXaPhuongSanXuatItems { get; set; } = new();
+        private List<XaPhuongModel> XaPhuongSanXuatItems { get; set; } = new();
+
+        private List<QLCLCoSoCheBienNLTSModel> QLCLCoSoCheBienNLTSItems = new List<QLCLCoSoCheBienNLTSModel>();
+        private Dictionary<int, List<QLCLCoSoCheBienNLTSModel>> SelectedQLCLCoSoCheBienNLTSItems = new Dictionary<int, List<QLCLCoSoCheBienNLTSModel>>();
+
+        private List<QLCLCoSoNLTSDuDieuKienATTPModel> QLCLCoSoNLTSDuDieuKienATTPItems = new List<QLCLCoSoNLTSDuDieuKienATTPModel>();
+        private Dictionary<int, List<QLCLCoSoNLTSDuDieuKienATTPModel>> SelectedQLCLCoSoNLTSDuDieuKienATTPItems = new Dictionary<int, List<QLCLCoSoNLTSDuDieuKienATTPModel>>();
 
         protected override async Task OnInitializedAsync()
         {
@@ -49,7 +63,7 @@ namespace CoreAdminWeb.Pages.QLCLChuoiCungUngATTP
         {
             if (firstRender)
             {
-               await LoadData();
+                await LoadData();
                 _selectedTinhFilter = await LoadDefaultData(TinhService);
                 _ = Task.Run(async () =>
                 {
@@ -70,6 +84,7 @@ namespace CoreAdminWeb.Pages.QLCLChuoiCungUngATTP
             BuilderQuery += "&filter[_and][0][deleted][_eq]=false";
             if (!string.IsNullOrEmpty(_searchString))
             {
+                index++;
                 BuilderQuery += $"&filter[_and][{index}][_or][0][code][_contains]={_searchString}";
                 BuilderQuery += $"&filter[_and][{index}][_or][1][name][_contains]={_searchString}";
                 BuilderQuery += $"&filter[_and][{index}][_or][2][dia_chi_san_xuat][_contains]={_searchString}";
@@ -77,31 +92,39 @@ namespace CoreAdminWeb.Pages.QLCLChuoiCungUngATTP
                 BuilderQuery += $"&filter[_and][{index}][_or][4][so_xac_nhan][_contains]={_searchString}";
                 BuilderQuery += $"&filter[_and][{index}][_or][5][co_quan_xac_nhan][_contains]={_searchString}";
                 BuilderQuery += $"&filter[_and][{index}][_or][6][san_pham][_contains]={_searchString}";
-                index++;
             }
-            if(_selectedTinhFilter != null)
+            if (_selectedTinhFilter != null)
             {
+                index++;
                 BuilderQuery += $"&filter[_and][{index}][_or][0][province_san_xuat][_eq]={_selectedTinhFilter.id}";
                 BuilderQuery += $"&filter[_and][{index}][_or][1][province_kinh_doanh][_eq]={_selectedTinhFilter.id}";
-                index++;
             }
 
-            if(_selectedXaFilter != null)
+            if (_selectedXaFilter != null)
             {
+                index++;
                 BuilderQuery += $"&filter[_and][{index}][_or][0][ward_san_xuat][_eq]={_selectedXaFilter.id}";
                 BuilderQuery += $"&filter[_and][{index}][_or][1][ward_kinh_doanh][_eq]={_selectedXaFilter.id}";
+            }
+            else
+            {
                 index++;
+                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
+                string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
+                BuilderQuery += $"&filter[_and][{index}][_or][0][ward_san_xuat][_in]={xaFilterIds}";
+                BuilderQuery += $"&filter[_and][{index}][_or][1][ward_kinh_doanh][_in]={xaFilterIds}";
             }
 
-            if(_fromDate != null)
+            if (_fromDate != null)
             {
-                BuilderQuery += $"&filter[_and][{index}][ngay_chung_nhan][_gte]={_fromDate.Value.ToString("yyyy-MM-dd")}";
                 index++;
+                BuilderQuery += $"&filter[_and][{index}][ngay_chung_nhan][_gte]={_fromDate.Value:yyyy-MM-dd}";
             }
 
-            if(_toDate != null)
+            if (_toDate != null)
             {
-                BuilderQuery += $"&filter[_and][{index}][ngay_chung_nhan][_lte]={_toDate.Value.ToString("yyyy-MM-dd")}";
+                index++;
+                BuilderQuery += $"&filter[_and][{index}][ngay_chung_nhan][_lte]={_toDate.Value:yyyy-MM-dd}";
             }
 
             var result = await MainService.GetAllAsync(BuilderQuery);
@@ -125,7 +148,6 @@ namespace CoreAdminWeb.Pages.QLCLChuoiCungUngATTP
         {
             var buildQuery = $"sort=-id";
             buildQuery += $"&filter[_and][][chuoi_cung_ung][_eq]={SelectedItem.id}";
-            // buildQuery += $"&filter[_and][][deleted][_eq]=false";
             var result = await QLCLChuoiCungUngATTPCoSoService.GetAllAsync(buildQuery);
             SelectedCoSoItemsDetail = result.Data ?? new List<QLCLChuoiCungUngATTPCoSoModel>();
         }
@@ -135,34 +157,51 @@ namespace CoreAdminWeb.Pages.QLCLChuoiCungUngATTP
             return await LoadBlazorTypeaheadData(searchText, TinhService);
         }
 
-        private async Task<IEnumerable<XaPhuongModel>> LoadXaSanXuatCRUDData(string searchText)
-        {
-            string query = $"sort=-id";
-            query += $"&filter[_and][][ProvinceId][_eq]={(SelectedItem.province_san_xuat == null ? 0 : SelectedItem.province_san_xuat?.id)}";
-            return await LoadBlazorTypeaheadData(searchText, XaPhuongService,query);
-        }
-        private async Task<IEnumerable<XaPhuongModel>> LoadXaKinhDoanhCRUDData(string searchText)
-        {
-            string query = $"sort=-id";
-            query += $"&filter[_and][][ProvinceId][_eq]={(SelectedItem.province_kinh_doanh == null ? 0 : SelectedItem.province_kinh_doanh?.id)}";
-            return await LoadBlazorTypeaheadData(searchText, XaPhuongService,query);
-        }
-
-        private async Task<IEnumerable<XaPhuongModel>> LoadXaFilterData(string searchText)
+        private async Task<List<XaPhuongModel>> FilterFunctionXaPhuongData(IEnumerable<XaPhuongModel> allItems, string filter,
+            CancellationToken token)
         {
             string query = $"sort=-id";
             query += $"&filter[_and][][ProvinceId][_eq]={(_selectedTinhFilter == null ? 0 : _selectedTinhFilter?.id)}";
-            return await LoadBlazorTypeaheadData(searchText, XaPhuongService,query);
+            XaPhuongItems = await LoadDataInTable(allItems, filter, token, XaPhuongService, query);
+            StateHasChanged();
+            return XaPhuongItems;
         }
 
-        private async Task<IEnumerable<QLCLCoSoCheBienNLTSModel>> LoadQLCLCoSoCheBienNLTSData(string searchText)
+        private async Task<List<XaPhuongModel>> FilterFunctionXaPhuongKinhDoanhData(IEnumerable<XaPhuongModel> allItems, string filter,
+            CancellationToken token)
         {
-            return await LoadBlazorTypeaheadData(searchText, QLCLCoSoCheBienNLTSService, isIgnoreCheck: true);
+            string query = $"sort=-id";
+            query += $"&filter[_and][][ProvinceId][_eq]={(SelectedItem.province_kinh_doanh == null ? 0 : SelectedItem.province_kinh_doanh?.id)}";
+            XaPhuongKinhDoanhItems = await LoadDataInTable(allItems, filter, token, XaPhuongService, query);
+            StateHasChanged();
+            return XaPhuongKinhDoanhItems;
         }
-        private async Task<IEnumerable<QLCLCoSoNLTSDuDieuKienATTPModel>> LoadQLCLCoSoNLTSDuDieuKienATTPData(string searchText)
+
+        private async Task<List<XaPhuongModel>> FilterFunctionXaPhuongSanXuatData(IEnumerable<XaPhuongModel> allItems, string filter,
+            CancellationToken token)
+        {
+            string query = $"sort=-id";
+            query += $"&filter[_and][][ProvinceId][_eq]={(SelectedItem.province_san_xuat == null ? 0 : SelectedItem.province_san_xuat?.id)}";
+            XaPhuongSanXuatItems = await LoadDataInTable(allItems, filter, token, XaPhuongService, query);
+            StateHasChanged();
+            return XaPhuongSanXuatItems;
+        }
+
+        private async Task<List<QLCLCoSoCheBienNLTSModel>> FilterFunctionQLCLCoSoCheBienNLTSMData(IEnumerable<QLCLCoSoCheBienNLTSModel> allItems, string filter,
+            CancellationToken token)
+        {
+            QLCLCoSoCheBienNLTSItems = await LoadDataInTable(allItems, filter, token, QLCLCoSoCheBienNLTSService);
+            StateHasChanged();
+            return QLCLCoSoCheBienNLTSItems;
+        }
+
+        private async Task<List<QLCLCoSoNLTSDuDieuKienATTPModel>> FilterFunctionQLCLCoSoNLTSDuDieuKienATTPData(IEnumerable<QLCLCoSoNLTSDuDieuKienATTPModel> allItems, string filter,
+            CancellationToken token)
         {
             string query = $"&filter[_and][][loai][_eq]={1}";
-            return await LoadBlazorTypeaheadData(searchText, QLCLCoSoNLTSDuDieuKienATTPService, query, isIgnoreCheck: true);
+            QLCLCoSoNLTSDuDieuKienATTPItems = await LoadDataInTable(allItems, filter, token, QLCLCoSoNLTSDuDieuKienATTPService, query);
+            StateHasChanged();
+            return QLCLCoSoNLTSDuDieuKienATTPItems;
         }
 
         private void OpenDeleteModal(QLCLChuoiCungUngATTPModel item)
@@ -225,6 +264,7 @@ namespace CoreAdminWeb.Pages.QLCLChuoiCungUngATTP
             openCoSoDetailDeleteModal = false;
 
             if (!SelectedCoSoItemsDetail.Any(c => c.deleted == null || c.deleted == false))
+            {
                 SelectedCoSoItemsDetail.Add(new QLCLChuoiCungUngATTPCoSoModel()
                 {
                     chuoi_cung_ung = SelectedItem,
@@ -234,6 +274,8 @@ namespace CoreAdminWeb.Pages.QLCLChuoiCungUngATTP
                     co_so_nlts_du_dieu_kien_attp = null,
                     deleted = false,
                 });
+            }
+
             StateHasChanged();
         }
 
@@ -246,7 +288,9 @@ namespace CoreAdminWeb.Pages.QLCLChuoiCungUngATTP
         private void OnAddCoSo()
         {
             if (SelectedCoSoItemsDetail == null)
+            {
                 SelectedCoSoItemsDetail = new List<QLCLChuoiCungUngATTPCoSoModel>();
+            }
 
             SelectedCoSoItemsDetail.Add(new QLCLChuoiCungUngATTPCoSoModel
             {
@@ -262,10 +306,12 @@ namespace CoreAdminWeb.Pages.QLCLChuoiCungUngATTP
         private async Task OpenAddOrUpdateModal(QLCLChuoiCungUngATTPModel? item)
         {
             _titleAddOrUpdate = item != null ? "Sửa" : "Thêm mới";
-            SelectedItem = item != null ? item : new QLCLChuoiCungUngATTPModel(){
-                    province_san_xuat = await LoadDefaultData(TinhService),
-                    province_kinh_doanh = await LoadDefaultData(TinhService),
-                };
+            SelectedCoSoItemsDetail = new List<QLCLChuoiCungUngATTPCoSoModel>();
+            SelectedItem = item != null ? item.DeepClone() : new QLCLChuoiCungUngATTPModel()
+            {
+                province_san_xuat = await LoadDefaultData(TinhService),
+                province_kinh_doanh = await LoadDefaultData(TinhService),
+            };
 
             if (SelectedItem.id > 0)
             {
@@ -273,6 +319,7 @@ namespace CoreAdminWeb.Pages.QLCLChuoiCungUngATTP
             }
 
             if (!SelectedCoSoItemsDetail.Any())
+            {
                 SelectedCoSoItemsDetail.Add(new QLCLChuoiCungUngATTPCoSoModel()
                 {
                     chuoi_cung_ung = SelectedItem,
@@ -282,6 +329,7 @@ namespace CoreAdminWeb.Pages.QLCLChuoiCungUngATTP
                     co_so_nlts_du_dieu_kien_attp = null,
                     deleted = false,
                 });
+            }
 
             openAddOrUpdateModal = true;
 
@@ -400,56 +448,30 @@ namespace CoreAdminWeb.Pages.QLCLChuoiCungUngATTP
             SelectedItem = new QLCLChuoiCungUngATTPModel();
             openAddOrUpdateModal = false;
         }
-        private async Task OnDateChanged(ChangeEventArgs e, string fieldName)
+        private async Task OnDateChanged(ChangeEventArgs e, string fieldName, bool isFilter = false)
         {
             try
             {
                 var dateStr = e.Value?.ToString();
                 if (string.IsNullOrEmpty(dateStr))
                 {
-                    switch (fieldName)
-                    {
-                        case "ngay_chung_nhan":
-                            SelectedItem.ngay_chung_nhan = null;
-                            break;
-
-                        case "fromDate":
-                            _fromDate = null;
-                            await LoadData();
-                            break;
-
-                        case "toDate":
-                            _toDate = null;
-                            await LoadData();
-                            break;
-                    }
-                    return;
+                    ReflectionHelper.SetDateFieldValue(this, SelectedItem, fieldName, null);
                 }
-
-                var parts = dateStr.Split('/');
-                if (parts.Length == 3 &&
-                    int.TryParse(parts[0], out int day) &&
-                    int.TryParse(parts[1], out int month) &&
-                    int.TryParse(parts[2], out int year))
+                else
                 {
-                    var date = new DateTime(year, month, day);
-
-                    switch (fieldName)
+                    var parts = dateStr.Split('/');
+                    if (parts.Length == 3 &&
+                        int.TryParse(parts[0], out int day) &&
+                        int.TryParse(parts[1], out int month) &&
+                        int.TryParse(parts[2], out int year))
                     {
-                        case "ngay_chung_nhan":
-                            SelectedItem.ngay_chung_nhan = date;
-                            break;
-
-                        case "fromDate":
-                            _fromDate = date;
-                            await LoadData();
-                            break;
-
-                        case "toDate":
-                            _toDate = date;
-                            await LoadData();
-                            break;
+                        var date = new DateTime(year, month, day, 0, 0, 0, DateTimeKind.Local);
+                        ReflectionHelper.SetDateFieldValue(this, SelectedItem, fieldName, date);
                     }
+                }
+                if (isFilter)
+                {
+                    await LoadData();
                 }
             }
             catch (Exception ex)
@@ -491,6 +513,7 @@ namespace CoreAdminWeb.Pages.QLCLChuoiCungUngATTP
             BuilderQuery += "&filter[_and][0][deleted][_eq]=false";
             if (!string.IsNullOrEmpty(_searchString))
             {
+                index++;
                 BuilderQuery += $"&filter[_and][{index}][_or][0][code][_contains]={_searchString}";
                 BuilderQuery += $"&filter[_and][{index}][_or][1][name][_contains]={_searchString}";
                 BuilderQuery += $"&filter[_and][{index}][_or][2][dia_chi_san_xuat][_contains]={_searchString}";
@@ -498,31 +521,39 @@ namespace CoreAdminWeb.Pages.QLCLChuoiCungUngATTP
                 BuilderQuery += $"&filter[_and][{index}][_or][4][so_xac_nhan][_contains]={_searchString}";
                 BuilderQuery += $"&filter[_and][{index}][_or][5][co_quan_xac_nhan][_contains]={_searchString}";
                 BuilderQuery += $"&filter[_and][{index}][_or][6][san_pham][_contains]={_searchString}";
-                index++;
             }
             if (_selectedTinhFilter != null)
             {
+                index++;
                 BuilderQuery += $"&filter[_and][{index}][_or][0][province_san_xuat][_eq]={_selectedTinhFilter.id}";
                 BuilderQuery += $"&filter[_and][{index}][_or][1][province_kinh_doanh][_eq]={_selectedTinhFilter.id}";
-                index++;
             }
 
             if (_selectedXaFilter != null)
             {
+                index++;
                 BuilderQuery += $"&filter[_and][{index}][_or][0][ward_san_xuat][_eq]={_selectedXaFilter.id}";
                 BuilderQuery += $"&filter[_and][{index}][_or][1][ward_kinh_doanh][_eq]={_selectedXaFilter.id}";
+            }
+            else
+            {
                 index++;
+                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
+                string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
+                BuilderQuery += $"&filter[_and][{index}][_or][0][ward_san_xuat][_in]={xaFilterIds}";
+                BuilderQuery += $"&filter[_and][{index}][_or][1][ward_kinh_doanh][_in]={xaFilterIds}";
             }
 
             if (_fromDate != null)
             {
-                BuilderQuery += $"&filter[_and][{index}][ngay_chung_nhan][_gte]={_fromDate.Value.ToString("yyyy-MM-dd")}";
                 index++;
+                BuilderQuery += $"&filter[_and][{index}][ngay_chung_nhan][_gte]={_fromDate.Value:yyyy-MM-dd}";
             }
 
             if (_toDate != null)
             {
-                BuilderQuery += $"&filter[_and][{index}][ngay_chung_nhan][_lte]={_toDate.Value.ToString("yyyy-MM-dd")}";
+                index++;
+                BuilderQuery += $"&filter[_and][{index}][ngay_chung_nhan][_lte]={_toDate.Value:yyyy-MM-dd}";
             }
 
             var result = await MainService.GetAllAsync(BuilderQuery);
@@ -586,8 +617,8 @@ namespace CoreAdminWeb.Pages.QLCLChuoiCungUngATTP
             ws.Cells[ws.Dimension.Address].AutoFitColumns();
 
             // Export to browser
-            var fileName = $"DanhSachCoSoVatTuNongNghiep_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
-            var fileBytes = package.GetAsByteArray();
+            var fileName = $"DuLieuCacChuoiCungUngThucPhamAnToan_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+            var fileBytes = await package.GetAsByteArrayAsync();
             // Nếu chưa có hàm saveAsFile trong wwwroot/js, hãy thêm hàm này để hỗ trợ download file từ base64
             await JsRuntime.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(fileBytes));
         }
