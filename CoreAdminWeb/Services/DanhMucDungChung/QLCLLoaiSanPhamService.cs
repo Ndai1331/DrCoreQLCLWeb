@@ -1,7 +1,7 @@
 ﻿using CoreAdminWeb.Model;
 using CoreAdminWeb.Model.RequestHttps;
-using CoreAdminWeb.Services.Http;
 using CoreAdminWeb.Services.BaseServices;
+using CoreAdminWeb.Services.Http;
 using System.Net;
 
 namespace CoreAdminWeb.Services
@@ -34,7 +34,8 @@ namespace CoreAdminWeb.Services
                 name = model.name,
                 description = model.description,
                 status = model.status.ToString(),
-                sort = model.sort
+                sort = model.sort,
+                english_name = model.english_name,
             };
         }
 

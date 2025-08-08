@@ -37,7 +37,8 @@ namespace CoreAdminWeb.Pages.QLCLGiaCaNongSan
         {
             if (firstRender)
             {
-               await LoadData();
+                SelectedItem.province = await LoadDefaultData(TinhService);
+                await LoadData();
                 _ = Task.Run(async () =>
                 {
                     await Task.Delay(500);
@@ -59,30 +60,30 @@ namespace CoreAdminWeb.Pages.QLCLGiaCaNongSan
                 BuilderQuery += "&filter[_and][0][deleted][_eq]=false&sort=-date_created";
                 if (!string.IsNullOrEmpty(_searchString))
                 {
+                    index++;
                     BuilderQuery += $"&filter[_and][{index}][_or][0][san_pham_san_xuat][name][_contains]={_searchString}";
                     BuilderQuery += $"&filter[_and][{index}][_or][1][nha_cung_cap][_contains]={_searchString}";
                     BuilderQuery += $"&filter[_and][{index}][_or][2][description][_contains]={_searchString}";
                     BuilderQuery += $"&filter[_and][{index}][_or][3][province][name][_contains]={_searchString}";
                     BuilderQuery += $"&filter[_and][{index}][_or][4][ward][name][_contains]={_searchString}";
-                    index++;
                 }
-                
+
                 if (_selectedSanPhamSanXuatFilter != null)
                 {
-                    BuilderQuery += $"&filter[_and][{index}][san_pham_san_xuat][_eq]={_selectedSanPhamSanXuatFilter.id}";
                     index++;
+                    BuilderQuery += $"&filter[_and][{index}][san_pham_san_xuat][_eq]={_selectedSanPhamSanXuatFilter.id}";
                 }
 
                 if (_fromDate != null)
                 {
-                    BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_gte]={_fromDate.Value.ToString("yyyy-MM-dd")}";
                     index++;
+                    BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_gte]={_fromDate?.ToString("yyyy-MM-dd")}";
                 }
 
                 if (_toDate != null)
                 {
-                    BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_lte]={_toDate.Value.ToString("yyyy-MM-dd")}";
                     index++;
+                    BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_lte]={_toDate?.ToString("yyyy-MM-dd")}";
                 }
 
                 var result = await MainService.GetAllAsync(BuilderQuery);
@@ -108,6 +109,7 @@ namespace CoreAdminWeb.Pages.QLCLGiaCaNongSan
             finally
             {
                 IsLoading = false;
+                StateHasChanged();
             }
         }
 
@@ -133,12 +135,18 @@ namespace CoreAdminWeb.Pages.QLCLGiaCaNongSan
             return await LoadBlazorTypeaheadData(searchText, DonViTinhService);
         }
 
-        private void OpenAddOrUpdateModal(QLCLGiaCaNongSanModel? item)
+        private async Task OpenAddOrUpdateModal(QLCLGiaCaNongSanModel? item)
         {
             try
             {
                 _titleAddOrUpdate = item != null ? "Sửa" : "Thêm mới";
                 SelectedItem = item?.DeepClone() ?? new QLCLGiaCaNongSanModel();
+
+                if (SelectedItem.province == null)
+                {
+                    SelectedItem.province = await LoadDefaultData(TinhService);
+                }
+
                 openAddOrUpdateModal = true;
 
                 // Wait for modal to render
@@ -167,11 +175,14 @@ namespace CoreAdminWeb.Pages.QLCLGiaCaNongSan
             }
         }
 
-        private void CloseDeleteModal()
+        private async Task CloseDeleteModal()
         {
             try
             {
-                SelectedItem = new QLCLGiaCaNongSanModel();
+                SelectedItem = new QLCLGiaCaNongSanModel()
+                {
+                    province = await LoadDefaultData(TinhService),
+                };
                 openDeleteModal = false;
             }
             catch (Exception ex)
@@ -180,11 +191,12 @@ namespace CoreAdminWeb.Pages.QLCLGiaCaNongSan
             }
         }
 
-        private void CloseAddOrUpdateModal()
+        private async Task CloseAddOrUpdateModal()
         {
             try
             {
                 SelectedItem = new QLCLGiaCaNongSanModel();
+                SelectedItem.province = await LoadDefaultData(TinhService);
                 openAddOrUpdateModal = false;
             }
             catch (Exception ex)
@@ -222,7 +234,10 @@ namespace CoreAdminWeb.Pages.QLCLGiaCaNongSan
         {
             try
             {
-                if (SelectedItem == null) return;
+                if (SelectedItem == null)
+                {
+                    return;
+                }
 
                 var result = await MainService.DeleteAsync(SelectedItem);
                 if (result.IsSuccess && result.Data)
@@ -242,49 +257,31 @@ namespace CoreAdminWeb.Pages.QLCLGiaCaNongSan
             }
         }
 
-        private async Task OnDateChanged(ChangeEventArgs e, string fieldName)
+        private async Task OnDateChanged(ChangeEventArgs e, string fieldName, bool isFilter = false)
         {
             try
             {
                 var dateStr = e.Value?.ToString();
                 if (string.IsNullOrEmpty(dateStr))
                 {
-                    if (fieldName == "ngay_ghi_nhan")
-                        SelectedItem.ngay_ghi_nhan = null;
-                    else if (fieldName == "fromDate")
+                    ReflectionHelper.SetDateFieldValue(this, SelectedItem, fieldName, null);
+                }
+                else
+                {
+                    var parts = dateStr.Split('/');
+                    if (parts.Length == 3 &&
+                        int.TryParse(parts[0], out int day) &&
+                        int.TryParse(parts[1], out int month) &&
+                        int.TryParse(parts[2], out int year))
                     {
-                        _fromDate = null;
-                        await LoadData();
+                        var date = new DateTime(year, month, day, 0, 0, 0, DateTimeKind.Local);
+                        ReflectionHelper.SetDateFieldValue(this, SelectedItem, fieldName, date);
                     }
-                    else if (fieldName == "toDate")
-                    {
-                        _toDate = null;
-                        await LoadData();
-                    }
-                    return;
                 }
 
-                var parts = dateStr.Split('/');
-                if (parts.Length == 3 &&
-                    int.TryParse(parts[0], out int day) &&
-                    int.TryParse(parts[1], out int month) &&
-                    int.TryParse(parts[2], out int year))
+                if (isFilter)
                 {
-                    var date = new DateTime(year, month, day);
-
-                    if (fieldName == "ngay_ghi_nhan")
-                        SelectedItem.ngay_ghi_nhan = date;
-                    else if (fieldName == "fromDate")
-                    {
-                        _fromDate = date;
-                        await LoadData();
-                    }
-                    else if (fieldName == "toDate")
-                    {
-                        _toDate = date;
-                        await LoadData();
-                    }
-
+                    await LoadData();
                 }
             }
             catch (Exception ex)
@@ -308,29 +305,30 @@ namespace CoreAdminWeb.Pages.QLCLGiaCaNongSan
             BuilderQuery += "&filter[_and][0][deleted][_eq]=false&sort=-date_created";
             if (!string.IsNullOrEmpty(_searchString))
             {
+                index++;
                 BuilderQuery += $"&filter[_and][{index}][_or][0][san_pham_san_xuat][name][_contains]={_searchString}";
                 BuilderQuery += $"&filter[_and][{index}][_or][1][nha_cung_cap][_contains]={_searchString}";
                 BuilderQuery += $"&filter[_and][{index}][_or][2][description][_contains]={_searchString}";
                 BuilderQuery += $"&filter[_and][{index}][_or][3][province][name][_contains]={_searchString}";
                 BuilderQuery += $"&filter[_and][{index}][_or][4][ward][name][_contains]={_searchString}";
-                index++;
             }
-            
+
             if (_selectedSanPhamSanXuatFilter != null)
             {
-                BuilderQuery += $"&filter[_and][{index}][san_pham_san_xuat][_eq]={_selectedSanPhamSanXuatFilter.id}";
                 index++;
+                BuilderQuery += $"&filter[_and][{index}][san_pham_san_xuat][_eq]={_selectedSanPhamSanXuatFilter.id}";
             }
 
             if (_fromDate != null)
             {
-                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_gte]={_fromDate.Value.ToString("yyyy-MM-dd")}";
                 index++;
+                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_gte]={_fromDate?.ToString("yyyy-MM-dd")}";
             }
 
             if (_toDate != null)
             {
-                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_lte]={_toDate.Value.ToString("yyyy-MM-dd")}";
+                index++;
+                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_lte]={_toDate?.ToString("yyyy-MM-dd")}";
             }
 
             var result = await MainService.GetAllAsync(BuilderQuery);
@@ -387,7 +385,7 @@ namespace CoreAdminWeb.Pages.QLCLGiaCaNongSan
 
             // Export to browser
             var fileName = $"DanhSachGiaCaNongSan_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
-            var fileBytes = package.GetAsByteArray();
+            var fileBytes = await package.GetAsByteArrayAsync();
             // Nếu chưa có hàm saveAsFile trong wwwroot/js, hãy thêm hàm này để hỗ trợ download file từ base64
             await JsRuntime.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(fileBytes));
         }

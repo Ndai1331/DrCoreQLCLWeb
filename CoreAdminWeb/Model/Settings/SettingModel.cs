@@ -22,7 +22,7 @@
         public List<ModuleBar> module_bar { get; set; } = new List<ModuleBar>();
         public string? project_descriptor { get; set; }
         public string? default_language { get; set; }
-        public string? custom_aspect_ratios { get; set; }
+        public List<AspectRatio>? custom_aspect_ratios { get; set; }
         public string? public_favicon { get; set; }
         public string? default_appearance { get; set; }
         public string? default_theme_light { get; set; }
@@ -37,6 +37,12 @@
         public string? public_registration_role { get; set; }
         public string? public_registration_email_filter { get; set; }
         public List<VisualEditorUrl> visual_editor_urls { get; set; } = new List<VisualEditorUrl>();
+    }
+
+    public class AspectRatio
+    {
+        public string? text { get; set; }
+        public int value{ get; set; } =0;
     }
 
     public class VisualEditorUrl
