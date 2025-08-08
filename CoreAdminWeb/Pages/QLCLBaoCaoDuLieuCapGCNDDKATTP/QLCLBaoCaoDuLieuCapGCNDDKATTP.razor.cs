@@ -56,6 +56,10 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuCapGCNDDKATTP
         private async Task LoadData()
         {
             IsLoading = true;
+            if (_selectedXaFilter == null)
+            {
+                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
+            }
             BuilderQuery = $"QLCLBaoCaoThamDinhCapGCN?limit={PageSize}&offset={(Page - 1) * PageSize}";
 
             if (_selectedTinhFilter != null)
@@ -66,14 +70,19 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuCapGCNDDKATTP
             {
                 BuilderQuery += $"&ward={_selectedXaFilter.id}";
             }
+            else
+            {
+                string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
+                BuilderQuery += $"&ward={xaFilterIds}";
+            }
             if (_fromDate != null)
             {
-                BuilderQuery += $"&fromDate={_fromDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&fromDate={_fromDate?.ToString("yyyy-MM-dd")}";
             }
 
             if (_toDate != null)
             {
-                BuilderQuery += $"&toDate={_toDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&toDate={_toDate?.ToString("yyyy-MM-dd")}";
             }
 
             var result = await MainService.GetAllAsync(BuilderQuery);
@@ -91,6 +100,7 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuCapGCNDDKATTP
                 MainModels = new List<ReportBaoCaoThamDinhCapGCNModel>();
             }
             IsLoading = false;
+            StateHasChanged();
         }
         private async Task<IEnumerable<TinhModel>> LoadTinhData(string searchText)
         {
@@ -168,6 +178,10 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuCapGCNDDKATTP
         private async Task OnExportExcel()
         {
             // Get all data for export
+            if (_selectedXaFilter == null)
+            {
+                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
+            }
             BuilderQuery = $"QLCLBaoCaoThamDinhCapGCN?";
 
             if (_selectedTinhFilter != null)
@@ -178,14 +192,19 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuCapGCNDDKATTP
             {
                 BuilderQuery += $"&ward={_selectedXaFilter.id}";
             }
+            //else
+            //{
+            //    string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
+            //    BuilderQuery += $"&ward={xaFilterIds}";
+            //}
             if (_fromDate != null)
             {
-                BuilderQuery += $"&fromDate={_fromDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&fromDate={_fromDate?.ToString("yyyy-MM-dd")}";
             }
 
             if (_toDate != null)
             {
-                BuilderQuery += $"&toDate={_toDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&toDate={_toDate?.ToString("yyyy-MM-dd")}";
             }
 
             var result = await MainService.GetAllAsync(BuilderQuery);

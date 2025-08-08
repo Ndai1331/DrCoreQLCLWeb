@@ -68,12 +68,12 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuLayMauHauKiemATTP
             }
             if (_fromDate != null)
             {
-                BuilderQuery += $"&fromDate={_fromDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&fromDate={_fromDate?.ToString("yyyy-MM-dd")}";
             }
 
             if (_toDate != null)
             {
-                BuilderQuery += $"&toDate={_toDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&toDate={_toDate?.ToString("yyyy-MM-dd")}";
             }
 
             var result = await MainService.GetAllAsync(BuilderQuery);
@@ -82,7 +82,7 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuLayMauHauKiemATTP
                 MainModels = result.Data ?? new List<ReportBaoCaoKiemTraHauKiemLayMauATTPModel>();
                 if (result.Meta != null)
                 {
-                    TotalItems = result.Meta.filter_count ?? 0;
+                    TotalItems = result.Meta.total_count ?? 0;
                     TotalPages = (int)Math.Ceiling((double)TotalItems / PageSize);
                 }
             }
@@ -91,6 +91,7 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuLayMauHauKiemATTP
                 MainModels = new List<ReportBaoCaoKiemTraHauKiemLayMauATTPModel>();
             }
             IsLoading = false;
+            StateHasChanged();
         }
         private async Task<IEnumerable<TinhModel>> LoadTinhData(string searchText)
         {
@@ -161,12 +162,12 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuLayMauHauKiemATTP
             }
             if (_fromDate != null)
             {
-                BuilderQuery += $"&fromDate={_fromDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&fromDate={_fromDate?.ToString("yyyy-MM-dd")}";
             }
 
             if (_toDate != null)
             {
-                BuilderQuery += $"&toDate={_toDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&toDate={_toDate?.ToString("yyyy-MM-dd")}";
             }
 
             var result = await MainService.GetAllAsync(BuilderQuery);

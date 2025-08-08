@@ -1,7 +1,7 @@
 ﻿using CoreAdminWeb.Model;
 using CoreAdminWeb.Model.RequestHttps;
-using CoreAdminWeb.Services.Http;
 using CoreAdminWeb.Services.BaseServices;
+using CoreAdminWeb.Services.Http;
 using System.Net;
 
 namespace CoreAdminWeb.Services
@@ -11,7 +11,7 @@ namespace CoreAdminWeb.Services
         private readonly string _collection = "QLCLKiemTraHauKiemATTP";
         private const string Fields = "*,user_created.last_name,user_created.first_name,user_updated.last_name,user_updated.first_name"
             + ",province.id,province,province.name,ward.id,ward,ward.name,co_so.id,co_so.code,co_so.name"
-            + ",chi_tiet.id, chi_tiet.san_pham.id,  chi_tiet.san_pham.name, dot_kiem_tra.id,dot_kiem_tra.code,dot_kiem_tra.name";
+            + ",chi_tiet.id, chi_tiet.deleted, chi_tiet.san_pham.id,chi_tiet.san_pham.name, dot_kiem_tra.id,dot_kiem_tra.code,dot_kiem_tra.name";
 
         /// <summary>
         /// Creates a response with error handling

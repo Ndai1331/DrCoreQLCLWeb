@@ -78,6 +78,10 @@ namespace CoreAdminWeb.Pages.QLCLChuoiCungUngATTP
         private async Task LoadData()
         {
             IsLoading = true;
+            if (_selectedXaFilter == null)
+            {
+                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
+            }
             BuildPaginationQuery(Page, PageSize, "id", false);
             int index = 2;
 
@@ -109,7 +113,6 @@ namespace CoreAdminWeb.Pages.QLCLChuoiCungUngATTP
             else
             {
                 index++;
-                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
                 string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
                 BuilderQuery += $"&filter[_and][{index}][_or][0][ward_san_xuat][_in]={xaFilterIds}";
                 BuilderQuery += $"&filter[_and][{index}][_or][1][ward_kinh_doanh][_in]={xaFilterIds}";
@@ -118,13 +121,13 @@ namespace CoreAdminWeb.Pages.QLCLChuoiCungUngATTP
             if (_fromDate != null)
             {
                 index++;
-                BuilderQuery += $"&filter[_and][{index}][ngay_chung_nhan][_gte]={_fromDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&filter[_and][{index}][ngay_chung_nhan][_gte]={_fromDate?.ToString("yyyy-MM-dd")}";
             }
 
             if (_toDate != null)
             {
                 index++;
-                BuilderQuery += $"&filter[_and][{index}][ngay_chung_nhan][_lte]={_toDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&filter[_and][{index}][ngay_chung_nhan][_lte]={_toDate?.ToString("yyyy-MM-dd")}";
             }
 
             var result = await MainService.GetAllAsync(BuilderQuery);
@@ -142,6 +145,7 @@ namespace CoreAdminWeb.Pages.QLCLChuoiCungUngATTP
                 MainModels = new List<QLCLChuoiCungUngATTPModel>();
             }
             IsLoading = false;
+            StateHasChanged();
         }
 
         private async Task LoadCoSoDetailData()
@@ -307,11 +311,17 @@ namespace CoreAdminWeb.Pages.QLCLChuoiCungUngATTP
         {
             _titleAddOrUpdate = item != null ? "Sửa" : "Thêm mới";
             SelectedCoSoItemsDetail = new List<QLCLChuoiCungUngATTPCoSoModel>();
-            SelectedItem = item != null ? item.DeepClone() : new QLCLChuoiCungUngATTPModel()
+            SelectedItem = item != null ? item.DeepClone() : new QLCLChuoiCungUngATTPModel();
+
+            if (SelectedItem.province_kinh_doanh == null)
             {
-                province_san_xuat = await LoadDefaultData(TinhService),
-                province_kinh_doanh = await LoadDefaultData(TinhService),
-            };
+                SelectedItem.province_kinh_doanh = await LoadDefaultData(TinhService);
+            }
+
+            if (SelectedItem.province_san_xuat == null)
+            {
+                SelectedItem.province_san_xuat = await LoadDefaultData(TinhService);
+            }
 
             if (SelectedItem.id > 0)
             {
@@ -506,6 +516,10 @@ namespace CoreAdminWeb.Pages.QLCLChuoiCungUngATTP
 
         private async Task OnExportExcel()
         {
+            if (_selectedXaFilter == null)
+            {
+                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
+            }
             // Get all data for export
             BuildPaginationQuery(Page, int.MaxValue);
             int index = 2;
@@ -538,7 +552,6 @@ namespace CoreAdminWeb.Pages.QLCLChuoiCungUngATTP
             else
             {
                 index++;
-                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
                 string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
                 BuilderQuery += $"&filter[_and][{index}][_or][0][ward_san_xuat][_in]={xaFilterIds}";
                 BuilderQuery += $"&filter[_and][{index}][_or][1][ward_kinh_doanh][_in]={xaFilterIds}";
@@ -547,13 +560,13 @@ namespace CoreAdminWeb.Pages.QLCLChuoiCungUngATTP
             if (_fromDate != null)
             {
                 index++;
-                BuilderQuery += $"&filter[_and][{index}][ngay_chung_nhan][_gte]={_fromDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&filter[_and][{index}][ngay_chung_nhan][_gte]={_fromDate?.ToString("yyyy-MM-dd")}";
             }
 
             if (_toDate != null)
             {
                 index++;
-                BuilderQuery += $"&filter[_and][{index}][ngay_chung_nhan][_lte]={_toDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&filter[_and][{index}][ngay_chung_nhan][_lte]={_toDate?.ToString("yyyy-MM-dd")}";
             }
 
             var result = await MainService.GetAllAsync(BuilderQuery);

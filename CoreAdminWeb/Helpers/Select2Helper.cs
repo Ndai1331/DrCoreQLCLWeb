@@ -60,10 +60,7 @@
                     cache[index] = value != null ? new List<TModel> { value } : new List<TModel>();
                 }
 
-                if (action != null)
-                {
-                    action();
-                }
+                action?.Invoke();
             }
             catch (Exception ex)
             {

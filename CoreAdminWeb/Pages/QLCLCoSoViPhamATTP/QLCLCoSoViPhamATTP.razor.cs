@@ -73,6 +73,10 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamATTP
             try
             {
                 IsLoading = true;
+                if (_selectedXaFilter == null)
+                {
+                    XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
+                }
                 BuildPaginationQuery(Page, PageSize);
                 int intdex = 1;
 
@@ -103,7 +107,6 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamATTP
                 else
                 {
                     intdex++;
-                    XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
                     string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
                     BuilderQuery += $"&filter[_and][{intdex}][_or][0][co_so_che_bien_nlts][ward][_in]={xaFilterIds}";
                     BuilderQuery += $"&filter[_and][{intdex}][_or][1][co_so_nlts_du_dieu_kien_attp][ward][_in]={xaFilterIds}";
@@ -112,13 +115,13 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamATTP
                 if (_fromDate != null)
                 {
                     intdex++;
-                    BuilderQuery += $"&filter[_and][{intdex}][ngay_ghi_nhan][_gte]={_fromDate.Value:yyyy-MM-dd}";
+                    BuilderQuery += $"&filter[_and][{intdex}][ngay_ghi_nhan][_gte]={_fromDate?.ToString("yyyy-MM-dd")}";
                 }
 
                 if (_toDate != null)
                 {
                     intdex++;
-                    BuilderQuery += $"&filter[_and][{intdex}][ngay_ghi_nhan][_lte]={_toDate.Value:yyyy-MM-dd}";
+                    BuilderQuery += $"&filter[_and][{intdex}][ngay_ghi_nhan][_lte]={_toDate?.ToString("yyyy-MM-dd")}";
                 }
 
                 var result = await MainService.GetAllAsync(BuilderQuery);
@@ -144,6 +147,7 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamATTP
             finally
             {
                 IsLoading = false;
+                StateHasChanged();
             }
         }
 
@@ -169,19 +173,6 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamATTP
                 _titleAddOrUpdate = item != null ? "Sửa" : "Thêm mới";
                 SelectedItem = item?.DeepClone() ?? new QLCLCoSoViPhamATTPModel();
                 openAddOrUpdateModal = true;
-
-                if (SelectedItem.co_so_che_bien_nlts != null)
-                {
-                    SelectedItem.loai_co_so = LoaiCoSoNLTS.CoSoCheBien;
-                }
-                else if (SelectedItem.co_so_nlts_du_dieu_kien_attp != null)
-                {
-                    SelectedItem.loai_co_so = LoaiCoSoNLTS.CoSoXSKDDuDieuKien;
-                }
-                else
-                {
-                    SelectedItem.loai_co_so = LoaiCoSoNLTS.CoSoXSKDKhongDuDieuKien;
-                }
 
                 // Wait for modal to render
                 _ = Task.Run(async () =>
@@ -357,6 +348,10 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamATTP
 
         private async Task OnExportExcel()
         {
+            if (_selectedXaFilter == null)
+            {
+                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
+            }
             // Get all data for export
             BuildPaginationQuery(Page, int.MaxValue);
             int intdex = 1;
@@ -388,7 +383,6 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamATTP
             else
             {
                 intdex++;
-                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
                 string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
                 BuilderQuery += $"&filter[_and][{intdex}][_or][0][co_so_che_bien_nlts][ward][_in]={xaFilterIds}";
                 BuilderQuery += $"&filter[_and][{intdex}][_or][1][co_so_nlts_du_dieu_kien_attp][ward][_in]={xaFilterIds}";
@@ -397,13 +391,13 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamATTP
             if (_fromDate != null)
             {
                 intdex++;
-                BuilderQuery += $"&filter[_and][{intdex}][ngay_ghi_nhan][_gte]={_fromDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&filter[_and][{intdex}][ngay_ghi_nhan][_gte]={_fromDate?.ToString("yyyy-MM-dd")}";
             }
 
             if (_toDate != null)
             {
                 intdex++;
-                BuilderQuery += $"&filter[_and][{intdex}][ngay_ghi_nhan][_lte]={_toDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&filter[_and][{intdex}][ngay_ghi_nhan][_lte]={_toDate?.ToString("yyyy-MM-dd")}";
             }
 
             var result = await MainService.GetAllAsync(BuilderQuery);

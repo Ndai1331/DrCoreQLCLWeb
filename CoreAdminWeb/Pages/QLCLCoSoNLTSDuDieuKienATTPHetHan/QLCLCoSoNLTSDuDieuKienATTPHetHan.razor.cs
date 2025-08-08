@@ -51,6 +51,10 @@ namespace CoreAdminWeb.Pages.QLCLCoSoNLTSDuDieuKienATTPHetHan
         private async Task LoadData()
         {
             IsLoading = true;
+            if (_selectedXaFilter == null)
+            {
+                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
+            }
             BuildPaginationQuery(Page, PageSize, "id", false);
             int index = 3;
 
@@ -85,7 +89,6 @@ namespace CoreAdminWeb.Pages.QLCLCoSoNLTSDuDieuKienATTPHetHan
             else
             {
                 index++;
-                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
                 string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
                 BuilderQuery += $"&filter[_and][{index}][ward][_in]={xaFilterIds}";
             }
@@ -93,13 +96,13 @@ namespace CoreAdminWeb.Pages.QLCLCoSoNLTSDuDieuKienATTPHetHan
             if (_fromDate != null)
             {
                 index++;
-                BuilderQuery += $"&filter[_and][{index}][ngay_het_hieu_luc][_gte]={_fromDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&filter[_and][{index}][ngay_het_hieu_luc][_gte]={_fromDate?.ToString("yyyy-MM-dd")}";
             }
 
             if (_toDate != null)
             {
                 index++;
-                BuilderQuery += $"&filter[_and][{index}][ngay_het_hieu_luc][_lte]={_toDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&filter[_and][{index}][ngay_het_hieu_luc][_lte]={_toDate?.ToString("yyyy-MM-dd")}";
             }
 
             var result = await MainService.GetAllAsync(BuilderQuery);
@@ -117,6 +120,7 @@ namespace CoreAdminWeb.Pages.QLCLCoSoNLTSDuDieuKienATTPHetHan
                 MainModels = new List<QLCLCoSoNLTSDuDieuKienATTPModel>();
             }
             IsLoading = false;
+            StateHasChanged();
         }
         private async Task<IEnumerable<TinhModel>> LoadTinhData(string searchText)
         {
@@ -166,6 +170,10 @@ namespace CoreAdminWeb.Pages.QLCLCoSoNLTSDuDieuKienATTPHetHan
 
         private async Task OnExportExcel()
         {
+            if (_selectedXaFilter == null)
+            {
+                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
+            }
             // Get all data for export
             string query = $"sort=-id";
 
@@ -202,7 +210,6 @@ namespace CoreAdminWeb.Pages.QLCLCoSoNLTSDuDieuKienATTPHetHan
             else
             {
                 index++;
-                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
                 string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
                 query += $"&filter[_and][{index}][ward][_in]={xaFilterIds}";
             }
@@ -210,13 +217,13 @@ namespace CoreAdminWeb.Pages.QLCLCoSoNLTSDuDieuKienATTPHetHan
             if (_fromDate != null)
             {
                 index++;
-                query += $"&filter[_and][{index}][ngay_het_hieu_luc][_gte]={_fromDate.Value:yyyy-MM-dd}";
+                query += $"&filter[_and][{index}][ngay_het_hieu_luc][_gte]={_fromDate?.ToString("yyyy-MM-dd")}";
             }
 
             if (_toDate != null)
             {
                 index++;
-                query += $"&filter[_and][{index}][ngay_het_hieu_luc][_lte]={_toDate.Value:yyyy-MM-dd}";
+                query += $"&filter[_and][{index}][ngay_het_hieu_luc][_lte]={_toDate?.ToString("yyyy-MM-dd")}";
             }
 
 

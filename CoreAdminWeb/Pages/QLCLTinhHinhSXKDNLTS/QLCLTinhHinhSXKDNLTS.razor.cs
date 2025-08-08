@@ -80,13 +80,13 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
             if (_fromDate != null)
             {
                 index++;
-                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_gte]={_fromDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_gte]={_fromDate?.ToString("yyyy-MM-dd")}";
             }
 
             if (_toDate != null)
             {
                 index++;
-                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_lte]={_toDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_lte]={_toDate?.ToString("yyyy-MM-dd")}";
             }
 
             var result = await MainService.GetAllAsync(BuilderQuery);
@@ -104,6 +104,7 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
                 MainModels = new List<QLCLTinhHinhSXKDNLTSModel>();
             }
             IsLoading = false;
+            StateHasChanged();
         }
 
         private async Task LoadNguyenLieuDetailData()
@@ -598,13 +599,13 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
             if (_fromDate != null)
             {
                 index++;
-                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_gte]={_fromDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_gte]={_fromDate?.ToString("yyyy-MM-dd")}";
             }
 
             if (_toDate != null)
             {
                 index++;
-                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_lte]={_toDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_lte]={_toDate?.ToString("yyyy-MM-dd")}";
             }
 
             var result = await MainService.GetAllAsync(BuilderQuery);
@@ -628,7 +629,7 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
             ws.Cells[1, 5].Value = "Thời gian kết thúc";
             ws.Cells[1, 6].Value = "Sản phẩm";
             ws.Cells[1, 7].Value = "Sự cố an toàn";
-            ws.Cells[1, 8].Value = "Biện pháp xử lý chất thải";
+            ws.Cells[1, 8].Value = "Biện pháp xử lý";
 
             // Style header
             using (var range = ws.Cells[1, 1, 1, 8])
@@ -648,7 +649,7 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
                 ws.Cells[row, 3].Value = item.qlcl_co_so_che_bien_nlts?.name;
                 ws.Cells[row, 4].Value = item.thoi_gian_bat_dau?.ToString("dd/MM/yyyy");
                 ws.Cells[row, 5].Value = item.thoi_gian_ket_thuc?.ToString("dd/MM/yyyy");
-                //ws.Cells[row, 6].Value = item.qlcl_san_pham_san_xuat_nlts?.name;
+                ws.Cells[row, 6].Value = string.Join("; ", item.san_pham?.Where(c => c.deleted == null || c.deleted == false).Select(c => c.san_pham?.name ?? string.Empty) ?? new List<string>());
                 ws.Cells[row, 7].Value = item.su_co_an_toan;
                 ws.Cells[row, 8].Value = item.bien_phap_xu_ly_chat_thai;
                 row++;

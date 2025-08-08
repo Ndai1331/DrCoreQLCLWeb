@@ -104,6 +104,10 @@ namespace CoreAdminWeb.Pages.QLCLKiemTraHauKiemATTP
         private async Task LoadData()
         {
             IsLoading = true;
+            if (_selectedXaFilter == null)
+            {
+                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
+            }
             BuildPaginationQuery(Page, PageSize, "id", false);
             int index = 0;
 
@@ -111,9 +115,10 @@ namespace CoreAdminWeb.Pages.QLCLKiemTraHauKiemATTP
             if (!string.IsNullOrEmpty(_searchString))
             {
                 index++;
-                BuilderQuery += $"&filter[_and][{index}][_or][2][dia_chi_san_xuat_kinh_doanh][_contains]={_searchString}";
-                BuilderQuery += $"&filter[_and][{index}][_or][3][co_quan_kiem_tra][_contains]={_searchString}";
-                BuilderQuery += $"&filter[_and][{index}][_or][4][noi_dung_kiem_tra][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{index}][_or][0][co_so][name][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{index}][_or][1][dia_chi_san_xuat_kinh_doanh][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{index}][_or][2][co_quan_kiem_tra][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{index}][_or][3][noi_dung_kiem_tra][_contains]={_searchString}";
             }
             if (_selectedTinhFilter != null)
             {
@@ -128,20 +133,19 @@ namespace CoreAdminWeb.Pages.QLCLKiemTraHauKiemATTP
             else
             {
                 index++;
-                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
                 string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
                 BuilderQuery += $"&filter[_and][{index}][ward][_in]={xaFilterIds}";
             }
             if (_fromDate != null)
             {
                 index++;
-                BuilderQuery += $"&filter[_and][{index}][ngay_kiem_tra][_gte]={_fromDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&filter[_and][{index}][ngay_kiem_tra][_gte]={_fromDate?.ToString("yyyy-MM-dd")}";
             }
 
             if (_toDate != null)
             {
                 index++;
-                BuilderQuery += $"&filter[_and][{index}][ngay_kiem_tra][_lte]={_toDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&filter[_and][{index}][ngay_kiem_tra][_lte]={_toDate?.ToString("yyyy-MM-dd")}";
             }
 
             var result = await MainService.GetAllAsync(BuilderQuery);
@@ -159,6 +163,7 @@ namespace CoreAdminWeb.Pages.QLCLKiemTraHauKiemATTP
                 MainModels = new List<QLCLKiemTraHauKiemATTPModel>();
             }
             IsLoading = false;
+            StateHasChanged();
         }
 
         private async Task LoadSanPhamDetailData()
@@ -317,10 +322,12 @@ namespace CoreAdminWeb.Pages.QLCLKiemTraHauKiemATTP
         {
             _titleAddOrUpdate = item != null ? "Sửa" : "Thêm mới";
             SelectedSanPhamItemsDetail = new List<QLCLKiemTraHauKiemATTPChiTietModel>();
-            SelectedItem = item != null ? item.DeepClone() : new QLCLKiemTraHauKiemATTPModel()
+            SelectedItem = item != null ? item.DeepClone() : new QLCLKiemTraHauKiemATTPModel();
+
+            if (SelectedItem.province == null)
             {
-                province = await LoadDefaultData(TinhService),
-            };
+                SelectedItem.province = await LoadDefaultData(TinhService);
+            }
 
             if (SelectedItem.id > 0)
             {
@@ -514,6 +521,10 @@ namespace CoreAdminWeb.Pages.QLCLKiemTraHauKiemATTP
 
         private async Task OnExportExcel()
         {
+            if (_selectedXaFilter == null)
+            {
+                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
+            }
             // Get all data for export
             BuildPaginationQuery(Page, int.MaxValue, "id", false);
             int index = 0;
@@ -541,20 +552,19 @@ namespace CoreAdminWeb.Pages.QLCLKiemTraHauKiemATTP
             else
             {
                 index++;
-                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
                 string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
                 BuilderQuery += $"&filter[_and][{index}][ward][_in]={xaFilterIds}";
             }
             if (_fromDate != null)
             {
                 index++;
-                BuilderQuery += $"&filter[_and][{index}][ngay_kiem_tra][_gte]={_fromDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&filter[_and][{index}][ngay_kiem_tra][_gte]={_fromDate?.ToString("yyyy-MM-dd")}";
             }
 
             if (_toDate != null)
             {
                 index++;
-                BuilderQuery += $"&filter[_and][{index}][ngay_kiem_tra][_lte]={_toDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&filter[_and][{index}][ngay_kiem_tra][_lte]={_toDate?.ToString("yyyy-MM-dd")}";
             }
 
             var result = await MainService.GetAllAsync(BuilderQuery);
@@ -598,7 +608,7 @@ namespace CoreAdminWeb.Pages.QLCLKiemTraHauKiemATTP
                 ws.Cells[row, 1].Value = stt;
                 ws.Cells[row, 2].Value = item.co_so?.name; // Tên cơ sở
                 ws.Cells[row, 3].Value = item.dia_chi_san_xuat_kinh_doanh; // Địa chỉ
-                ws.Cells[row, 4].Value = string.Join("; ", item.chi_tiet?.Select(c => c.san_pham?.name ?? string.Empty) ?? new List<string>()); // Sản phẩm kiểm tra
+                ws.Cells[row, 4].Value = string.Join("; ", item.chi_tiet?.Where(c => c.deleted == null || c.deleted == false).Select(c => c.san_pham?.name ?? string.Empty) ?? new List<string>()); // Sản phẩm kiểm tra
                 ws.Cells[row, 5].Value = item.loai_hinh_kiem_tra?.GetDescription(); // Loại hình kiểm tra
                 ws.Cells[row, 6].Value = item.hinh_thuc_xet_nghiem?.GetDescription(); // Hình thức xét nghiệm
                 ws.Cells[row, 7].Value = item.ngay_kiem_tra?.ToString("dd/MM/yyyy"); // Ngày kiểm tra
