@@ -60,6 +60,10 @@ namespace CoreAdminWeb.Pages.QLCLPhamViKinhDoanh
             try
             {
                 IsLoading = true;
+                if (_selectedXaFilter == null)
+                {
+                    XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaService);
+                }
                 BuildPaginationQuery(Page, PageSize);
                 int intdex = 0;
 
@@ -86,7 +90,6 @@ namespace CoreAdminWeb.Pages.QLCLPhamViKinhDoanh
                 else
                 {
                     intdex++;
-                    XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaService);
                     string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
                     BuilderQuery += $"&filter[_and][{intdex}][ward][_in]={xaFilterIds}";
                 }
@@ -120,6 +123,7 @@ namespace CoreAdminWeb.Pages.QLCLPhamViKinhDoanh
             finally
             {
                 IsLoading = false;
+                StateHasChanged();
             }
         }
 
@@ -128,10 +132,13 @@ namespace CoreAdminWeb.Pages.QLCLPhamViKinhDoanh
             try
             {
                 _titleAddOrUpdate = item != null ? "Sửa" : "Thêm mới";
-                SelectedItem = item?.DeepClone() ?? new QLCLPhamViHoatDongModel()
+                SelectedItem = item?.DeepClone() ?? new QLCLPhamViHoatDongModel();
+
+                if (SelectedItem.province == null)
                 {
-                    province = await LoadDefaultData(TinhService),
-                };
+                    SelectedItem.province = await LoadDefaultData(TinhService);
+                }
+
                 openAddOrUpdateModal = true;
 
                 // Wait for modal to render
@@ -289,6 +296,10 @@ namespace CoreAdminWeb.Pages.QLCLPhamViKinhDoanh
 
         private async Task OnExportExcel()
         {
+            if (_selectedXaFilter == null)
+            {
+                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaService);
+            }
             // Get all data for export
             BuildPaginationQuery(Page, int.MaxValue);
             int intdex = 0;
@@ -316,7 +327,6 @@ namespace CoreAdminWeb.Pages.QLCLPhamViKinhDoanh
             else
             {
                 intdex++;
-                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaService);
                 string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
                 BuilderQuery += $"&filter[_and][{intdex}][ward][_in]={xaFilterIds}";
             }

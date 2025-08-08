@@ -100,7 +100,7 @@
                             <th>Tên tiếng anh</th>
                             <th>Loại sản phẩm sản xuất</th>
                             <th>Tiêu chuẩn chất lượng</th>
-                            <th>Tiêu chuẩn kiểm dịch</th>
+                            <th>Căn cứ pháp lý</th>
                             <th>Ghi chú</th>
                             <th>Trạng thái</th>
                             <th class="flex items-center gap-2">Tác vụ</th>
@@ -222,8 +222,8 @@
                                     <input type="text" class="form-input" @bind-value="@SelectedItem.tieu_chuan_chat_luong" Label="Tiêu chuẩn chất lượng" />
                                 </div>
                                 <div class="space-y-2 md:col-span-2">
-                                    <label>Tiêu chuẩn kiểm dịch</label>
-                                    <input type="text" class="form-input" @bind-value="@SelectedItem.tieu_chuan_kiem_dich" Label="Tiêu chuẩn kiểm dịch" />
+                                    <label>Căn cứ pháp lý</label>
+                                    <input type="text" class="form-input" @bind-value="@SelectedItem.tieu_chuan_kiem_dich" Label="Căn cứ pháp lý" />
                                 </div>
                                 <div class="space-y-2 md:col-span-2">
                                     <label>Ghi chú</label>
@@ -327,6 +327,7 @@
             MainModels = new List<QLCLSanPhamSanXuatModel>();
         }
         IsLoading = false;
+        StateHasChanged();
     }
 
     private void OpenDeleteModal(QLCLSanPhamSanXuatModel item)
@@ -450,7 +451,7 @@
         ws.Cells[1, 4].Value = "Tên tiếng anh";
         ws.Cells[1, 5].Value = "Loại sản phẩm sản xuất";
         ws.Cells[1, 6].Value = "Tiêu chuẩn chất lượng";
-        ws.Cells[1, 7].Value = "Tiêu chuẩn kiểm dịch";
+        ws.Cells[1, 7].Value = "Căn cứ pháp lý";
         ws.Cells[1, 8].Value = "Ghi chú";
         ws.Cells[1, 9].Value = "Trạng thái";
 

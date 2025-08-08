@@ -96,7 +96,7 @@
                             <th>Thời gian kết thúc</th>
                             <th>Sản phẩm</th>
                             <th>Sự cố an toàn</th>
-                            <th>Biện pháp xử lý chất thải</th>
+                            <th>Biện pháp xử lý</th>
                             <th class="flex items-center gap-2">Tác vụ</th>
                         </tr>
                     </thead>
@@ -110,7 +110,7 @@
                                 <td>@item.Data.qlcl_co_so_che_bien_nlts?.name</td>
                                 <td>@item.Data.thoi_gian_bat_dau?.ToString("dd/MM/yyyy")</td>
                                 <td>@item.Data.thoi_gian_ket_thuc?.ToString("dd/MM/yyyy")</td>
-                                <td></td>
+                                <td>@(string.Join("; ", item.Data.san_pham?.Where(c => c.deleted == null || c.deleted == false).Select(c => c.san_pham?.name ?? string.Empty) ?? new List<string>()))</td>
                                 <td>@item.Data.su_co_an_toan</td>
                                 <td>@item.Data.bien_phap_xu_ly_chat_thai</td>
                                 <td class="flex items-center gap-2">
@@ -236,8 +236,8 @@
 
 
                                 <div class="space-y-2 md:col-span-2">
-                                    <label>Biện pháp xử lý chất thải</label>
-                                    <textarea rows="3" class="form-input" @bind="@SelectedItem.bien_phap_xu_ly_chat_thai" Label="Biện pháp xử lý chất thải" />
+                                    <label>Biện pháp xử lý</label>
+                                    <textarea rows="3" class="form-input" @bind="@SelectedItem.bien_phap_xu_ly_chat_thai" Label="Biện pháp xử lý" />
                                 </div>
 
                                 <div class="space-y-2 md:col-span-2">

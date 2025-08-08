@@ -69,6 +69,10 @@ namespace CoreAdminWeb.Pages.QLCLCoSoCheBienNLTS
             try
             {
                 IsLoading = true;
+                if (_selectedXaFilter == null)
+                {
+                    XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaService);
+                }
                 BuildPaginationQuery(Page, PageSize, "id", false);
                 int intdex = 0;
 
@@ -98,20 +102,19 @@ namespace CoreAdminWeb.Pages.QLCLCoSoCheBienNLTS
                 else
                 {
                     intdex++;
-                    XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaService);
                     string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
                     BuilderQuery += $"&filter[_and][{intdex}][ward][_in]={xaFilterIds}";
                 }
                 if (_fromDate != null)
                 {
                     intdex++;
-                    BuilderQuery += $"&filter[_and][{intdex}][ngay_cap][_gte]={_fromDate.Value:yyyy-MM-dd}";
+                    BuilderQuery += $"&filter[_and][{intdex}][ngay_cap][_gte]={_fromDate?.ToString("yyyy-MM-dd")}";
                 }
 
                 if (_toDate != null)
                 {
                     intdex++;
-                    BuilderQuery += $"&filter[_and][{intdex}][ngay_cap][_lte]={_toDate.Value:yyyy-MM-dd}";
+                    BuilderQuery += $"&filter[_and][{intdex}][ngay_cap][_lte]={_toDate?.ToString("yyyy-MM-dd")}";
                 }
 
                 var result = await MainService.GetAllAsync(BuilderQuery);
@@ -137,6 +140,7 @@ namespace CoreAdminWeb.Pages.QLCLCoSoCheBienNLTS
             finally
             {
                 IsLoading = false;
+                StateHasChanged();
             }
         }
 
@@ -145,10 +149,13 @@ namespace CoreAdminWeb.Pages.QLCLCoSoCheBienNLTS
             try
             {
                 _titleAddOrUpdate = item != null ? "Sửa" : "Thêm mới";
-                SelectedItem = item?.DeepClone() ?? new QLCLCoSoCheBienNLTSModel()
+                SelectedItem = item?.DeepClone() ?? new QLCLCoSoCheBienNLTSModel();
+
+                if (SelectedItem.province == null)
                 {
-                    province = await LoadDefaultData(TinhService),
-                };
+                    SelectedItem.province = await LoadDefaultData(TinhService);
+                }
+
                 openAddOrUpdateModal = true;
 
                 // Wait for modal to render
@@ -334,6 +341,11 @@ namespace CoreAdminWeb.Pages.QLCLCoSoCheBienNLTS
 
         private async Task OnExportExcel()
         {
+            if (_selectedXaFilter == null)
+            {
+                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaService);
+            }
+
             // Get all data for export
             BuildPaginationQuery(Page, int.MaxValue);
             int intdex = 0;
@@ -364,20 +376,19 @@ namespace CoreAdminWeb.Pages.QLCLCoSoCheBienNLTS
             else
             {
                 intdex++;
-                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaService);
                 string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
                 BuilderQuery += $"&filter[_and][{intdex}][ward][_in]={xaFilterIds}";
             }
             if (_fromDate != null)
             {
                 intdex++;
-                BuilderQuery += $"&filter[_and][{intdex}][ngay_cap][_gte]={_fromDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&filter[_and][{intdex}][ngay_cap][_gte]={_fromDate?.ToString("yyyy-MM-dd")}";
             }
 
             if (_toDate != null)
             {
                 intdex++;
-                BuilderQuery += $"&filter[_and][{intdex}][ngay_cap][_lte]={_toDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&filter[_and][{intdex}][ngay_cap][_lte]={_toDate?.ToString("yyyy-MM-dd")}";
             }
 
             var result = await MainService.GetAllAsync(BuilderQuery);

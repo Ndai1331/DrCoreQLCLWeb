@@ -51,11 +51,11 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoBienDongGia
             }
             if (_fromDate != null)
             {
-                BuilderQuery += $"&fromDate={_fromDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&fromDate={_fromDate?.ToString("yyyy-MM-dd")}";
             }
             if (_toDate != null)
             {
-                BuilderQuery += $"&toDate={_toDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&toDate={_toDate?.ToString("yyyy-MM-dd")}";
             }
 
             var result = await MainService.GetAllAsync(BuilderQuery);
@@ -73,6 +73,7 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoBienDongGia
                 MainModels = new List<QLCLBienDongGiaModel>();
             }
             IsLoading = false;
+            StateHasChanged();
         }
 
         private async Task OnDateChanged(ChangeEventArgs e, string fieldName)
@@ -115,12 +116,12 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoBienDongGia
             }
             if (_fromDate != null)
             {
-                BuilderQuery += $"&fromDate={_fromDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&fromDate={_fromDate?.ToString("yyyy-MM-dd")}";
             }
 
             if (_toDate != null)
             {
-                BuilderQuery += $"&toDate={_toDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&toDate={_toDate?.ToString("yyyy-MM-dd")}";
             }
 
             var result = await MainService.GetAllAsync(BuilderQuery);

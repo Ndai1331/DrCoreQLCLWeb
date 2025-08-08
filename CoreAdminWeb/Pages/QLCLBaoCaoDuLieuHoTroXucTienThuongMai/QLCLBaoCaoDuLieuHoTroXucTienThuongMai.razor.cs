@@ -50,6 +50,11 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuHoTroXucTienThuongMai
             try
             {
                 IsLoading = true;
+                if (_selectedXaFilter == null)
+                {
+                    XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
+                }
+
                 BuildPaginationQuery(Page, PageSize);
                 int index = 0;
 
@@ -75,7 +80,6 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuHoTroXucTienThuongMai
                 else
                 {
                     index++;
-                    XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
                     string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
                     BuilderQuery += $"&filter[_and][{index}][ward][_in]={xaFilterIds}";
                 }
@@ -83,13 +87,13 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuHoTroXucTienThuongMai
                 if (_fromDate != null)
                 {
                     index++;
-                    BuilderQuery += $"&filter[_and][{index}][ngay_to_chuc][_gte]={_fromDate.Value:yyyy-MM-dd}";
+                    BuilderQuery += $"&filter[_and][{index}][ngay_to_chuc][_gte]={_fromDate?.ToString("yyyy-MM-dd")}";
                 }
 
                 if (_toDate != null)
                 {
                     index++;
-                    BuilderQuery += $"&filter[_and][{index}][ngay_to_chuc][_lte]={_toDate.Value:yyyy-MM-dd}";
+                    BuilderQuery += $"&filter[_and][{index}][ngay_to_chuc][_lte]={_toDate?.ToString("yyyy-MM-dd")}";
                 }
 
                 var result = await MainService.GetAllAsync(BuilderQuery);
@@ -115,6 +119,7 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuHoTroXucTienThuongMai
             finally
             {
                 IsLoading = false;
+                StateHasChanged();
             }
         }
 
@@ -171,50 +176,54 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuHoTroXucTienThuongMai
 
         private async Task OnExportExcel()
         {
+            if (_selectedXaFilter == null)
+            {
+                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
+            }
+
             // Get all data for export
-            string query = $"sort=-id";
+            BuildPaginationQuery(Page, int.MaxValue);
             int index = 0;
 
-            query += "&filter[_and][0][deleted][_eq]=false&sort=sort";
+            BuilderQuery += "&filter[_and][0][deleted][_eq]=false&sort=sort";
             if (!string.IsNullOrEmpty(_searchString))
             {
                 index++;
-                query += $"&filter[_and][{index}][_or][0][name][_contains]={_searchString}";
-                query += $"&filter[_and][{index}][_or][1][dia_diem_to_chuc][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{index}][_or][0][name][_contains]={_searchString}";
+                BuilderQuery += $"&filter[_and][{index}][_or][1][dia_diem_to_chuc][_contains]={_searchString}";
             }
 
             if (_selectedTinhFilter != null)
             {
                 index++;
-                query += $"&filter[_and][{index}][province][_eq]={_selectedTinhFilter.id}";
+                BuilderQuery += $"&filter[_and][{index}][province][_eq]={_selectedTinhFilter.id}";
             }
 
             if (_selectedXaFilter != null)
             {
                 index++;
-                query += $"&filter[_and][{index}][ward][_eq]={_selectedXaFilter.id}";
+                BuilderQuery += $"&filter[_and][{index}][ward][_eq]={_selectedXaFilter.id}";
             }
             else
             {
                 index++;
-                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
                 string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
-                query += $"&filter[_and][{index}][ward][_in]={xaFilterIds}";
+                BuilderQuery += $"&filter[_and][{index}][ward][_in]={xaFilterIds}";
             }
 
             if (_fromDate != null)
             {
                 index++;
-                query += $"&filter[_and][{index}][ngay_to_chuc][_gte]={_fromDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&filter[_and][{index}][ngay_to_chuc][_gte]={_fromDate?.ToString("yyyy-MM-dd")}";
             }
 
             if (_toDate != null)
             {
                 index++;
-                query += $"&filter[_and][{index}][ngay_to_chuc][_lte]={_toDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&filter[_and][{index}][ngay_to_chuc][_lte]={_toDate?.ToString("yyyy-MM-dd")}";
             }
 
-            var result = await MainService.GetAllAsync(query);
+            var result = await MainService.GetAllAsync(BuilderQuery);
             if (!result.IsSuccess || result.Data == null)
             {
                 AlertService.ShowAlert("Không có dữ liệu để xuất Excel", "warning");

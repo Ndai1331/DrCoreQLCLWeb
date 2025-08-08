@@ -10,7 +10,7 @@
 @inject IJSRuntime JsRuntime
 
 <!-- Start Main Content -->
-<div class="min-h-[calc(100vh-134px)] py-4 px-4 sm:px-12 flex justify-center items-center max-w-[1440px] mx-auto" @onkeydown="HandleGlobalKeyDown" tabindex="0">
+<div class="min-h-[calc(100vh-134px)] py-4 px-4 sm:px-12 flex justify-center items-center max-w-[1440px] mx-auto">
     <div class="max-w-[550px] flex-none w-full bg-white border border-black/10 p-6 sm:p-10 lg:px-10 lg:py-14 rounded-2xl loginform dark:bg-darklight dark:border-darkborder">
         <MudText Typo="Typo.h2" Class="mb-2 text-2xl font-semibold text-center dark:text-white">
             PHẦN MỀM CƠ SỞ DỮ LIỆU QUẢN LÝ CHẤT LƯỢNG
@@ -20,39 +20,80 @@
         @* Logo *@
 
         <MudText Class="text-center text-muted mb-7 dark:text-darkmuted">Nhập email và mật khẩu để đăng nhập!</MudText>
-        <div class="space-y-4">
-            <div>
-                <InputText @bind-Value="_email" placeholder="Địa chỉ email" class="form-input" />
+        <EditForm Model="this" OnValidSubmit="HandleGraphQLSignIn">
+            <div class="space-y-4">
+                <div>
+                    <InputText @bind-Value="_email" placeholder="Địa chỉ email" class="form-input" />
+                </div>
+                <div>
+                    <InputText @bind-Value="_password" placeholder="Mật khẩu" type="password" class="form-input" />
+                </div>
+                <button type="submit" class="btn w-full py-3.5 text-base bg-purple border-purple text-white hover:bg-purple/[0.85] hover:border-purple/[0.85] project-color project-text-color">
+                    @if (isLoading)
+                    {
+                        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" class="inline-block h-5 w-5 animate-[spin_2s_linear_infinite] align-middle">
+                            <line x1="12" y1="2" x2="12" y2="6"></line>
+                            <line x1="12" y1="18" x2="12" y2="22"></line>
+                            <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
+                            <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
+                            <line x1="2" y1="12" x2="6" y2="12"></line>
+                            <line x1="18" y1="12" x2="22" y2="12"></line>
+                            <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
+                            <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+                        </svg>
+                    }
+                    Đăng nhập
+                </button>
             </div>
-            <div>
-                <InputText @bind-Value="_password" placeholder="Mật khẩu" type="password" class="form-input" />
-            </div>
-            <button type="button" class="btn w-full py-3.5 text-base bg-purple border-purple text-white hover:bg-purple/[0.85] hover:border-purple/[0.85]  " @onclick="HandleGraphQLSignIn">
-                @if (isLoading)
-                {
-                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" class="inline-block h-5 w-5 animate-[spin_2s_linear_infinite] align-middle">
-                        <line x1="12" y1="2" x2="12" y2="6"></line>
-                        <line x1="12" y1="18" x2="12" y2="22"></line>
-                        <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
-                        <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
-                        <line x1="2" y1="12" x2="6" y2="12"></line>
-                        <line x1="18" y1="12" x2="22" y2="12"></line>
-                        <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
-                        <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
-                    </svg>
-                }
-                Đăng nhập
-            </button>
-        </div>
-
+        </EditForm>
     </div>
 </div>
+
+<script>
+    // Listen for Enter key and trigger a custom event
+    window.listenForEnterKey = function (elementId, dotNetRef, methodName) {
+        const handler = function (event) {
+            if (event.key === "Enter") {
+                dotNetRef.invokeMethodAsync(methodName);
+            }
+        };
+        const el = elementId ? document.getElementById(elementId) : document;
+        el.addEventListener('keydown', handler);
+
+        // Return a cleanup function
+        return {
+            dispose: () => el.removeEventListener('keydown', handler)
+        };
+    };
+</script>
+
 <!-- End Main Content -->
 @code {
     private string _email { get; set; } = string.Empty;
     private string _password { get; set; } = string.Empty;
     private bool isLoading = false;
+    private DotNetObjectReference<Signin>? _dotNetRef;
+    private IJSObjectReference? _jsListener;
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _dotNetRef = DotNetObjectReference.Create(this);
+            _jsListener = await JsRuntime.InvokeAsync<IJSObjectReference>(
+                "listenForEnterKey",
+                null, // Không truyền elementId => lắng nghe trên document
+                _dotNetRef,
+                nameof(OnEnterPressed)
+            );
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnEnterPressed()
+    {
+        await HandleGraphQLSignIn();
+    }
     private async Task HandleGraphQLSignIn()
     {
         if (string.IsNullOrEmpty(_password) || string.IsNullOrEmpty(_email))
@@ -67,6 +108,21 @@
             if (authState.User.Identity != null && authState.User.Identity.IsAuthenticated)
             {
                 AlertService.ShowAlert("Đăng nhập thành công!", "success");
+
+                try
+                {
+                    if (_jsListener != null)
+                    {
+                        await _jsListener.InvokeVoidAsync("dispose");
+                        await _jsListener.DisposeAsync();
+                    }
+                    _dotNetRef?.Dispose();
+                }
+                catch (Exception jsEx)
+                {
+                    Console.WriteLine($"Error disposing JS listener: {jsEx.Message}");
+                }
+
                 Navigation.NavigateTo("/dashboard");
             }
             else
@@ -91,3 +147,4 @@
         }
     }
 }
+

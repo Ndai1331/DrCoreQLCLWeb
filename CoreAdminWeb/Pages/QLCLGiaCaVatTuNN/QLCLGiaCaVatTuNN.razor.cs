@@ -77,13 +77,13 @@ namespace CoreAdminWeb.Pages.QLCLGiaCaVatTuNN
                 if (_fromDate != null)
                 {
                     index++;
-                    BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_gte]={_fromDate.Value:yyyy-MM-dd}";
+                    BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_gte]={_fromDate?.ToString("yyyy-MM-dd")}";
                 }
 
                 if (_toDate != null)
                 {
                     index++;
-                    BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_lte]={_toDate.Value:yyyy-MM-dd}";
+                    BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_lte]={_toDate?.ToString("yyyy-MM-dd")}";
                 }
 
                 var result = await MainService.GetAllAsync(BuilderQuery);
@@ -109,6 +109,7 @@ namespace CoreAdminWeb.Pages.QLCLGiaCaVatTuNN
             finally
             {
                 IsLoading = false;
+                StateHasChanged();
             }
         }
 
@@ -139,10 +140,13 @@ namespace CoreAdminWeb.Pages.QLCLGiaCaVatTuNN
             try
             {
                 _titleAddOrUpdate = item != null ? "Sửa" : "Thêm mới";
-                SelectedItem = item?.DeepClone() ?? new QLCLGiaCaVatTuNNModel()
+                SelectedItem = item?.DeepClone() ?? new QLCLGiaCaVatTuNNModel();
+
+                if (SelectedItem.province == null)
                 {
-                    province = await LoadDefaultData(TinhService),
-                };
+                    SelectedItem.province = await LoadDefaultData(TinhService);
+                }
+
                 openAddOrUpdateModal = true;
 
                 // Wait for modal to render
@@ -318,13 +322,13 @@ namespace CoreAdminWeb.Pages.QLCLGiaCaVatTuNN
             if (_fromDate != null)
             {
                 index++;
-                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_gte]={_fromDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_gte]={_fromDate?.ToString("yyyy-MM-dd")}";
             }
 
             if (_toDate != null)
             {
                 index++;
-                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_lte]={_toDate.Value:yyyy-MM-dd}";
+                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_lte]={_toDate?.ToString("yyyy-MM-dd")}";
             }
 
             var result = await MainService.GetAllAsync(BuilderQuery);

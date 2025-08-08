@@ -294,13 +294,13 @@
 
                                 <div class="space-y-2 md:col-span-1">
                                     <label>Thị trường nội địa</label>
-                                    <input type="checkbox" class="form-checkbox text-purple" checked="@SelectedItem.pham_vi_noi_dia" />
+                                    <input type="checkbox" class="form-checkbox text-purple" @bind="@SelectedItem.pham_vi_noi_dia" />
                                 </div>
 
 
                                 <div class="space-y-2 md:col-span-1">
                                     <label>Thị trường xuất khẩu</label>
-                                    <input type="checkbox" class="form-checkbox text-purple" checked="@SelectedItem.pham_vi_xuat_khau" />
+                                    <input type="checkbox" class="form-checkbox text-purple" @bind="@SelectedItem.pham_vi_xuat_khau" />
                                 </div>
 
                                 <div class="space-y-2 md:col-span-2">
