@@ -478,7 +478,7 @@ namespace CoreAdminWeb.Pages.QLCLCoSoVatTuNongNghiep
                 XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
             }
             // Get all data for export
-            BuildPaginationQuery(Page, int.MaxValue);
+            BuildPaginationQuery(1, int.MaxValue);
             int index = 2;
 
             BuilderQuery += "&filter[_and][0][deleted][_eq]=false";
