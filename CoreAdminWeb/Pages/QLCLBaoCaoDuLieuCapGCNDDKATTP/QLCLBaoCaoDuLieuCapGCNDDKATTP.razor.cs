@@ -191,7 +191,7 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuCapGCNDDKATTP
             {
                 XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
             }
-            BuilderQuery = $"QLCLBaoCaoThamDinhCapGCN?";
+            BuilderQuery = $"QLCLBaoCaoThamDinhCapGCN?limit={int.MaxValue}&offset=0";
 
             if (_selectedTinhFilter != null)
             {

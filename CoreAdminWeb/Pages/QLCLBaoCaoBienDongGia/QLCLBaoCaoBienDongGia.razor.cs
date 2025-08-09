@@ -1,6 +1,7 @@
 ﻿using CoreAdminWeb.Helpers;
 using CoreAdminWeb.Model;
 using CoreAdminWeb.Services;
+using CoreAdminWeb.Services.BaseServices;
 using CoreAdminWeb.Services.Reports;
 using CoreAdminWeb.Shared.Base;
 using Microsoft.AspNetCore.Components;
@@ -11,14 +12,17 @@ using OfficeOpenXml.Style;
 
 namespace CoreAdminWeb.Pages.QLCLBaoCaoBienDongGia
 {
-    public partial class QLCLBaoCaoBienDongGia(IReportService<QLCLBienDongGiaModel> MainService) : BlazorCoreBase
+    public partial class QLCLBaoCaoBienDongGia(IReportService<QLCLBienDongGiaModel> MainService, IBaseService<XaPhuongModel> XaPhuongService) : BlazorCoreBase
     {
         private List<QLCLBienDongGiaModel> MainModels { get; set; } = new();
 
         private string _searchString = "";
-        private DateTime? _fromDate { get; set; }
-        private DateTime? _toDate { get; set; }
+        private DateTime? _fromDate { get; set; } = default;
+        private DateTime? _toDate { get; set; } = default;
 
+
+        private Dictionary<int, List<XaPhuongModel>> SelectedXaPhuongItems { get; set; } = new();
+        private List<XaPhuongModel> XaPhuongItems { get; set; } = new();
 
         protected override async Task OnInitializedAsync()
         {
@@ -43,7 +47,11 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoBienDongGia
         private async Task LoadData()
         {
             IsLoading = true;
+            XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
+            string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
+
             BuilderQuery = $"QLCLBaoCaoBienDongGia?limit={PageSize}&offset={(Page - 1) * PageSize}";
+            BuilderQuery += $"&wards={xaFilterIds}";
 
             if (!string.IsNullOrEmpty(_searchString))
             {
@@ -107,8 +115,12 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoBienDongGia
 
         private async Task OnExportExcel()
         {
+            XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
+            string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
+
             // Get all data for export
-            BuilderQuery = $"QLCLBaoCaoBienDongGia?";
+            BuilderQuery = $"QLCLBaoCaoBienDongGia?limit={int.MaxValue}&offset=0";
+            BuilderQuery += $"&wards={xaFilterIds}";
 
             if (!string.IsNullOrEmpty(_searchString))
             {

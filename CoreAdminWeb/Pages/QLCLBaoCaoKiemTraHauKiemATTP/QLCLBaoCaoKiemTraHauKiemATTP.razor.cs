@@ -193,7 +193,7 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoKiemTraHauKiemATTP
             {
                 XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
             }
-            BuilderQuery = $"QLCLBaoCaoKiemTraHauKiemATTP?";
+            BuilderQuery = $"QLCLBaoCaoKiemTraHauKiemATTP?limit={int.MaxValue}&offset=0";
 
             if (_selectedTinhFilter != null)
             {

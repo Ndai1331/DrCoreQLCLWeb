@@ -160,7 +160,7 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuLayMauHauKiemATTP
             {
                 XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
             }
-            BuilderQuery = $"QLCLBaoCaoKiemTraHauKiemATTP/chiTiet?";
+            BuilderQuery = $"QLCLBaoCaoKiemTraHauKiemATTP/chiTiet?limit={int.MaxValue}&offset=0";
             if (!string.IsNullOrEmpty(_searchString))
             {
                 BuilderQuery += $"&stringSearch={_searchString}";
