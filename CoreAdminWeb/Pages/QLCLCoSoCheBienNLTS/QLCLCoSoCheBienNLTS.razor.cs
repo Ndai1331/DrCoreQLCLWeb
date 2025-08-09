@@ -347,7 +347,7 @@ namespace CoreAdminWeb.Pages.QLCLCoSoCheBienNLTS
             }
 
             // Get all data for export
-            BuildPaginationQuery(Page, int.MaxValue);
+            BuildPaginationQuery(1, int.MaxValue);
             int intdex = 0;
 
             BuilderQuery += "&filter[_and][0][deleted][_eq]=false";

@@ -371,7 +371,7 @@
     private async Task OnExportExcel()
     {
         // Get all data for export
-        BuildPaginationQuery(Page, int.MaxValue);
+        BuildPaginationQuery(1, int.MaxValue);
         int index = 0;
 
         if (!string.IsNullOrEmpty(_searchString))

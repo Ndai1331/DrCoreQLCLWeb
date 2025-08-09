@@ -306,7 +306,7 @@ namespace CoreAdminWeb.Pages.QLCLGiaCaNongSan
             // Get all data for export
             XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
 
-            BuildPaginationQuery(Page, int.MaxValue);
+            BuildPaginationQuery(1, int.MaxValue);
             int index = 1;
 
             BuilderQuery += "&filter[_and][0][deleted][_eq]=false&sort=-date_created";

@@ -353,7 +353,7 @@ namespace CoreAdminWeb.Pages.QLCLCoSoViPhamATTP
                 XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
             }
             // Get all data for export
-            BuildPaginationQuery(Page, int.MaxValue);
+            BuildPaginationQuery(1, int.MaxValue);
             int intdex = 1;
 
             BuilderQuery += "&filter[_and][0][deleted][_eq]=false";
