@@ -231,7 +231,7 @@
     {
         IsLoading = true;
 
-        BuildPaginationQuery(Page, PageSize);
+        BuildPaginationQuery(Page, PageSize, "sort");
         BuilderQuery += $"&filter[_and][0][deleted][_eq]=false&filter[_and][1][system][_eq]=2";
 
         if (!string.IsNullOrEmpty(_searchString))

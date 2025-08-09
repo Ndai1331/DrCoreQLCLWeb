@@ -136,6 +136,8 @@
                             <th>MS doanh nghiệp</th>
                             <th>Tên cơ sở</th>
                             <th>Loại hình cơ sở</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Sản lượng</th>
                             <th>Địa chỉ</th>
                             <th>GCN đủ điều kiện</th>
                             <th>Ngày cấp</th>
@@ -153,6 +155,8 @@
                                 <td>@MainModels[i].code</td>
                                 <td>@MainModels[i].name</td>
                                 <td>@MainModels[i].loai_hinh_co_so?.name</td>
+                                <td>@MainModels[i].nguyen_lieu_che_bien?.name</td>
+                                <td>@MainModels[i].san_luong_du_kien</td>
                                 <td>@MainModels[i].dia_chi</td>
                                 <td>@MainModels[i].so_giay_phep</td>
                                 <td>@MainModels[i].ngay_cap?.ToString("dd/MM/yyyy")</td>
