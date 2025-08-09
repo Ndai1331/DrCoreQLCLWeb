@@ -68,12 +68,12 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuCapGCNDDKATTP
             }
             if (_selectedXaFilter != null)
             {
-                BuilderQuery += $"&ward={_selectedXaFilter.id}";
+                BuilderQuery += $"&wards={_selectedXaFilter.id}";
             }
             else
             {
                 string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
-                BuilderQuery += $"&ward={xaFilterIds}";
+                BuilderQuery += $"&wards={xaFilterIds}";
             }
             if (_fromDate != null)
             {
@@ -158,6 +158,10 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuCapGCNDDKATTP
 
         private async Task OnRowClick(string thang)
         {
+            if (_selectedXaFilter == null)
+            {
+                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
+            }
             string query = $"QLCLBaoCaoThamDinhCapGCN/coSoKhongCapGCN?thangNam={thang}";
             if (_selectedTinhFilter != null)
             {
@@ -165,7 +169,12 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuCapGCNDDKATTP
             }
             if (_selectedXaFilter != null)
             {
-                query += $"&ward={_selectedXaFilter.id}";
+                query += $"&wards={_selectedXaFilter.id}";
+            }
+            else
+            {
+                string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
+                BuilderQuery += $"&wards={xaFilterIds}";
             }
             var result = await DetailService.GetAllAsync(query);
             if (result.IsSuccess)
@@ -190,13 +199,13 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuCapGCNDDKATTP
             }
             if (_selectedXaFilter != null)
             {
-                BuilderQuery += $"&ward={_selectedXaFilter.id}";
+                BuilderQuery += $"&wards={_selectedXaFilter.id}";
             }
-            //else
-            //{
-            //    string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
-            //    BuilderQuery += $"&ward={xaFilterIds}";
-            //}
+            else
+            {
+                string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
+                BuilderQuery += $"&wards={xaFilterIds}";
+            }
             if (_fromDate != null)
             {
                 BuilderQuery += $"&fromDate={_fromDate?.ToString("yyyy-MM-dd")}";
