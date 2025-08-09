@@ -5,22 +5,22 @@ namespace CoreAdminWeb.Model
 {
     public class QLCLHinhThucXuPhatModel : BaseModel<int>
     {
-        public string? mo_ta{set;get;}
+        public string? mo_ta { set; get; }
     }
     public class QLCLHinhThucXuPhatCRUDModel : BaseDetailModel
     {
         public new string status { set; get; } = Status.active.ToString();
-        public string? mo_ta{set;get;}
+        public string? mo_ta { set; get; }
 
     }
     public class QLCLHanhViViPhamModel : BaseModel<int>
     {
-        public string? muc_phat{set;get;}
+        public string? muc_phat { set; get; }
     }
     public class QLCLHanhViViPhamCRUDModel : BaseDetailModel
     {
         public new string status { set; get; } = Status.active.ToString();
-        public string? muc_phat{set;get;}
+        public string? muc_phat { set; get; }
 
     }
     public class QLCLLoaiHinhCoSoModel : BaseModel<int>
@@ -61,7 +61,7 @@ namespace CoreAdminWeb.Model
         public bool? pham_vi_noi_dia { get; set; }
         public bool? pham_vi_xuat_khau { get; set; }
     }
-    
+
 
     public class CountryModel : BaseModel<int>
     {
@@ -109,11 +109,13 @@ namespace CoreAdminWeb.Model
     public class QLCLLoaiSanPhamModel : BaseModel<int>
     {
         public string? english_name { set; get; }
+        public string? loai_san_pham { set; get; } = LoaiSanPham.SanPhamNguonGocThucVat.ToString();
     }
     public class QLCLLoaiSanPhamCRUDModel : BaseDetailModel
     {
         public string? english_name { set; get; }
         public new string status { set; get; } = Status.active.ToString();
+        public string? loai_san_pham { set; get; } = LoaiSanPham.SanPhamNguonGocThucVat.ToString();
     }
 
     public class QLCLSanPhamSanXuatModel : BaseModel<int>

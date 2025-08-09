@@ -36,6 +36,7 @@ namespace CoreAdminWeb.Services
                 status = model.status.ToString(),
                 sort = model.sort,
                 english_name = model.english_name,
+                loai_san_pham = model.loai_san_pham,
             };
         }
 
