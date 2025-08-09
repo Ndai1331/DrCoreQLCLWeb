@@ -409,13 +409,15 @@ namespace CoreAdminWeb.Pages.QLCLCoSoCheBienNLTS
             ws.Cells[1, 2].Value = "MS doanh nghiệp";
             ws.Cells[1, 3].Value = "Tên cơ sở";
             ws.Cells[1, 4].Value = "Loại hình cơ sở";
-            ws.Cells[1, 5].Value = "Địa chỉ";
-            ws.Cells[1, 6].Value = "GCN đủ điều kiện";
-            ws.Cells[1, 7].Value = "Ngày cấp";
-            ws.Cells[1, 8].Value = "Chứng nhận về ATTP";
-            ws.Cells[1, 9].Value = "Trạng thái";
+            ws.Cells[1, 5].Value = "Tên sản phẩm";
+            ws.Cells[1, 6].Value = "Sản lượng";
+            ws.Cells[1, 7].Value = "Địa chỉ";
+            ws.Cells[1, 8].Value = "GCN đủ điều kiện";
+            ws.Cells[1, 9].Value = "Ngày cấp";
+            ws.Cells[1, 10].Value = "Chứng nhận về ATTP";
+            ws.Cells[1, 11].Value = "Trạng thái";
             // Style header
-            using (var range = ws.Cells[1, 1, 1, 9])
+            using (var range = ws.Cells[1, 1, 1, 11])
             {
                 range.Style.Font.Bold = true;
                 range.Style.Fill.PatternType = ExcelFillStyle.Solid;
@@ -431,11 +433,13 @@ namespace CoreAdminWeb.Pages.QLCLCoSoCheBienNLTS
                 ws.Cells[row, 2].Value = item.code;
                 ws.Cells[row, 3].Value = item.name;
                 ws.Cells[row, 4].Value = item.loai_hinh_co_so?.name;
-                ws.Cells[row, 5].Value = item.dia_chi;
-                ws.Cells[row, 6].Value = item.so_giay_phep;
-                ws.Cells[row, 7].Value = item.ngay_cap?.ToString("dd/MM/yyyy");
-                ws.Cells[row, 8].Value = item.chung_nhan_attp;
-                ws.Cells[row, 9].Value = item.status.GetDescription();
+                ws.Cells[row, 5].Value = item.nguyen_lieu_che_bien?.name;
+                ws.Cells[row, 6].Value = item.san_luong_du_kien;
+                ws.Cells[row, 7].Value = item.dia_chi;
+                ws.Cells[row, 8].Value = item.so_giay_phep;
+                ws.Cells[row, 9].Value = item.ngay_cap?.ToString("dd/MM/yyyy");
+                ws.Cells[row, 10].Value = item.chung_nhan_attp;
+                ws.Cells[row, 11].Value = item.status.GetDescription();
                 row++;
                 stt++;
             }

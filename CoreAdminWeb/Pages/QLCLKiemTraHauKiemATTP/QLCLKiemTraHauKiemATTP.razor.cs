@@ -54,7 +54,9 @@ namespace CoreAdminWeb.Pages.QLCLKiemTraHauKiemATTP
         private List<Enums.ChiTieu> ChiTieuItems { get; set; } = new List<Enums.ChiTieu>() {
             Enums.ChiTieu.ChiTieuViSinh,
             Enums.ChiTieu.ChiTieuThuocBVTV,
-            Enums.ChiTieu.ChiTieuHoaChat
+            Enums.ChiTieu.ChiTieuHoaChat,
+            Enums.ChiTieu.ChiTieuHoaChatKhangSinh,
+            Enums.ChiTieu.ChiTieuKimLoaiNang,
         };
         private List<Enums.MauGoc> MauGocItems { get; set; } = new List<Enums.MauGoc>() {
             Enums.MauGoc.MauGoc,

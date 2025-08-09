@@ -251,7 +251,7 @@
     {
         IsLoading = true;
 
-        BuildPaginationQuery(Page, PageSize);
+        BuildPaginationQuery(Page, PageSize, "sort");
         if (!string.IsNullOrEmpty(_searchString))
         {
             BuilderQuery += $"&filter[_and][0][_or][0][code][_contains]={_searchString}&filter[_and][0][_or][1][name][_contains]={_searchString}";
@@ -371,7 +371,7 @@
     private async Task OnExportExcel()
     {
         // Get all data for export
-        BuildPaginationQuery(1, int.MaxValue);
+        BuildPaginationQuery(1, int.MaxValue, "sort");
         if (!string.IsNullOrEmpty(_searchString))
         {
             BuilderQuery += $"&filter[_and][0][_or][0][code][_contains]={_searchString}&filter[_and][0][_or][1][name][_contains]={_searchString}";

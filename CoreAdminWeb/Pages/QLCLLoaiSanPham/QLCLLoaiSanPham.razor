@@ -262,7 +262,7 @@
     {
         IsLoading = true;
 
-        BuildPaginationQuery(Page, PageSize);
+        BuildPaginationQuery(Page, PageSize, "sort");
         int index = 1;
         if (!string.IsNullOrEmpty(_searchString))
         {
@@ -377,7 +377,7 @@
     private async Task OnExportExcel()
     {
         // Get all data for export
-        BuildPaginationQuery(1, int.MaxValue);
+        BuildPaginationQuery(1, int.MaxValue, "sort");
         if (!string.IsNullOrEmpty(_searchString))
         {
             BuilderQuery += $"&filter[_and][][name][_contains]={_searchString}";
