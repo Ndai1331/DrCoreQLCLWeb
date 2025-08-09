@@ -16,7 +16,8 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
                                               IQLCLTinhHinhSXKDNLTSSanPhamService SanPhamService,
                                               IBaseService<QLCLSanPhamSanXuatModel> QLCLSanPhamSanXuatService,
                                               IBaseService<QLCLCoSoCheBienNLTSModel> QLCLCoSoCheBienNLTSService,
-                                              IBaseService<QLCLNguyenLieuCheBienModel> NguyenLieuCheBienService) : BlazorCoreBase
+                                              IBaseService<QLCLNguyenLieuCheBienModel> NguyenLieuCheBienService,
+                                              IBaseService<XaPhuongModel> XaService) : BlazorCoreBase
     {
         private List<QLCLTinhHinhSXKDNLTSModel> MainModels { get; set; } = new();
         private bool openDeleteModal = false;
@@ -42,6 +43,7 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
 
         private List<QLCLSanPhamSanXuatModel> QLCLSanPhamSanXuatItems = new List<QLCLSanPhamSanXuatModel>();
         private Dictionary<int, List<QLCLSanPhamSanXuatModel>> SelectedQLCLSanPhamSanXuatItems = new Dictionary<int, List<QLCLSanPhamSanXuatModel>>();
+        private List<XaPhuongModel> XaPhuongItems { get; set; } = new();
 
         protected override async Task OnInitializedAsync()
         {
@@ -66,6 +68,8 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
         private async Task LoadData()
         {
             IsLoading = true;
+            
+            XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaService);
             BuildPaginationQuery(Page, PageSize, "id", false);
             int index = 1;
 
@@ -88,6 +92,10 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
                 index++;
                 BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_lte]={_toDate?.ToString("yyyy-MM-dd")}";
             }
+            
+            index++;
+            string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
+            BuilderQuery += $"&filter[_and][{index}][qlcl_co_so_che_bien_nlts][ward][_in]={xaFilterIds}";
 
             var result = await MainService.GetAllAsync(BuilderQuery);
             if (result.IsSuccess)
@@ -584,6 +592,8 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
 
         private async Task OnExportExcel()
         {
+            XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaService);
+
             // Get all data for export
             BuildPaginationQuery(Page, int.MaxValue);
             int index = 1;
@@ -607,6 +617,10 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
                 index++;
                 BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_lte]={_toDate?.ToString("yyyy-MM-dd")}";
             }
+            
+            index++;
+            string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
+            BuilderQuery += $"&filter[_and][{index}][qlcl_co_so_che_bien_nlts][ward][_in]={xaFilterIds}";
 
             var result = await MainService.GetAllAsync(BuilderQuery);
             if (!result.IsSuccess || result.Data == null)
