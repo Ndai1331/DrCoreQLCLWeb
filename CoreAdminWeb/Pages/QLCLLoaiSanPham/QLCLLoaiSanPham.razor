@@ -202,6 +202,16 @@
                                     </select>
                                 </div>
                                 <div class="space-y-2 md:col-span-2">
+                                    <label>Loại sản phẩm</label>
+                                    <select class="form-select" @bind-value="@SelectedItem.loai_san_pham" @bind-value:event="onchange">
+                                        <option value="" selected="@(string.IsNullOrEmpty(SelectedItem.loai_san_pham))">Chọn loại sản phẩm</option>
+                                        @foreach (var item in EnumHelper.ToList<LoaiSanPham>())
+                                        {
+                                            <option value="@item.Name" selected="@(SelectedItem.loai_san_pham == item.Name)">@item.Description</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="space-y-2 md:col-span-2">
                                     <label>Sắp xếp</label>
                                     <input type="number" class="form-input" @bind-value="@SelectedItem.sort" Label="Sắp xếp" min="0" max="100" />
                                 </div>
