@@ -51,6 +51,10 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuLayMauHauKiemATTP
         private async Task LoadData()
         {
             IsLoading = true;
+            if (_selectedXaFilter == null)
+            {
+                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
+            }
             BuilderQuery = $"QLCLBaoCaoKiemTraHauKiemATTP/chiTiet?limit={PageSize}&offset={(Page - 1) * PageSize}";
 
             if (!string.IsNullOrEmpty(_searchString))
@@ -64,7 +68,12 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuLayMauHauKiemATTP
             }
             if (_selectedXaFilter != null)
             {
-                BuilderQuery += $"&ward={_selectedXaFilter.id}";
+                BuilderQuery += $"&wards={_selectedXaFilter.id}";
+            }
+            else
+            {
+                string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
+                BuilderQuery += $"&wards={xaFilterIds}";
             }
             if (_fromDate != null)
             {
@@ -147,6 +156,10 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuLayMauHauKiemATTP
         private async Task OnExportExcel()
         {
             // Get all data for export
+            if (_selectedXaFilter == null)
+            {
+                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
+            }
             BuilderQuery = $"QLCLBaoCaoKiemTraHauKiemATTP/chiTiet?";
             if (!string.IsNullOrEmpty(_searchString))
             {
@@ -158,7 +171,12 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoDuLieuLayMauHauKiemATTP
             }
             if (_selectedXaFilter != null)
             {
-                BuilderQuery += $"&ward={_selectedXaFilter.id}";
+                BuilderQuery += $"&wards={_selectedXaFilter.id}";
+            }
+            else
+            {
+                string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
+                BuilderQuery += $"&wards={xaFilterIds}";
             }
             if (_fromDate != null)
             {

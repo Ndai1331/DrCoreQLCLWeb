@@ -55,6 +55,10 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoKiemTraHauKiemATTP
         private async Task LoadData()
         {
             IsLoading = true;
+            if (_selectedXaFilter == null)
+            {
+                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
+            }
             BuilderQuery = $"QLCLBaoCaoKiemTraHauKiemATTP?limit={PageSize}&offset={(Page - 1) * PageSize}";
 
             if (_selectedTinhFilter != null)
@@ -63,7 +67,12 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoKiemTraHauKiemATTP
             }
             if (_selectedXaFilter != null)
             {
-                BuilderQuery += $"&ward={_selectedXaFilter.id}";
+                BuilderQuery += $"&wards={_selectedXaFilter.id}";
+            }
+            else
+            {
+                string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
+                BuilderQuery += $"&wards={xaFilterIds}";
             }
             if (_fromDate != null)
             {
@@ -151,6 +160,10 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoKiemTraHauKiemATTP
 
         private async Task OnRowClick(string thang)
         {
+            if (_selectedXaFilter == null)
+            {
+                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
+            }
             string query = $"QLCLBaoCaoKiemTraHauKiemATTP/detail?thangNam={thang}";
             if (_selectedTinhFilter != null)
             {
@@ -158,7 +171,12 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoKiemTraHauKiemATTP
             }
             if (_selectedXaFilter != null)
             {
-                query += $"&ward={_selectedXaFilter.id}";
+                query += $"&wards={_selectedXaFilter.id}";
+            }
+            else
+            {
+                string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
+                BuilderQuery += $"&wards={xaFilterIds}";
             }
             var result = await DetailService.GetAllAsync(query);
             if (result.IsSuccess)
@@ -171,6 +189,10 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoKiemTraHauKiemATTP
         private async Task OnExportExcel()
         {
             // Get all data for export
+            if (_selectedXaFilter == null)
+            {
+                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
+            }
             BuilderQuery = $"QLCLBaoCaoKiemTraHauKiemATTP?";
 
             if (_selectedTinhFilter != null)
@@ -179,7 +201,12 @@ namespace CoreAdminWeb.Pages.QLCLBaoCaoKiemTraHauKiemATTP
             }
             if (_selectedXaFilter != null)
             {
-                BuilderQuery += $"&ward={_selectedXaFilter.id}";
+                BuilderQuery += $"&wards={_selectedXaFilter.id}";
+            }
+            else
+            {
+                string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
+                BuilderQuery += $"&wards={xaFilterIds}";
             }
             if (_fromDate != null)
             {
