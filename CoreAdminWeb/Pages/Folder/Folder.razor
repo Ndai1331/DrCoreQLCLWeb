@@ -148,7 +148,7 @@
                     <div class="grid max-w-4xl grid-cols-1 mx-auto space-y-7">
                         <!-- list file -->
                         <FileItems Files="Files" OnSelect="OnViewFileDetail"/>
-                        <CoreAdminWeb.Shared.Components.Pagination TotalItems="@TotalItems" TotalPages="@TotalPages" PageSize="@PageSize" PageSizeChanged="OnPageSizeChanged" PageChanged="SelectedPage" LoadData="LoadFolders" PagingConf="false" />
+                        <CoreAdminWeb.Shared.Components.Pagination TotalItems="@TotalItems" Page="@Page" TotalPages="@TotalPages" PageSize="@PageSize" PageSizeChanged="OnPageSizeChanged" PageChanged="SelectedPage" LoadData="LoadFolders" PagingConf="false" />
                     </div>
                 </div>
             </div>
