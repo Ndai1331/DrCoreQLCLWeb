@@ -71,6 +71,7 @@ namespace CoreAdminWeb.Pages.QLCLKenhQuangBaXucTienThuongMai
             if (firstRender)
             {
                 SelectedItem.province = await LoadDefaultData(TinhService);
+                _selectedTinhFilter = await LoadDefaultData(TinhService);
 
                 await LoadData();
                 _ = Task.Run(async () =>

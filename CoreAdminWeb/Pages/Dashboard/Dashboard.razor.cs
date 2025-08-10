@@ -1,15 +1,17 @@
-﻿using CoreAdminWeb.Shared.Base;
-using Microsoft.JSInterop;
-using CoreAdminWeb.Services.Reports;
+﻿using CoreAdminWeb.Model;
 using CoreAdminWeb.Model.Reports;
-using System.Collections.Generic;
-using System;
+using CoreAdminWeb.Services.BaseServices;
+using CoreAdminWeb.Services.Reports;
+using CoreAdminWeb.Shared.Base;
+using Microsoft.JSInterop;
 
 namespace CoreAdminWeb.Pages.Dashboard
 {
-    public partial class Dashboard(IReportService<ReportDashboardModel> MainService) : BlazorCoreBase
+    public partial class Dashboard(IReportService<ReportDashboardModel> MainService, IBaseService<XaPhuongModel> XaPhuongService) : BlazorCoreBase
     {
         private ReportDashboardModel? MainModel { get; set; }
+
+        private List<XaPhuongModel> XaPhuongItems { get; set; } = new();
 
         protected override async Task OnInitializedAsync()
         {
@@ -29,7 +31,11 @@ namespace CoreAdminWeb.Pages.Dashboard
         {
             try
             {
-                var result = await MainService.GetAllAsync("QLCLDashboard/");
+                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaPhuongService);
+
+                var result = await MainService.GetAllAsync("QLCLDashboard?");
+                string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
+                BuilderQuery += $"wards={xaFilterIds}";
                 if (result.IsSuccess && result.Data != null && result.Data.Any())
                 {
                     MainModel = result.Data.FirstOrDefault();
@@ -56,12 +62,12 @@ namespace CoreAdminWeb.Pages.Dashboard
         {
             try
             {
-                string[] chartLabels = ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", 
+                string[] chartLabels = ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6",
                                        "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"];
-                
+
                 var chartData = MainModel?.so_dot_kiem_tra_theo_thang?.FirstOrDefault();
-                
-                int[] chartSeries = chartData != null ? 
+
+                int[] chartSeries = chartData != null ?
                 [
                     chartData.t1, chartData.t2, chartData.t3, chartData.t4, chartData.t5, chartData.t6,
                     chartData.t7, chartData.t8, chartData.t9, chartData.t10, chartData.t11, chartData.t12
@@ -81,9 +87,9 @@ namespace CoreAdminWeb.Pages.Dashboard
             try
             {
                 string[] chartLabels = MainModel?.loai_hinh_co_so?.Select(x => x.name).ToArray() ?? new string[0];
-                
+
                 var chartData = MainModel?.loai_hinh_co_so;
-                
+
                 int[] chartSeries = chartData?.Select(x => x.so_luong_co_so).ToArray() ?? new int[0];
 
                 // Generate predefined beautiful colors for better visual appeal
