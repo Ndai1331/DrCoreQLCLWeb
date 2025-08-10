@@ -10,5 +10,9 @@ namespace CoreAdminWeb.Enums
         ChiTieuThuocBVTV = 2,
         [Description("Chỉ tiêu hóa chất, chất bảo quản")]
         ChiTieuHoaChat = 3,
+        [Description("Chỉ tiêu hóa chất, kháng sinh")]
+        ChiTieuHoaChatKhangSinh = 4,
+        [Description("Chỉ tiêu kim loại nặng")]
+        ChiTieuKimLoaiNang = 5,
     }
 }

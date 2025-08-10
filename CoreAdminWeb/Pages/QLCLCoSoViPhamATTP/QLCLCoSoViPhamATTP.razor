@@ -1,5 +1,6 @@
 ﻿@page "/du-lieu-cac-co-so-vi-pham-ve-attp"
 @using CoreAdminWeb.Extensions
+@using CoreAdminWeb.Helpers
 @using CoreAdminWeb.Model
 @using CoreAdminWeb.Services.BaseServices
 @using CoreAdminWeb.Shared.Base
@@ -57,56 +58,43 @@
                     <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
                         <MudForm>
                             <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Xã phường</MudText>
-                            <BlazoredTypeahead EnableDropDown="true"
-                                               ShowDropDownOnFocus="true"
-                                               MinimumLength="0"
-                                               TItem="XaPhuongModel"
-                                               TValue="XaPhuongModel"
-                                               SearchMethod="LoadXaFilterData"
-                                               Value="@_selectedXaFilter"
-                                               ValueExpression="@(() => _selectedXaFilter)"
-                                               ValueChanged="OnXaFilterChanged"
-                                               placeholder="Chọn xã phường"
-                                               Class="form-select">
-                                <SelectedTemplate Context="item">
-                                    @item.name
-                                </SelectedTemplate>
-                                <ResultTemplate Context="item">
-                                    @item.name
-                                </ResultTemplate>
-                                <NotFoundTemplate Context="item">
-                                    Không tìm thấy dữ liệu
-                                </NotFoundTemplate>
-                            </BlazoredTypeahead>
+                            <Select2 IdSelector="c => c != null ? c.id.ToString() : String.Empty"
+                                     TextSelector="c => c != null ? c.name : String.Empty"
+                                     FilterFunction="FilterFunctionXaPhuongData"
+                                     GetElementById="async (items, id, token) => Select2Helper.GetElementByIdGeneric(items, id, c => c.id) ?? new XaPhuongModel()"
+                                     Datasource="XaPhuongItems"
+                                     Value="@(Select2Helper.GetCurrentSelectionGeneric<XaPhuongModel>(_selectedXaFilter, 0, SelectedXaPhuongItems))"
+                                     OnValueChanged="@(e => Select2Helper.OnSelect2ChangedGeneric<XaPhuongModel>(e, v => _selectedXaFilter = v, 0, SelectedXaPhuongItems, async () => await LoadData()))"
+                                     Multiselect="false" />
                         </MudForm>
                     </div>
                     <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
                         <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Từ ngày ghi nhận</MudText>
-                         <input type="text" 
-                                   class="form-input date-picker"
-                                   placeholder="Từ ngày ghi nhận"
-                                   value="@(_fromDate?.ToString("dd/MM/yyyy"))"
-                                   @onchange="@(e => OnDateChanged(e, "fromDate"))" />
+                        <input type="text"
+                               class="form-input date-picker"
+                               placeholder="Từ ngày ghi nhận"
+                               value="@(_fromDate?.ToString("dd/MM/yyyy"))"
+                               @onchange="@(e => OnDateChanged(e, nameof(_fromDate), true))" />
                     </div>
                     <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
                         <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Đến ngày ghi nhận</MudText>
-                        <input type="text" 
+                        <input type="text"
                                class="form-input date-picker"
                                placeholder="Đến ngày ghi nhận"
                                value="@(_toDate?.ToString("dd/MM/yyyy"))"
-                               @onchange="@(e => OnDateChanged(e, "toDate"))" />
+                               @onchange="@(e => OnDateChanged(e, nameof(_toDate), true))" />
                     </div>
 
                     <div class="xs:col-span-4 sm:col-span-4 md:col-span-3 xl:col-span-3">
                         <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Tìm kiếm</MudText>
                         <div class="relative">
                             <input type="text" id="search"
-                                class="border-black/10 dark:text-white/80 dark:placeholder:text-white/30 dark:border-darkborder dark:bg-dark dark:focus:border-white/30 focus:border-black/30 placeholder:text-black/50 border text-black text-sm rounded block w-full ltr:pl-3 rtl:pr-3 ltr:pr-7 rtl:pl-7 h-10 bg-[#f9fbfd] focus:ring-0 focus:outline-0"
-                                placeholder="Tìm kiếm..."
-                                required=""
-                                @bind-value="@_searchString"
-                                @bind-value:event="oninput"
-                                @onkeydown="async (e) => await OnInputKeyDownSearch(e, LoadData)">
+                                   class="border-black/10 dark:text-white/80 dark:placeholder:text-white/30 dark:border-darkborder dark:bg-dark dark:focus:border-white/30 focus:border-black/30 placeholder:text-black/50 border text-black text-sm rounded block w-full ltr:pl-3 rtl:pr-3 ltr:pr-7 rtl:pl-7 h-10 bg-[#f9fbfd] focus:ring-0 focus:outline-0"
+                                   placeholder="Tìm kiếm..."
+                                   required=""
+                                   @bind-value="@_searchString"
+                                   @bind-value:event="oninput"
+                                   @onkeydown="async (e) => await OnInputKeyDownSearch(e, LoadData)">
 
                             <MudButton OnClick="LoadData" type="button" Class="absolute inset-y-0 flex items-center text-black ltr:right-0 rtl:left-0 ltr:pr-2 rtl:pl-2 dark:text-white/80">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-4 h-4">
@@ -160,11 +148,11 @@
                             <tr>
                                 <td>@(((Page - 1) * PageSize) + i + 1)</td>
                                 <td>@MainModels[i].ngay_ghi_nhan?.ToString("dd/MM/yyyy")</td>
-                                @if(MainModels[i].loai_co_so == LoaiCoSoNLTS.CoSoCheBien)
+                                @if (MainModels[i].loai_co_so == LoaiCoSoNLTS.CoSoCheBien)
                                 {
                                     <td>@MainModels[i].co_so_che_bien_nlts?.name</td>
                                 }
-                                else if(MainModels[i].loai_co_so == LoaiCoSoNLTS.CoSoXSKDDuDieuKien || MainModels[i].loai_co_so == LoaiCoSoNLTS.CoSoXSKDKhongDuDieuKien)
+                                else if (MainModels[i].loai_co_so == LoaiCoSoNLTS.CoSoXSKDDuDieuKien || MainModels[i].loai_co_so == LoaiCoSoNLTS.CoSoXSKDKhongDuDieuKien)
                                 {
                                     <td>@MainModels[i].co_so_nlts_du_dieu_kien_attp?.name</td>
                                 }
@@ -173,7 +161,7 @@
                                 <td>@MainModels[i].phat_tien</td>
                                 <td>@MainModels[i].gia_tri_tang_vat</td>
                                 <td>@MainModels[i].description</td>
-                                <td>@((MarkupString)MainModels[i].status.GetDescription())</td>
+                                <td>@((MarkupString)(MainModels[i].status?.GetDescription() ?? string.Empty))</td>
                                 <td class="flex items-center gap-2">
                                     <MudButton Class="transition-all duration-300 border btn-crud rounded-md btn text-purple border-purple hover:bg-purple hover:text-white"
                                                @onclick="@(e => OpenAddOrUpdateModal(MainModels[currentIndex]))">
@@ -187,82 +175,11 @@
                             </tr>
                         }
                     </tbody>
-                    
+
                 </table>
             </div>
-            <div class="w-full grid grid-cols-1 pb-2">
-                <div class="flex items-center justify-between p-4">
-                    <div class="flex items-center gap-2">
-                        <span>Hiển thị</span>
-                        <select class="form-select" @bind="PageSize" @bind:event="oninput" @onchange="async (e) => await OnPageSizeChanged(LoadData)">
-                            <option value="10">10</option>
-                            <option value="25">25</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                        </select>
-                        <span>mục</span>
-                    </div>
-                    <div class="flex items-center gap-2">
 
-                        <div>
-                            <ul class="inline-flex my-2 -space-x-px list-inside">
-                                <li><MudLink Href="#" Class="px-3 py-2 bg-white border cursor-not-allowed ltr:ml-0 rtl:mr-0 ltr:rounded-l-lg rtl:rounded-r-lg text-black/50 border-black/10 dark:bg-transparent dark:text-darkmuted dark:border-darkborder" @onclick="async (e) => await PreviousPage(LoadData)" disabled="@(Page <= 1)">Trước</MudLink></li>
-                                @{
-                                    var startPage = Math.Max(1, Page - 1);
-                                    var endPage = Math.Min(TotalPages, Page + 1);
-
-                                    // Always show first page
-                                    <li>
-                                        <a href="#"
-                                            class="px-3 py-2 text-black  border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple @(Page == 1 ? "bg-purple text-white" : "bg-white")"
-                                            @onclick="async (e) => await SelectedPage(1, LoadData)">1</a>
-                                    </li>
-
-                                    // Show ellipsis if needed
-                                    if (startPage > 2)
-                                    {
-                                        <li><span class="px-3 py-2">...</span></li>
-                                    }
-
-                                    // Show pages around current page
-                                    for (int i = startPage; i <= endPage; i++)
-                                    {
-                                        if (i > 1 && i < TotalPages)
-                                        {   
-                                            var currentPage = i; // Local variable to avoid closure issues
-                                            <li>
-                                                <a href="#"
-                                                    class="px-3 py-2 text-black  border border-black/10
-                                                    hover:bg-purple hover:text-white dark:bg-transparent
-                                                    dark:text-white dark:border-darkborder dark:hover:bg-purple
-                                                    dark:hover:text-white dark:hover:border-purple @(Page == i ? "bg-purple text-white" : "bg-white")"
-                                                    @onclick="async (e) => await SelectedPage(currentPage, LoadData)">@i</a>
-                                            </li>
-                                        }
-                                    }
-
-                                    // Show ellipsis if needed
-                                    if (endPage < TotalPages - 1)
-                                    {
-                                        <li><span class="px-3 py-2">...</span></li>
-                                    }
-
-                                    // Always show last page if there is more than one page
-                                    if (TotalPages > 1)
-                                    {
-                                        <li>
-                                            <a href="#"
-                                                class="px-3 py-2 text-black  border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple @(Page == TotalPages ? "bg-purple text-white" : "bg-white")"
-                                                @onclick="async (e) => await SelectedPage(TotalPages, LoadData)">@TotalPages</a>
-                                        </li>
-                                    }
-                                }
-                                <li><MudLink Href="#" Class="px-3 py-2 bg-white border cursor-not-allowed ltr:ml-0 rtl:mr-0 ltr:rounded-r-lg rtl:rounded-l-lg text-black/50 border-black/10 dark:bg-transparent dark:text-darkmuted dark:border-darkborder" @onclick="async (e) => await NextPage(LoadData)" disabled="@(Page >= TotalPages)">Sau</MudLink></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <CoreAdminWeb.Shared.Components.Pagination TotalItems="@TotalItems" Page="@Page" TotalPages="@TotalPages" PageSize="@PageSize" PageSizeChanged="OnPageSizeChanged" PageChanged="SelectedPage" LoadData="LoadData" />
         </div>
     </div>
 </div>
@@ -308,7 +225,7 @@
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-2 py-2">
                             <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
                                 <label>Ngày ghi nhận<span class="text-danger">*</span></label>
-                                <input type="text" 
+                                <input type="text"
                                        class="form-input date-picker"
                                        placeholder="Chọn ngày cấp"
                                        value="@(SelectedItem.ngay_ghi_nhan?.ToString("dd/MM/yyyy"))"
@@ -316,7 +233,7 @@
                             </div>
                             <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
                                 <label>Ngày xử lý<span class="text-danger">*</span></label>
-                                <input type="text" 
+                                <input type="text"
                                        class="form-input date-picker"
                                        placeholder="Chọn ngày cấp"
                                        value="@(SelectedItem.ngay_xu_ly?.ToString("dd/MM/yyyy"))"
@@ -331,7 +248,7 @@
                                 <select class="form-select" @onchange="OnLoaiCoSoChanged">
                                     @foreach (var item in LoaiCoSoList)
                                     {
-                                        <option value="@item">@item.GetDescription()</option>
+                                        <option value="@item" selected="@(SelectedItem.loai_co_so == item)">@item.GetDescription()</option>
                                     }
                                 </select>
                             </div>
@@ -340,16 +257,16 @@
                                 <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
                                     <label>Tên cơ sở<span class="text-danger">*</span></label>
                                     <BlazoredTypeahead EnableDropDown="true"
-                                               ShowDropDownOnFocus="true"
-                                               MinimumLength="0"
-                                               TItem="QLCLCoSoCheBienNLTSModel"
-                                               TValue="QLCLCoSoCheBienNLTSModel"
-                                               SearchMethod="LoadQLCLCoSoCheBienNLTSData"
-                                               Value="SelectedItem.co_so_che_bien_nlts"
-                                               ValueExpression="@(() => SelectedItem.co_so_che_bien_nlts)"
-                                               ValueChanged="@(e => SelectedItem.co_so_che_bien_nlts = e)"
-                                               placeholder="Chọn cơ sở"
-                                               Class="form-select">
+                                                       ShowDropDownOnFocus="true"
+                                                       MinimumLength="0"
+                                                       TItem="QLCLCoSoCheBienNLTSModel"
+                                                       TValue="QLCLCoSoCheBienNLTSModel"
+                                                       SearchMethod="LoadQLCLCoSoCheBienNLTSData"
+                                                       Value="SelectedItem.co_so_che_bien_nlts"
+                                                       ValueExpression="@(() => SelectedItem.co_so_che_bien_nlts)"
+                                                       ValueChanged="@(e => SelectedItem.co_so_che_bien_nlts = e)"
+                                                       placeholder="Chọn cơ sở"
+                                                       Class="form-select">
                                         <SelectedTemplate Context="item">
                                             @item.name
                                         </SelectedTemplate>
@@ -367,16 +284,16 @@
                                 <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
                                     <label>Tên cơ sở<span class="text-danger">*</span></label>
                                     <BlazoredTypeahead EnableDropDown="true"
-                                               ShowDropDownOnFocus="true"
-                                               MinimumLength="0"
-                                               TItem="QLCLCoSoNLTSDuDieuKienATTPModel"
-                                               TValue="QLCLCoSoNLTSDuDieuKienATTPModel"
-                                                SearchMethod="LoadQLCLCoSoNLTSDuDieuKienATTPData"
-                                               Value="SelectedItem.co_so_nlts_du_dieu_kien_attp"
-                                               ValueExpression="@(() => SelectedItem.co_so_nlts_du_dieu_kien_attp)"
-                                               ValueChanged="@(e => SelectedItem.co_so_nlts_du_dieu_kien_attp = e)"
-                                               placeholder="Chọn cơ sở"    
-                                               Class="form-select">
+                                                       ShowDropDownOnFocus="true"
+                                                       MinimumLength="0"
+                                                       TItem="QLCLCoSoNLTSDuDieuKienATTPModel"
+                                                       TValue="QLCLCoSoNLTSDuDieuKienATTPModel"
+                                                       SearchMethod="LoadQLCLCoSoNLTSDuDieuKienATTPData"
+                                                       Value="SelectedItem.co_so_nlts_du_dieu_kien_attp"
+                                                       ValueExpression="@(() => SelectedItem.co_so_nlts_du_dieu_kien_attp)"
+                                                       ValueChanged="@(e => SelectedItem.co_so_nlts_du_dieu_kien_attp = e)"
+                                                       placeholder="Chọn cơ sở"
+                                                       Class="form-select">
                                         <SelectedTemplate Context="item">
                                             @item.name
                                         </SelectedTemplate>
@@ -394,16 +311,16 @@
                                 <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
                                     <label>Tên cơ sở<span class="text-danger">*</span></label>
                                     <BlazoredTypeahead EnableDropDown="true"
-                                               ShowDropDownOnFocus="true"
-                                               MinimumLength="0"
-                                               TItem="QLCLCoSoNLTSDuDieuKienATTPModel"
-                                               TValue="QLCLCoSoNLTSDuDieuKienATTPModel"
-                                               SearchMethod="LoadQLCLCoSoNLTSKhongDuDieuKienATTPData"
-                                               Value="SelectedItem.co_so_nlts_du_dieu_kien_attp"
-                                               ValueExpression="@(() => SelectedItem.co_so_nlts_du_dieu_kien_attp)"
-                                               ValueChanged="@(e => SelectedItem.co_so_nlts_du_dieu_kien_attp = e)"
-                                               placeholder="Chọn cơ sở"
-                                               Class="form-select">
+                                                       ShowDropDownOnFocus="true"
+                                                       MinimumLength="0"
+                                                       TItem="QLCLCoSoNLTSDuDieuKienATTPModel"
+                                                       TValue="QLCLCoSoNLTSDuDieuKienATTPModel"
+                                                       SearchMethod="LoadQLCLCoSoNLTSKhongDuDieuKienATTPData"
+                                                       Value="SelectedItem.co_so_nlts_du_dieu_kien_attp"
+                                                       ValueExpression="@(() => SelectedItem.co_so_nlts_du_dieu_kien_attp)"
+                                                       ValueChanged="@(e => SelectedItem.co_so_nlts_du_dieu_kien_attp = e)"
+                                                       placeholder="Chọn cơ sở"
+                                                       Class="form-select">
                                         <SelectedTemplate Context="item">
                                             @item.name
                                         </SelectedTemplate>
@@ -430,16 +347,16 @@
                             <div class="space-y-2 xs:col-span-2 sm:col-span-2 md:col-span-2 xl:col-span-2">
                                 <label>Hành vi vi phạm</label>
                                 <BlazoredTypeahead EnableDropDown="true"
-                                               ShowDropDownOnFocus="true"
-                                               MinimumLength="0"
-                                               TItem="QLCLHanhViViPhamModel"
-                                               TValue="QLCLHanhViViPhamModel"
-                                               SearchMethod="LoadQLCLHanhViViPhamData"
-                                               Value="SelectedItem.hanh_vi_vi_pham"
-                                               ValueExpression="@(() => SelectedItem.hanh_vi_vi_pham)"
-                                               ValueChanged="@(e => SelectedItem.hanh_vi_vi_pham = e)"
-                                               placeholder="Chọn hành vi vi phạm"
-                                               Class="form-select">
+                                                   ShowDropDownOnFocus="true"
+                                                   MinimumLength="0"
+                                                   TItem="QLCLHanhViViPhamModel"
+                                                   TValue="QLCLHanhViViPhamModel"
+                                                   SearchMethod="LoadQLCLHanhViViPhamData"
+                                                   Value="SelectedItem.hanh_vi_vi_pham"
+                                                   ValueExpression="@(() => SelectedItem.hanh_vi_vi_pham)"
+                                                   ValueChanged="@(e => SelectedItem.hanh_vi_vi_pham = e)"
+                                                   placeholder="Chọn hành vi vi phạm"
+                                                   Class="form-select">
                                     <SelectedTemplate Context="item">
                                         @item.name
                                     </SelectedTemplate>
@@ -451,7 +368,7 @@
                                     </NotFoundTemplate>
                                 </BlazoredTypeahead>
                             </div>
-                            
+
                             <div class="space-y-2 xs:col-span-2 sm:col-span-2 md:col-span-2 xl:col-span-2">
                                 <label>Hướng xử lý</label>
                                 <input type="text" class="form-input" @bind-value="@SelectedItem.huong_xu_ly" />
@@ -465,16 +382,16 @@
                             <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
                                 <label>Hình thức xử phạt:</label>
                                 <BlazoredTypeahead EnableDropDown="true"
-                                               ShowDropDownOnFocus="true"
-                                               MinimumLength="0"
-                                               TItem="QLCLHinhThucXuPhatModel"
-                                               TValue="QLCLHinhThucXuPhatModel"
-                                               SearchMethod="LoadQLCLHinhThucXuPhatData"
-                                               Value="SelectedItem.hinh_thuc_xu_phat"
-                                               ValueExpression="@(() => SelectedItem.hinh_thuc_xu_phat)"
-                                               ValueChanged="@(e => SelectedItem.hinh_thuc_xu_phat = e)"
-                                               placeholder="Chọn hình thức xử phạt"
-                                               Class="form-select">
+                                                   ShowDropDownOnFocus="true"
+                                                   MinimumLength="0"
+                                                   TItem="QLCLHinhThucXuPhatModel"
+                                                   TValue="QLCLHinhThucXuPhatModel"
+                                                   SearchMethod="LoadQLCLHinhThucXuPhatData"
+                                                   Value="SelectedItem.hinh_thuc_xu_phat"
+                                                   ValueExpression="@(() => SelectedItem.hinh_thuc_xu_phat)"
+                                                   ValueChanged="@(e => SelectedItem.hinh_thuc_xu_phat = e)"
+                                                   placeholder="Chọn hình thức xử phạt"
+                                                   Class="form-select">
                                     <SelectedTemplate Context="item">
                                         @item.name
                                     </SelectedTemplate>
@@ -491,7 +408,7 @@
                                 <select class="form-select" @bind-value="@SelectedItem.khac_phuc" @bind-value:event="onchange">
                                     @foreach (var item in KhacPhucList)
                                     {
-                                        <option value="@item">@item.GetDescription()</option>
+                                        <option value="@item" selected="@(SelectedItem.khac_phuc == item)">@item.GetDescription()</option>
                                     }
                                 </select>
                             </div>
@@ -502,16 +419,16 @@
                             <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
                                 <label>Đơn vị tính</label>
                                 <BlazoredTypeahead EnableDropDown="true"
-                                               ShowDropDownOnFocus="true"
-                                               MinimumLength="0"
-                                               TItem="DonViTinhModel"
-                                               TValue="DonViTinhModel"
-                                               SearchMethod="LoadDonViTinhData"
-                                               Value="SelectedItem.don_vi_tinh"
-                                               ValueExpression="@(() => SelectedItem.don_vi_tinh)"
-                                               ValueChanged="@(e => SelectedItem.don_vi_tinh = e)"
-                                               placeholder="Chọn đơn vị tính"
-                                               Class="form-select">
+                                                   ShowDropDownOnFocus="true"
+                                                   MinimumLength="0"
+                                                   TItem="DonViTinhModel"
+                                                   TValue="DonViTinhModel"
+                                                   SearchMethod="LoadDonViTinhData"
+                                                   Value="SelectedItem.don_vi_tinh"
+                                                   ValueExpression="@(() => SelectedItem.don_vi_tinh)"
+                                                   ValueChanged="@(e => SelectedItem.don_vi_tinh = e)"
+                                                   placeholder="Chọn đơn vị tính"
+                                                   Class="form-select">
                                     <SelectedTemplate Context="item">
                                         @item.name
                                     </SelectedTemplate>
@@ -533,7 +450,7 @@
                                 <select class="form-select" @bind-value="@SelectedItem.xu_ly_khac" @bind-value:event="onchange">
                                     @foreach (var item in TrangThaiXuLyKhacList)
                                     {
-                                        <option value="@item">@item.GetDescription()</option>
+                                        <option value="@item" selected="@(SelectedItem.xu_ly_khac == item)">@item.GetDescription()</option>
                                     }
                                 </select>
                             </div>
@@ -543,7 +460,7 @@
                                 <select class="form-select" @bind-value="@SelectedItem.status" @bind-value:event="onchange">
                                     @foreach (var item in TrangThaiXuLyList)
                                     {
-                                        <option value="@item">@item.GetDescription()</option>
+                                        <option value="@item" selected="@(SelectedItem.status == item)">@item.GetDescription()</option>
                                     }
                                 </select>
                             </div>

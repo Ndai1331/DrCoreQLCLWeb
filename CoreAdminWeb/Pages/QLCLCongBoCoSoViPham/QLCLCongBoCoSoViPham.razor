@@ -1,12 +1,13 @@
 ﻿@page "/cong-bo-cac-co-so-vi-pham-chat-luong-hang-hoa-va-attp"
 @using CoreAdminWeb.Extensions
+@using CoreAdminWeb.Helpers
 @using CoreAdminWeb.Model
 @using CoreAdminWeb.Shared.Base
 @inherits BlazorCoreBase
 @layout MainLayout
 
-<PageHeader Title="Công bố các cơ sở vi phạm chất lượng hàng hóa và ATTP" 
-pTitle="Công bố các cơ sở vi phạm chất lượng hàng hóa và ATTP"></PageHeader>
+<PageHeader Title="Công bố các cơ sở vi phạm chất lượng hàng hóa và ATTP"
+            pTitle="Công bố các cơ sở vi phạm chất lượng hàng hóa và ATTP"></PageHeader>
 
 <!-- Start All Card -->
 <div class="flex flex-col gap-4 min-h-[calc(100vh-212px)]">
@@ -55,56 +56,43 @@ pTitle="Công bố các cơ sở vi phạm chất lượng hàng hóa và ATTP">
                     <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
                         <MudForm>
                             <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Xã phường</MudText>
-                            <BlazoredTypeahead EnableDropDown="true"
-                                               ShowDropDownOnFocus="true"
-                                               MinimumLength="0"
-                                               TItem="XaPhuongModel"
-                                               TValue="XaPhuongModel"
-                                               SearchMethod="LoadXaFilterData"
-                                               Value="@_selectedXaFilter"
-                                               ValueExpression="@(() => _selectedXaFilter)"
-                                               ValueChanged="OnXaFilterChanged"
-                                               placeholder="Chọn xã phường"
-                                               Class="form-select">
-                                <SelectedTemplate Context="item">
-                                    @item.name
-                                </SelectedTemplate>
-                                <ResultTemplate Context="item">
-                                    @item.name
-                                </ResultTemplate>
-                                <NotFoundTemplate Context="item">
-                                    Không tìm thấy dữ liệu
-                                </NotFoundTemplate>
-                            </BlazoredTypeahead>
+                            <Select2 IdSelector="c => c != null ? c.id.ToString() : String.Empty"
+                                     TextSelector="c => c != null ? c.name : String.Empty"
+                                     FilterFunction="FilterFunctionXaPhuongData"
+                                     GetElementById="async (items, id, token) => Select2Helper.GetElementByIdGeneric(items, id, c => c.id) ?? new XaPhuongModel()"
+                                     Datasource="XaPhuongItems"
+                                     Value="@(Select2Helper.GetCurrentSelectionGeneric<XaPhuongModel>(_selectedXaFilter, 0, SelectedXaPhuongItems))"
+                                     OnValueChanged="@(e => Select2Helper.OnSelect2ChangedGeneric<XaPhuongModel>(e, v => _selectedXaFilter = v, 0, SelectedXaPhuongItems, async () => await LoadData()))"
+                                     Multiselect="false" />
                         </MudForm>
                     </div>
                     <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
                         <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Từ ngày vi phạm</MudText>
-                         <input type="text" 
-                                   class="form-input date-picker"
-                                   placeholder="Từ ngày vi phạm"
-                                   value="@(_fromDate?.ToString("dd/MM/yyyy"))"
-                                   @onchange="@(e => OnDateChanged(e, "fromDate"))" />
+                        <input type="text"
+                               class="form-input date-picker"
+                               placeholder="Từ ngày vi phạm"
+                               value="@(_fromDate?.ToString("dd/MM/yyyy"))"
+                               @onchange="@(e => OnDateChanged(e, nameof(_fromDate)))" />
                     </div>
                     <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
                         <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Đến ngày vi phạm</MudText>
-                        <input type="text" 
+                        <input type="text"
                                class="form-input date-picker"
                                placeholder="Đến ngày vi phạm"
                                value="@(_toDate?.ToString("dd/MM/yyyy"))"
-                               @onchange="@(e => OnDateChanged(e, "toDate"))" />
+                               @onchange="@(e => OnDateChanged(e, nameof(_toDate)))" />
                     </div>
 
                     <div class="xs:col-span-4 sm:col-span-4 md:col-span-3 xl:col-span-3">
                         <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Tìm kiếm</MudText>
                         <div class="relative">
                             <input type="text" id="search"
-                                class="border-black/10 dark:text-white/80 dark:placeholder:text-white/30 dark:border-darkborder dark:bg-dark dark:focus:border-white/30 focus:border-black/30 placeholder:text-black/50 border text-black text-sm rounded block w-full ltr:pl-3 rtl:pr-3 ltr:pr-7 rtl:pl-7 h-10 bg-[#f9fbfd] focus:ring-0 focus:outline-0"
-                                placeholder="Tìm kiếm..."
-                                required=""
-                                @bind-value="@_searchString"
-                                @bind-value:event="oninput"
-                                @onkeydown="async (e) => await OnInputKeyDownSearch(e, LoadData)">
+                                   class="border-black/10 dark:text-white/80 dark:placeholder:text-white/30 dark:border-darkborder dark:bg-dark dark:focus:border-white/30 focus:border-black/30 placeholder:text-black/50 border text-black text-sm rounded block w-full ltr:pl-3 rtl:pr-3 ltr:pr-7 rtl:pl-7 h-10 bg-[#f9fbfd] focus:ring-0 focus:outline-0"
+                                   placeholder="Tìm kiếm..."
+                                   required=""
+                                   @bind-value="@_searchString"
+                                   @bind-value:event="oninput"
+                                   @onkeydown="async (e) => await OnInputKeyDownSearch(e, LoadData)">
 
                             <MudButton OnClick="LoadData" type="button" Class="absolute inset-y-0 flex items-center text-black ltr:right-0 rtl:left-0 ltr:pr-2 rtl:pl-2 dark:text-white/80">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-4 h-4">
@@ -146,14 +134,15 @@ pTitle="Công bố các cơ sở vi phạm chất lượng hàng hóa và ATTP">
                         {
                             <tr>
                                 <td>@(((Page - 1) * PageSize) + item.Index + 1)</td>
-                                <td>@if(item.Data.da_cong_bo  != null && item.Data.da_cong_bo == true)
-                                {
-                                    <span @onclick=" (e) =>  OpenCongBoModal(item.Data)" class="shadow-success/50 bg-success text-white inline-flex items-center rounded shadow-md text-xs justify-center px-1.5 py-0.5">Đã công bố</span>
-                                }
-                                else
-                                {
-                                    <span @onclick=" (e) =>  OpenCongBoModal(item.Data)" class="shadow-danger/50 bg-danger text-white inline-flex items-center rounded shadow-md text-xs justify-center px-1.5 py-0.5">Chưa công bố</span>
-                                }
+                                <td>
+                                    @if (item.Data.da_cong_bo != null && item.Data.da_cong_bo == true)
+                                    {
+                                        <span @onclick=" (e) =>  OpenCongBoModal(item.Data)" class="shadow-success/50 bg-success text-white inline-flex items-center rounded shadow-md text-xs justify-center px-1.5 py-0.5">Đã công bố</span>
+                                    }
+                                    else
+                                    {
+                                        <span @onclick=" (e) =>  OpenCongBoModal(item.Data)" class="shadow-danger/50 bg-danger text-white inline-flex items-center rounded shadow-md text-xs justify-center px-1.5 py-0.5">Chưa công bố</span>
+                                    }
                                 </td>
                                 @if (item.Data.loai_co_so == Enums.LoaiCoSoNLTS.CoSoCheBien)
                                 {
@@ -172,84 +161,14 @@ pTitle="Công bố các cơ sở vi phạm chất lượng hàng hóa và ATTP">
                                 <td>@item.Data.san_pham_vi_pham</td>
                                 <td>@item.Data.hanh_vi_vi_pham?.name</td>
                                 <td>@(item.Data.hinh_thuc_xu_phat != null ? item.Data.hinh_thuc_xu_phat?.name : item.Data.xu_ly_khac?.GetDescription())</td>
-                                
+
                             </tr>
-                            }
+                        }
                     </tbody>
                 </table>
             </div>
-            <div class="w-full grid grid-cols-1 pb-2">
-                <div class="flex items-center justify-between p-4">
-                    <div class="flex items-center gap-2">
-                        <span>Hiển thị</span>
-                        <select class="form-select" @bind="PageSize" @bind:event="oninput" @onchange="async (e) => await OnPageSizeChanged(LoadData)">
-                            <option value="10">10</option>
-                            <option value="25">25</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                        </select>
-                        <span>mục</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <div>
-                            <ul class="inline-flex my-2 -space-x-px list-inside">
-                                <li><MudLink Href="#" Class="px-3 py-2 bg-white border cursor-not-allowed ltr:ml-0 rtl:mr-0 ltr:rounded-l-lg rtl:rounded-r-lg text-black/50 border-black/10 dark:bg-transparent dark:text-darkmuted dark:border-darkborder" @onclick="async (e) => await PreviousPage(LoadData)" disabled="@(Page <= 1)">Trước</MudLink></li>
-                                @{
-                                    var startPage = Math.Max(1, Page - 1);
-                                    var endPage = Math.Min(TotalPages, Page + 1);
 
-                                    // Always show first page
-                                    <li>
-                                        <a href="#"
-                                            class="px-3 py-2 text-black  border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple @(Page == 1 ? "bg-purple text-white" : "bg-white")"
-                                            @onclick="async (e) => await SelectedPage(1, LoadData)">1</a>
-                                    </li>
-
-                                    // Show ellipsis if needed
-                                    if (startPage > 2)
-                                    {
-                                        <li><span class="px-3 py-2">...</span></li>
-                                    }
-
-                                    // Show pages around current page
-                                    for (int i = startPage; i <= endPage; i++)
-                                    {
-                                        if (i > 1 && i < TotalPages)
-                                        {   
-                                            var currentPage = i; // Local variable to avoid closure issues
-                                            <li>
-                                                <a href="#"
-                                                    class="px-3 py-2 text-black  border border-black/10
-                                                    hover:bg-purple hover:text-white dark:bg-transparent
-                                                    dark:text-white dark:border-darkborder dark:hover:bg-purple
-                                                    dark:hover:text-white dark:hover:border-purple @(Page == i ? "bg-purple text-white" : "bg-white")"
-                                                    @onclick="async (e) => await SelectedPage(currentPage, LoadData)">@i</a>
-                                            </li>
-                                        }
-                                    }
-
-                                    // Show ellipsis if needed
-                                    if (endPage < TotalPages - 1)
-                                    {
-                                        <li><span class="px-3 py-2">...</span></li>
-                                    }
-
-                                    // Always show last page if there is more than one page
-                                    if (TotalPages > 1)
-                                    {
-                                        <li>
-                                            <a href="#"
-                                                class="px-3 py-2 text-black  border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple @(Page == TotalPages ? "bg-purple text-white" : "bg-white")"
-                                                @onclick="async (e) => await SelectedPage(TotalPages, LoadData)">@TotalPages</a>
-                                        </li>
-                                    }
-                                }
-                                <li><MudLink Href="#" Class="px-3 py-2 bg-white border cursor-not-allowed ltr:ml-0 rtl:mr-0 ltr:rounded-r-lg rtl:rounded-l-lg text-black/50 border-black/10 dark:bg-transparent dark:text-darkmuted dark:border-darkborder" @onclick="async (e) => await NextPage(LoadData)" disabled="@(Page >= TotalPages)">Sau</MudLink></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <CoreAdminWeb.Shared.Components.Pagination TotalItems="@TotalItems" Page="@Page" TotalPages="@TotalPages" PageSize="@PageSize" PageSizeChanged="OnPageSizeChanged" PageChanged="SelectedPage" LoadData="LoadData" />
         </div>
     </div>
 </div>
@@ -261,14 +180,14 @@ pTitle="Công bố các cơ sở vi phạm chất lượng hàng hóa và ATTP">
         <div class="flex items-center justify-center min-h-screen px-4" @onclick="CloseCongBoModal">
             <div class="relative w-full max-w-lg p-0 my-8 overflow-hidden bg-white border rounded-lg border-black/10 dark:bg-darklight dark:border-darkborder" @onclick:stopPropagation>
                 <div class="flex items-center justify-between px-5 py-3 bg-white border-b border-black/10 dark:bg-darklight dark:border-darkborder">
-                    <MudText Typo="Typo.h5" Class="text-lg font-semibold text-slate-800 dark:text-slate-100">@(_selectedItem.da_cong_bo == true ? "Hủy" : "") Công Bố</MudText>
+                    <MudText Typo="Typo.h5" Class="text-lg font-semibold text-slate-800 dark:text-slate-100">@(_selectedItem?.da_cong_bo == true ? "Hủy" : "") Công Bố</MudText>
                     <MudButton Class="text-muted hover:text-black dark:hover:text-white" OnClick="CloseCongBoModal">
                         <i class="ri-close-line"></i>
                     </MudButton>
                 </div>
                 <div class="p-5">
                     <div class="text-black dark:text-muted">
-                        <h3>Bạn có chắc chắn muốn @(_selectedItem.da_cong_bo == true ? "hủy công bố" : "công bố") dữ liệu này không?</h3>
+                        <h3>Bạn có chắc chắn muốn @(_selectedItem?.da_cong_bo == true ? "hủy công bố" : "công bố") dữ liệu này không?</h3>
                     </div>
                     <div class="flex items-center justify-end gap-2">
                         <MudButton Class="transition-all duration-300 border btn-crud rounded-md btn text-danger border-danger hover:bg-danger hover:text-white" OnClick="CloseCongBoModal">Huỷ</MudButton>

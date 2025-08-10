@@ -8,13 +8,12 @@
 @using OfficeOpenXml
 @using OfficeOpenXml.Style
 @using System.Drawing
-@inject IJSRuntime JsRuntime
 @inject IBaseService<QLCLDotKiemTraHauKiemATTPModel> MainService
 @inherits BlazorCoreBase
 @layout MainLayout
 
 <PageHeader Title="Danh sách đợt kiểm tra, hậu kiểm ATTP"
- pTitle="Danh sách đợt kiểm tra, hậu kiểm ATTP"></PageHeader>
+            pTitle="Danh sách đợt kiểm tra, hậu kiểm ATTP"></PageHeader>
 
 
 <!-- Start All Card -->
@@ -57,28 +56,28 @@
                     </div>
                     <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
                         <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Từ ngày</MudText>
-                         <input type="text" 
-                                   class="form-input date-picker"
-                                   placeholder="Từ ngày"
-                                   value="@(_fromDate?.ToString("dd/MM/yyyy"))"
-                                   @onchange="@(e => OnDateChanged(e, "fromDate" , true))" />
+                        <input type="text"
+                               class="form-input date-picker"
+                               placeholder="Từ ngày"
+                               value="@(_fromDate?.ToString("dd/MM/yyyy"))"
+                               @onchange="@(e => OnDateChanged(e, nameof(_fromDate), true))" />
                     </div>
                     <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
                         <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Đến ngày</MudText>
-                        <input type="text" 
+                        <input type="text"
                                class="form-input date-picker"
                                placeholder="Đến ngày"
                                value="@(_toDate?.ToString("dd/MM/yyyy"))"
-                               @onchange="@(e => OnDateChanged(e, "toDate" , true))" />
+                               @onchange="@(e => OnDateChanged(e, nameof(_toDate), true))" />
                     </div>
                     <div class="xs:col-span-4 sm:col-span-4 md:col-span-1 xl:col-span-1">
                         <MudForm class="flex-1">
                             <MudText Typo="Typo.h2" Class="mb-1 text-base font-semibold capitalize text-slate-800 dark:text-slate-100">Trạng thái</MudText>
                             <select class="form-select" @bind="_searchStatusString" @bind:event="oninput" @onchange="OnStatusFilterChanged">
                                 <option value="" selected>Tất cả</option>
-                                @foreach (var item in StatusList)
+                                @foreach (var item in EnumHelper.ToList<Model.Base.Status>())
                                 {
-                                    <option value="@item" selected="@(_searchStatusString == item.ToString())">@item.GetDescription()</option>
+                                    <option value="@item.EnumValue" selected="@(_searchStatusString == item.Name)">@item.Description</option>
                                 }
                             </select>
                         </MudForm>
@@ -108,120 +107,47 @@
             <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
                 <table id="example" class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400" style="width:100%">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                    <tr>
-                        <th>Mã</th>
-                        <th>Tên</th>
-                        <th>Thời gian</th>
-                        <th>Số quyết định</th>
-                        <th>Đơn vị chủ trì</th>
-                        <th>Nội dung kiểm tra</th>
-                        <th>Ghi chú</th>
-                        <th>Trạng thái</th>
-                        <th class="flex items-center gap-2">Tác vụ</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in MainModels)
-                    {
                         <tr>
-                            <td>@item.code</td>
-                            <td>@item.name</td>
-                            <td>@item.bat_dau_tu?.ToString("dd/MM/yyyy") - @item.den?.ToString("dd/MM/yyyy")</td>
-                            <td>@item.so_quyet_dinh</td>
-                            <td>@item.don_vi_chu_tri</td>
-                            <td>@item.noi_dung_kiem_tra</td>
-                            <td>@item.description</td>
-                            <td>@((MarkupString)item.status.GetTrangThai())</td>
-                            <td class="flex items-center gap-2">
-                                <MudButton Class="transition-all duration-300 border btn-crud rounded-md btn text-purple border-purple hover:bg-purple hover:text-white"
-                                           @onclick="@(e => OpenAddOrUpdateModal(item))">
-                                    <i class="ri-edit-line"></i>
-                                </MudButton>
-                                <MudButton Class="transition-all duration-300 border btn-crud rounded-md btn text-danger border-danger hover:bg-danger hover:text-white"
-                                           @onclick="@(e => OpenDeleteModal(item))">
-                                    <i class="ri-delete-bin-line"></i>
-                                </MudButton>
-                            </td>
+                            <th>Mã</th>
+                            <th>Tên</th>
+                            <th>Thời gian</th>
+                            <th>Số quyết định</th>
+                            <th>Đơn vị chủ trì</th>
+                            <th>Nội dung kiểm tra</th>
+                            <th>Ghi chú</th>
+                            <th>Trạng thái</th>
+                            <th class="flex items-center gap-2">Tác vụ</th>
                         </tr>
-                    }
-                </tbody>
-                
-            </table>
-        </div>
-
-        <div class="w-full grid grid-cols-1 pb-2">
-                <div class="flex items-center justify-between p-4">
-                    <div class="flex items-center gap-2">
-                        <span>Hiển thị</span>
-                        <select class="form-select" @bind="PageSize" @bind:event="oninput" @onchange="async (e) => await OnPageSizeChanged(LoadData)">
-                            <option value="10">10</option>
-                            <option value="25">25</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                        </select>
-                        <span>mục</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-
-                        <div>
-                            <ul class="inline-flex my-2 -space-x-px list-inside">
-                                <li><MudLink Href="#" Class="px-3 py-2 bg-white border cursor-not-allowed ltr:ml-0 rtl:mr-0 ltr:rounded-l-lg rtl:rounded-r-lg text-black/50 border-black/10 dark:bg-transparent dark:text-darkmuted dark:border-darkborder" @onclick="async (e) => await PreviousPage(LoadData)" disabled="@(Page <= 1)">Trước</MudLink></li>
-                                @{
-                                    var startPage = Math.Max(1, Page - 1);
-                                    var endPage = Math.Min(TotalPages, Page + 1);
-
-                                    // Always show first page
-                                    <li>
-                                        <a href="#"
-                                            class="px-3 py-2 text-black  border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple @(Page == 1 ? "bg-purple text-white" : "bg-white")"
-                                            @onclick="async (e) => await SelectedPage(1, LoadData)">1</a>
-                                    </li>
-
-                                    // Show ellipsis if needed
-                                    if (startPage > 2)
-                                    {
-                                        <li><span class="px-3 py-2">...</span></li>
-                                    }
-
-                                    // Show pages around current page
-                                    for (int i = startPage; i <= endPage; i++)
-                                    {
-                                        if (i > 1 && i < TotalPages)
-                                        {   
-                                            var currentPage = i; // Local variable to avoid closure issues
-                                            <li>
-                                                <a href="#"
-                                                    class="px-3 py-2 text-black  border border-black/10
-                                                    hover:bg-purple hover:text-white dark:bg-transparent
-                                                    dark:text-white dark:border-darkborder dark:hover:bg-purple
-                                                    dark:hover:text-white dark:hover:border-purple @(Page == i ? "bg-purple text-white" : "bg-white")"
-                                                    @onclick="async (e) => await SelectedPage(currentPage, LoadData)">@i</a>
-                                            </li>
-                                        }
-                                    }
-
-                                    // Show ellipsis if needed
-                                    if (endPage < TotalPages - 1)
-                                    {
-                                        <li><span class="px-3 py-2">...</span></li>
-                                    }
-
-                                    // Always show last page if there is more than one page
-                                    if (TotalPages > 1)
-                                    {
-                                        <li>
-                                            <a href="#"
-                                                class="px-3 py-2 text-black  border border-black/10 hover:bg-purple hover:text-white dark:bg-transparent dark:text-white dark:border-darkborder dark:hover:bg-purple dark:hover:text-white dark:hover:border-purple @(Page == TotalPages ? "bg-purple text-white" : "bg-white")"
-                                                @onclick="async (e) => await SelectedPage(TotalPages, LoadData)">@TotalPages</a>
-                                        </li>
-                                    }
-                                }
-                                <li><MudLink Href="#" Class="px-3 py-2 bg-white border cursor-not-allowed ltr:ml-0 rtl:mr-0 ltr:rounded-r-lg rtl:rounded-l-lg text-black/50 border-black/10 dark:bg-transparent dark:text-darkmuted dark:border-darkborder" @onclick="async (e) => await NextPage(LoadData)" disabled="@(Page >= TotalPages)">Sau</MudLink></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in MainModels)
+                        {
+                            <tr>
+                                <td>@item.code</td>
+                                <td>@item.name</td>
+                                <td>@item.bat_dau_tu?.ToString("dd/MM/yyyy") - @item.den?.ToString("dd/MM/yyyy")</td>
+                                <td>@item.so_quyet_dinh</td>
+                                <td>@item.don_vi_chu_tri</td>
+                                <td>@item.noi_dung_kiem_tra</td>
+                                <td>@item.description</td>
+                                <td>@((MarkupString)item.status.GetTrangThai())</td>
+                                <td class="flex items-center gap-2">
+                                    <MudButton Class="transition-all duration-300 border btn-crud rounded-md btn text-purple border-purple hover:bg-purple hover:text-white"
+                                               @onclick="@(e => OpenAddOrUpdateModal(item))">
+                                        <i class="ri-edit-line"></i>
+                                    </MudButton>
+                                    <MudButton Class="transition-all duration-300 border btn-crud rounded-md btn text-danger border-danger hover:bg-danger hover:text-white"
+                                               @onclick="@(e => OpenDeleteModal(item))">
+                                        <i class="ri-delete-bin-line"></i>
+                                    </MudButton>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
+
+            <CoreAdminWeb.Shared.Components.Pagination TotalItems="@TotalItems" Page="@Page" TotalPages="@TotalPages" PageSize="@PageSize" PageSizeChanged="OnPageSizeChanged" PageChanged="SelectedPage" LoadData="LoadData" />
         </div>
     </div>
 </div>
@@ -281,19 +207,19 @@
                                 </div>
                                 <div class="space-y-2 md:col-span-1">
                                     <label>Bắt dầu từ</label>
-                                    <input type="text" 
-                                            class="form-input date-picker"
-                                            placeholder="Bắt dầu từ"
-                                            value="@(SelectedItem.bat_dau_tu?.ToString("dd/MM/yyyy"))"
-                                            @onchange="@(e => OnDateChanged(e, "bat_dau_tu"))" />
+                                    <input type="text"
+                                           class="form-input date-picker"
+                                           placeholder="Bắt dầu từ"
+                                           value="@(SelectedItem.bat_dau_tu?.ToString("dd/MM/yyyy"))"
+                                           @onchange="@(e => OnDateChanged(e, "bat_dau_tu"))" />
                                 </div>
                                 <div class="space-y-2 md:col-span-1">
                                     <label>Đến</label>
-                                    <input type="text" 
-                                            class="form-input date-picker"
-                                            placeholder="Đến"
-                                            value="@(SelectedItem.den?.ToString("dd/MM/yyyy"))"
-                                            @onchange="@(e => OnDateChanged(e, "den"))" />
+                                    <input type="text"
+                                           class="form-input date-picker"
+                                           placeholder="Đến"
+                                           value="@(SelectedItem.den?.ToString("dd/MM/yyyy"))"
+                                           @onchange="@(e => OnDateChanged(e, "den"))" />
                                 </div>
 
                                 <div class="space-y-2 md:col-span-1">
@@ -315,9 +241,9 @@
                                 <div class="space-y-2 md:col-span-2">
                                     <label>Trạng thái</label>
                                     <select class="form-select" @bind-value="@SelectedItem.status" @bind-value:event="onchange">
-                                        @foreach (var item in StatusList)
+                                        @foreach (var item in EnumHelper.ToList<Model.Base.Status>())
                                         {
-                                            <option value="@item" selected="@(SelectedItem.status == item)">@item.GetDescription()</option>
+                                            <option value="@item.EnumValue" selected="@(SelectedItem.status == item.EnumValue)">@item.Description</option>
                                         }
                                     </select>
                                 </div>
@@ -346,7 +272,6 @@
 }
 
 @code {
-    private IJSObjectReference _module;
     private List<QLCLDotKiemTraHauKiemATTPModel> MainModels { get; set; } = new();
     private bool openDeleteModal = false;
     private bool openAddOrUpdateModal = false;
@@ -378,28 +303,28 @@
         BuildPaginationQuery(Page, PageSize, "id", false);
         if (!string.IsNullOrEmpty(_searchString))
         {
+            index++;
             BuilderQuery += $"&filter[_and][{index}][_or][0][code][_contains]={_searchString}"
             + $"&filter[_and][{index}][_or][1][name][_contains]={_searchString}"
             + $"&filter[_and][{index}][_or][2][so_quyet_dinh][_contains]={_searchString}"
             + $"&filter[_and][{index}][_or][3][don_vi_chu_tri][_contains]={_searchString}"
             + $"&filter[_and][{index}][_or][4][noi_dung_kiem_tra][_contains]={_searchString}"
             + $"&filter[_and][{index}][_or][5][description][_contains]={_searchString}";
-            index++;
         }
         if (_fromDate != null)
         {
-            BuilderQuery += $"&filter[_and][{index}][bat_dau_tu][_gte]={_fromDate.Value.ToString("yyyy-MM-dd")}";
             index++;
+            BuilderQuery += $"&filter[_and][{index}][bat_dau_tu][_gte]={_fromDate.Value.ToString("yyyy-MM-dd")}";
         }
         if (_toDate != null)
         {
-            BuilderQuery += $"&filter[_and][{index}][den][_lte]={_toDate.Value.ToString("yyyy-MM-dd")}";
             index++;
+            BuilderQuery += $"&filter[_and][{index}][den][_lte]={_toDate.Value.ToString("yyyy-MM-dd")}";
         }
         if (!string.IsNullOrEmpty(_searchStatusString))
         {
-            BuilderQuery += $"&filter[_and][{index}][status][_eq]={_searchStatusString}";
             index++;
+            BuilderQuery += $"&filter[_and][{index}][status][_eq]={_searchStatusString}";
         }
         BuilderQuery += $"&filter[_and][{index}][deleted][_eq]=false";
         var result = await MainService.GetAllAsync(BuilderQuery);
@@ -417,6 +342,7 @@
             MainModels = new List<QLCLDotKiemTraHauKiemATTPModel>();
         }
         IsLoading = false;
+        StateHasChanged();
     }
 
 
@@ -504,14 +430,6 @@
         await LoadData();
     }
 
-    public async ValueTask DisposeAsync()
-    {
-        if (_module != null)
-        {
-            await _module.DisposeAsync();
-        }
-    }
-
     private async Task OnDateChanged(ChangeEventArgs e, string fieldName, bool isFilter = false)
     {
         try
@@ -519,51 +437,24 @@
             var dateStr = e.Value?.ToString();
             if (string.IsNullOrEmpty(dateStr))
             {
-                switch (fieldName)
+                ReflectionHelper.SetDateFieldValue(this, SelectedItem, fieldName, null);
+            }
+            else
+            {
+                var parts = dateStr.Split('/');
+                if (parts.Length == 3 &&
+                    int.TryParse(parts[0], out int day) &&
+                    int.TryParse(parts[1], out int month) &&
+                    int.TryParse(parts[2], out int year))
                 {
-                    case nameof(SelectedItem.bat_dau_tu):
-                        SelectedItem.bat_dau_tu = null;
-                        break;
-                    case nameof(SelectedItem.den):
-                        SelectedItem.den = null;
-                        break;
-                    case "fromDate":
-                        _fromDate = null;
-                        await LoadData();
-                        break;
-                    case "toDate":
-                        _toDate = null;
-                        await LoadData();
-                        break;
+                    var date = new DateTime(year, month, day, 0, 0, 0, DateTimeKind.Local);
+                    ReflectionHelper.SetDateFieldValue(this, SelectedItem, fieldName, date);
                 }
-                return;
             }
 
-            var parts = dateStr.Split('/');
-            if (parts.Length == 3 &&
-                int.TryParse(parts[0], out int day) &&
-                int.TryParse(parts[1], out int month) &&
-                int.TryParse(parts[2], out int year))
+            if (isFilter)
             {
-                var date = new DateTime(year, month, day);
-
-                switch (fieldName)
-                {
-                    case nameof(SelectedItem.bat_dau_tu):
-                        SelectedItem.bat_dau_tu = date;
-                        break;
-                    case nameof(SelectedItem.den):
-                        SelectedItem.den = date;
-                        break;
-                    case "fromDate":
-                        _fromDate = date;
-                        await LoadData();
-                        break;
-                    case "toDate":
-                        _toDate = date;
-                        await LoadData();
-                        break;
-                }
+                await LoadData();
             }
         }
         catch (Exception ex)
@@ -571,39 +462,38 @@
             AlertService.ShowAlert($"Lỗi khi xử lý ngày: {ex.Message}", "danger");
         }
     }
-    
+
     private async Task OnExportExcel()
     {
         // Get all data for export
-        int index = 0;
         BuildPaginationQuery(Page, int.MaxValue, "id", false);
-       if (!string.IsNullOrEmpty(_searchString))
+        int index = 0;
+        if (!string.IsNullOrEmpty(_searchString))
         {
+            index++;
             BuilderQuery += $"&filter[_and][{index}][_or][0][code][_contains]={_searchString}"
             + $"&filter[_and][{index}][_or][1][name][_contains]={_searchString}"
             + $"&filter[_and][{index}][_or][2][so_quyet_dinh][_contains]={_searchString}"
             + $"&filter[_and][{index}][_or][3][don_vi_chu_tri][_contains]={_searchString}"
             + $"&filter[_and][{index}][_or][4][noi_dung_kiem_tra][_contains]={_searchString}"
             + $"&filter[_and][{index}][_or][5][description][_contains]={_searchString}";
-            index++;
         }
         if (_fromDate != null)
         {
-            BuilderQuery += $"&filter[_and][{index}][bat_dau_tu][_gte]={_fromDate.Value.ToString("yyyy-MM-dd")}";
             index++;
+            BuilderQuery += $"&filter[_and][{index}][bat_dau_tu][_gte]={_fromDate.Value.ToString("yyyy-MM-dd")}";
         }
         if (_toDate != null)
         {
-            BuilderQuery += $"&filter[_and][{index}][den][_lte]={_toDate.Value.ToString("yyyy-MM-dd")}";
             index++;
+            BuilderQuery += $"&filter[_and][{index}][den][_lte]={_toDate.Value.ToString("yyyy-MM-dd")}";
         }
         if (!string.IsNullOrEmpty(_searchStatusString))
         {
-            BuilderQuery += $"&filter[_and][{index}][status][_eq]={_searchStatusString}";
             index++;
+            BuilderQuery += $"&filter[_and][{index}][status][_eq]={_searchStatusString}";
         }
         BuilderQuery += $"&filter[_and][{index}][deleted][_eq]=false";
-
 
         var result = await MainService.GetAllAsync(BuilderQuery);
         if (!result.IsSuccess || result.Data == null)
@@ -659,7 +549,7 @@
 
         // Export to browser
         var fileName = $"DanhSachDotKiemTraHauKiemATTP_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
-        var fileBytes = package.GetAsByteArray();
+        var fileBytes = await package.GetAsByteArrayAsync();
         // Nếu chưa có hàm saveAsFile trong wwwroot/js, hãy thêm hàm này để hỗ trợ download file từ base64
         await JsRuntime.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(fileBytes));
     }

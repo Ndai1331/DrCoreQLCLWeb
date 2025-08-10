@@ -1,4 +1,5 @@
-﻿using CoreAdminWeb.Helpers;
+﻿using CoreAdminWeb.Extensions;
+using CoreAdminWeb.Helpers;
 using CoreAdminWeb.Model;
 using CoreAdminWeb.Services;
 using CoreAdminWeb.Services.BaseServices;
@@ -6,7 +7,6 @@ using CoreAdminWeb.Shared.Base;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using OfficeOpenXml;
-using CoreAdminWeb.Extensions;
 using OfficeOpenXml.Style;
 
 namespace CoreAdminWeb.Pages.QLCLPhamViKinhDoanh
@@ -30,6 +30,9 @@ namespace CoreAdminWeb.Pages.QLCLPhamViKinhDoanh
 
         private QLCLPhamViHoatDongModel SelectedItem { get; set; } = new QLCLPhamViHoatDongModel();
 
+        private Dictionary<int, List<XaPhuongModel>> SelectedXaPhuongItems { get; set; } = new();
+        private List<XaPhuongModel> XaPhuongItems { get; set; } = new();
+
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
@@ -41,7 +44,7 @@ namespace CoreAdminWeb.Pages.QLCLPhamViKinhDoanh
             {
                 _selectedTinhFilter = await LoadDefaultData(TinhService);
                 SelectedItem.province = await LoadDefaultData(TinhService);
-               await LoadData();
+                await LoadData();
                 _ = Task.Run(async () =>
                 {
                     await Task.Delay(500);
@@ -57,36 +60,45 @@ namespace CoreAdminWeb.Pages.QLCLPhamViKinhDoanh
             try
             {
                 IsLoading = true;
+                if (_selectedXaFilter == null)
+                {
+                    XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaService);
+                }
                 BuildPaginationQuery(Page, PageSize);
-                int intdex =1;
+                int intdex = 0;
 
                 BuilderQuery += "&filter[_and][0][deleted][_eq]=false&sort=sort";
                 if (!string.IsNullOrEmpty(_searchString))
                 {
+                    intdex++;
                     BuilderQuery += $"&filter[_and][{intdex}][_or][0][name][_contains]={_searchString}";
                     BuilderQuery += $"&filter[_and][{intdex}][_or][1][description][_contains]={_searchString}";
                     BuilderQuery += $"&filter[_and][{intdex}][_or][2][code][_contains]={_searchString}";
-                    intdex++;
                 }
 
-                if(_selectedTinhFilter != null)
+                if (_selectedTinhFilter != null)
                 {
+                    intdex++;
                     BuilderQuery += $"&filter[_and][{intdex}][province][_eq]={_selectedTinhFilter.id}";
-                    intdex++;
                 }
 
-                if(_selectedXaFilter != null)
+                if (_selectedXaFilter != null)
                 {
+                    intdex++;
                     BuilderQuery += $"&filter[_and][{intdex}][ward][_eq]={_selectedXaFilter.id}";
+                }
+                else
+                {
                     intdex++;
+                    string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
+                    BuilderQuery += $"&filter[_and][{intdex}][ward][_in]={xaFilterIds}";
                 }
 
-                if(!string.IsNullOrEmpty(_searchStatusString))
+                if (!string.IsNullOrEmpty(_searchStatusString))
                 {
-                    BuilderQuery += $"&filter[_and][{intdex}][status][_eq]={_searchStatusString}";
                     intdex++;
+                    BuilderQuery += $"&filter[_and][{intdex}][status][_eq]={_searchStatusString}";
                 }
-                
 
                 var result = await MainService.GetAllAsync(BuilderQuery);
                 if (result.IsSuccess)
@@ -111,6 +123,7 @@ namespace CoreAdminWeb.Pages.QLCLPhamViKinhDoanh
             finally
             {
                 IsLoading = false;
+                StateHasChanged();
             }
         }
 
@@ -119,9 +132,13 @@ namespace CoreAdminWeb.Pages.QLCLPhamViKinhDoanh
             try
             {
                 _titleAddOrUpdate = item != null ? "Sửa" : "Thêm mới";
-                SelectedItem = item?.DeepClone() ?? new QLCLPhamViHoatDongModel(){
-                    province = await LoadDefaultData(TinhService),
-                };
+                SelectedItem = item?.DeepClone() ?? new QLCLPhamViHoatDongModel();
+
+                if (SelectedItem.province == null)
+                {
+                    SelectedItem.province = await LoadDefaultData(TinhService);
+                }
+
                 openAddOrUpdateModal = true;
 
                 // Wait for modal to render
@@ -154,7 +171,8 @@ namespace CoreAdminWeb.Pages.QLCLPhamViKinhDoanh
         {
             try
             {
-                SelectedItem = new QLCLPhamViHoatDongModel(){
+                SelectedItem = new QLCLPhamViHoatDongModel()
+                {
                     province = await LoadDefaultData(TinhService),
                 };
                 openDeleteModal = false;
@@ -169,7 +187,8 @@ namespace CoreAdminWeb.Pages.QLCLPhamViKinhDoanh
         {
             try
             {
-                SelectedItem = new QLCLPhamViHoatDongModel(){
+                SelectedItem = new QLCLPhamViHoatDongModel()
+                {
                     province = await LoadDefaultData(TinhService),
                 };
                 openAddOrUpdateModal = false;
@@ -186,8 +205,8 @@ namespace CoreAdminWeb.Pages.QLCLPhamViKinhDoanh
             {
                 var resultCreate = SelectedItem.id == 0 ? await MainService.CreateAsync(SelectedItem) : new();
                 var resultUpdate = SelectedItem.id > 0 ? await MainService.UpdateAsync(SelectedItem) : new();
-                string message =resultCreate.Message ?? resultUpdate.Message;
-                if ((resultCreate.IsSuccess && SelectedItem.id == 0 ) || (resultUpdate.IsSuccess && SelectedItem.id > 0))
+                string message = resultCreate.Message ?? resultUpdate.Message;
+                if ((resultCreate.IsSuccess && SelectedItem.id == 0) || (resultUpdate.IsSuccess && SelectedItem.id > 0))
                 {
                     await LoadData();
                     openAddOrUpdateModal = false;
@@ -195,7 +214,7 @@ namespace CoreAdminWeb.Pages.QLCLPhamViKinhDoanh
                 }
                 else
                 {
-                    AlertService.ShowAlert($"Lỗi khi {(SelectedItem.id == 0 ? "thêm mới" : "cập nhật")} dữ liệu :" + message , "danger");
+                    AlertService.ShowAlert($"Lỗi khi {(SelectedItem.id == 0 ? "thêm mới" : "cập nhật")} dữ liệu :" + message, "danger");
                 }
             }
             catch (Exception ex)
@@ -208,7 +227,10 @@ namespace CoreAdminWeb.Pages.QLCLPhamViKinhDoanh
         {
             try
             {
-                if (SelectedItem == null) return;
+                if (SelectedItem == null)
+                {
+                    return;
+                }
 
                 var result = await MainService.DeleteAsync(SelectedItem);
                 if (result.IsSuccess && result.Data)
@@ -230,25 +252,23 @@ namespace CoreAdminWeb.Pages.QLCLPhamViKinhDoanh
 
         private async Task<IEnumerable<TinhModel>> LoadTinhData(string searchText)
         {
-            return await LoadBlazorTypeaheadData(searchText, TinhService, isIgnoreCheck: true);
+            return await LoadBlazorTypeaheadData(searchText, TinhService);
         }
 
         private async Task<IEnumerable<XaPhuongModel>> LoadXaCRUDData(string searchText)
         {
             string query = $"&filter[_and][][ProvinceId][_eq]={SelectedItem.province?.id ?? 0}";
-            return await LoadBlazorTypeaheadData(searchText, XaService,query, isIgnoreCheck: true);
+            return await LoadBlazorTypeaheadData(searchText, XaService, query);
         }
 
-        private async Task<IEnumerable<XaPhuongModel>> LoadXaFilterData(string searchText)
+        private async Task<List<XaPhuongModel>> FilterFunctionXaPhuongData(IEnumerable<XaPhuongModel> allItems, string filter,
+            CancellationToken token)
         {
-            string query = $"&filter[_and][][ProvinceId][_eq]={_selectedTinhFilter?.id ?? 0}";
-            return await LoadBlazorTypeaheadData(searchText, XaService, query, isIgnoreCheck: true);
-        }
-
-        public async Task OnTinhFilterChanged(TinhModel? item)
-        {
-            _selectedTinhFilter = item;
-            await LoadData();
+            string query = $"sort=-id";
+            query += $"&filter[_and][][ProvinceId][_eq]={(_selectedTinhFilter == null ? 0 : _selectedTinhFilter?.id)}";
+            XaPhuongItems = await LoadDataInTable(allItems, filter, token, XaService, query);
+            StateHasChanged();
+            return XaPhuongItems;
         }
 
         public async Task OnStatusFilterChanged(ChangeEventArgs e)
@@ -257,46 +277,65 @@ namespace CoreAdminWeb.Pages.QLCLPhamViKinhDoanh
             await LoadData();
         }
 
-        public async Task OnXaFilterChanged(XaPhuongModel? item)
+        public async Task OnTinhFilterChanged(TinhModel? item)
         {
-            _selectedXaFilter = item;
+            _selectedTinhFilter = item;
             await LoadData();
         }
 
+        public void OnTinhCRUDChanged(TinhModel? item)
+        {
+            SelectedItem.province = item;
+            SelectedItem.ward = null;
+        }
+
+        public void OnXaCRUDChanged(XaPhuongModel? item)
+        {
+            SelectedItem.ward = item;
+        }
 
         private async Task OnExportExcel()
         {
+            if (_selectedXaFilter == null)
+            {
+                XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaService);
+            }
             // Get all data for export
-            BuildPaginationQuery(Page, int.MaxValue);
-            int intdex =1;
+            BuildPaginationQuery(1, int.MaxValue);
+            int intdex = 0;
 
             BuilderQuery += "&filter[_and][0][deleted][_eq]=false&sort=sort";
             if (!string.IsNullOrEmpty(_searchString))
             {
+                intdex++;
                 BuilderQuery += $"&filter[_and][{intdex}][_or][0][name][_contains]={_searchString}";
                 BuilderQuery += $"&filter[_and][{intdex}][_or][1][description][_contains]={_searchString}";
                 BuilderQuery += $"&filter[_and][{intdex}][_or][2][code][_contains]={_searchString}";
-                intdex++;
             }
 
-            if(_selectedTinhFilter != null)
+            if (_selectedTinhFilter != null)
             {
+                intdex++;
                 BuilderQuery += $"&filter[_and][{intdex}][province][_eq]={_selectedTinhFilter.id}";
-                intdex++;
             }
 
-            if(_selectedXaFilter != null)
+            if (_selectedXaFilter != null)
             {
+                intdex++;
                 BuilderQuery += $"&filter[_and][{intdex}][ward][_eq]={_selectedXaFilter.id}";
-                intdex++;
             }
-
-            if(!string.IsNullOrEmpty(_searchStatusString))
+            else
             {
-                BuilderQuery += $"&filter[_and][{intdex}][status][_eq]={_searchStatusString}";
                 intdex++;
+                string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
+                BuilderQuery += $"&filter[_and][{intdex}][ward][_in]={xaFilterIds}";
             }
 
+            if (!string.IsNullOrEmpty(_searchStatusString))
+            {
+                intdex++;
+                BuilderQuery += $"&filter[_and][{intdex}][status][_eq]={_searchStatusString}";
+            }
 
             var result = await MainService.GetAllAsync(BuilderQuery);
             if (!result.IsSuccess || result.Data == null)
@@ -339,7 +378,7 @@ namespace CoreAdminWeb.Pages.QLCLPhamViKinhDoanh
                 ws.Cells[row, 4].Value = item.khu_vuc_hoat_dong;
                 ws.Cells[row, 5].Value = item.province?.name + ", " + item.ward?.name;
                 ws.Cells[row, 6].Value = item.doi_tac_tieu_thu;
-                ws.Cells[row, 7].Value = item.pham_vi_noi_dia == true ? "Nội địa," : "" + (item.pham_vi_xuat_khau == true ? "Xuất khẩu" : "");
+                ws.Cells[row, 7].Value = $"{(item.pham_vi_noi_dia == true ? "Nội địa," : "")}{(item.pham_vi_xuat_khau == true ? "Xuất khẩu" : "")}";
                 ws.Cells[row, 8].Value = item.status.GetDescription();
                 row++;
                 stt++;
@@ -348,8 +387,8 @@ namespace CoreAdminWeb.Pages.QLCLPhamViKinhDoanh
             ws.Cells[ws.Dimension.Address].AutoFitColumns();
 
             // Export to browser
-            var fileName = $"DanhSachPhamViKinhDoanh_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
-            var fileBytes = package.GetAsByteArray();
+            var fileName = $"DuLieuDiaBanPhamViSanXuatKinhDoanh{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+            var fileBytes = await package.GetAsByteArrayAsync();
             // Nếu chưa có hàm saveAsFile trong wwwroot/js, hãy thêm hàm này để hỗ trợ download file từ base64
             await JsRuntime.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(fileBytes));
         }

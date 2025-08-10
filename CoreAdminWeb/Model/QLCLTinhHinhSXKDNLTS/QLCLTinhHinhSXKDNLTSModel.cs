@@ -1,6 +1,4 @@
-﻿using CoreAdminWeb.Model.Base;
-using CoreAdminWeb.Model.User;
-using System.Text.Json.Serialization;
+﻿using CoreAdminWeb.Model.User;
 
 namespace CoreAdminWeb.Model
 {
@@ -22,6 +20,9 @@ namespace CoreAdminWeb.Model
         public string? bien_phap_xu_ly_chat_thai { get; set; }
         public bool? deleted { get; set; } = false;
         public int? sort { get; set; } = 0;
+
+        public List<QLCLTinhHinhSXKDNLTSNguyenLieuModel>? nguyen_lieu { get; set; }
+        public List<QLCLTinhHinhSXKDNLTSSanPhamModel>? san_pham { get; set; }
     }
 
     /// <summary>

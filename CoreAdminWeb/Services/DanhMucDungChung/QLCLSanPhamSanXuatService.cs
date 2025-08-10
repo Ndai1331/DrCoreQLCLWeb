@@ -1,7 +1,7 @@
 ﻿using CoreAdminWeb.Model;
 using CoreAdminWeb.Model.RequestHttps;
-using CoreAdminWeb.Services.Http;
 using CoreAdminWeb.Services.BaseServices;
+using CoreAdminWeb.Services.Http;
 using System.Net;
 
 namespace CoreAdminWeb.Services
@@ -10,7 +10,7 @@ namespace CoreAdminWeb.Services
     {
         private readonly string _collection = "QLCLSanPhamSanXuat";
         private const string Fields = "*,user_created.last_name,user_created.first_name,user_updated.last_name,user_updated.first_name"
-        +",loai_sp.id,loai_sp.name";
+        + ",loai_sp.id,loai_sp.name";
 
         /// <summary>
         /// Creates a response with error handling
@@ -36,7 +36,10 @@ namespace CoreAdminWeb.Services
                 description = model.description,
                 status = model.status.ToString(),
                 sort = model.sort,
-                loai_sp = model.loai_sp?.id
+                loai_sp = model.loai_sp?.id,
+                tieu_chuan_chat_luong = model.tieu_chuan_chat_luong,
+                english_name = model.english_name,
+                tieu_chuan_kiem_dich = model.tieu_chuan_kiem_dich,
             };
         }
 

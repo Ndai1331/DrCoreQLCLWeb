@@ -1,12 +1,10 @@
-﻿using CoreAdminWeb.Enums;
+﻿using CoreAdminWeb.Helpers;
 using CoreAdminWeb.Model;
 using CoreAdminWeb.Services;
 using CoreAdminWeb.Services.BaseServices;
 using CoreAdminWeb.Shared.Base;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using CoreAdminWeb.Helpers;  
-using System.Drawing;   
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 
@@ -18,7 +16,8 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
                                               IQLCLTinhHinhSXKDNLTSSanPhamService SanPhamService,
                                               IBaseService<QLCLSanPhamSanXuatModel> QLCLSanPhamSanXuatService,
                                               IBaseService<QLCLCoSoCheBienNLTSModel> QLCLCoSoCheBienNLTSService,
-                                              IBaseService<QLCLNguyenLieuCheBienModel> NguyenLieuCheBienService) : BlazorCoreBase
+                                              IBaseService<QLCLNguyenLieuCheBienModel> NguyenLieuCheBienService,
+                                              IBaseService<XaPhuongModel> XaService) : BlazorCoreBase
     {
         private List<QLCLTinhHinhSXKDNLTSModel> MainModels { get; set; } = new();
         private bool openDeleteModal = false;
@@ -33,11 +32,18 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
         private QLCLTinhHinhSXKDNLTSSanPhamModel? SelectedSanPhamItemDetail { get; set; } = default;
 
         private string _searchString = "";
-        private TinhModel? _selectedTinhFilter { get; set; }
         private string _titleAddOrUpdate = "Thêm mới";
         private string activeDefTab { get; set; } = "tab1";
-        private DateTime? _fromDate { get; set; }
-        private DateTime? _toDate { get; set; }
+        private DateTime? _fromDate { get; set; } = null;
+        private DateTime? _toDate { get; set; } = null;
+
+        // Select2 define
+        private List<QLCLNguyenLieuCheBienModel> QLCLNguyenLieuCheBienItems = new List<QLCLNguyenLieuCheBienModel>();
+        private Dictionary<int, List<QLCLNguyenLieuCheBienModel>> SelectedQLCLNguyenLieuCheBienItems = new Dictionary<int, List<QLCLNguyenLieuCheBienModel>>();
+
+        private List<QLCLSanPhamSanXuatModel> QLCLSanPhamSanXuatItems = new List<QLCLSanPhamSanXuatModel>();
+        private Dictionary<int, List<QLCLSanPhamSanXuatModel>> SelectedQLCLSanPhamSanXuatItems = new Dictionary<int, List<QLCLSanPhamSanXuatModel>>();
+        private List<XaPhuongModel> XaPhuongItems { get; set; } = new();
 
         protected override async Task OnInitializedAsync()
         {
@@ -48,7 +54,7 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
         {
             if (firstRender)
             {
-               await LoadData();
+                await LoadData();
                 _ = Task.Run(async () =>
                 {
                     await Task.Delay(500);
@@ -62,28 +68,34 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
         private async Task LoadData()
         {
             IsLoading = true;
+            
+            XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaService);
             BuildPaginationQuery(Page, PageSize, "id", false);
-            int index =1;
+            int index = 1;
 
             BuilderQuery += "&filter[_and][0][deleted][_eq]=false";
             if (!string.IsNullOrEmpty(_searchString))
             {
+                index++;
                 BuilderQuery += $"&filter[_and][{index}][_or][0][su_co_an_toan][_contains]={_searchString}";
                 BuilderQuery += $"&filter[_and][{index}][_or][1][bien_phap_xu_ly_chat_thai][_contains]={_searchString}";
                 BuilderQuery += $"&filter[_and][{index}][_or][2][qlcl_co_so_che_bien_nlts][name][_contains]={_searchString}";
-                index++;
             }
-            if(_fromDate != null)
+            if (_fromDate != null)
             {
-                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_gte]={_fromDate.Value.ToString("yyyy-MM-dd")}";
                 index++;
+                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_gte]={_fromDate?.ToString("yyyy-MM-dd")}";
             }
 
-            if(_toDate != null)
+            if (_toDate != null)
             {
-                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_lte]={_toDate.Value.ToString("yyyy-MM-dd")}";
+                index++;
+                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_lte]={_toDate?.ToString("yyyy-MM-dd")}";
             }
-
+            
+            index++;
+            string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
+            BuilderQuery += $"&filter[_and][{index}][qlcl_co_so_che_bien_nlts][ward][_in]={xaFilterIds}";
 
             var result = await MainService.GetAllAsync(BuilderQuery);
             if (result.IsSuccess)
@@ -100,6 +112,7 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
                 MainModels = new List<QLCLTinhHinhSXKDNLTSModel>();
             }
             IsLoading = false;
+            StateHasChanged();
         }
 
         private async Task LoadNguyenLieuDetailData()
@@ -119,17 +132,25 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
             SelectedSanPhamItemsDetail = result.Data ?? new List<QLCLTinhHinhSXKDNLTSSanPhamModel>();
         }
 
-        private async Task<IEnumerable<QLCLNguyenLieuCheBienModel>> LoadNguyenLieuData(string searchText)
+        private async Task<List<QLCLNguyenLieuCheBienModel>> FilterFunctionQLCLNguyenLieuCheBienData(IEnumerable<QLCLNguyenLieuCheBienModel> allItems, string filter,
+            CancellationToken token)
         {
-            return await LoadBlazorTypeaheadData(searchText, NguyenLieuCheBienService);
+            QLCLNguyenLieuCheBienItems = await LoadDataInTable(allItems, filter, token, NguyenLieuCheBienService);
+            StateHasChanged();
+            return QLCLNguyenLieuCheBienItems;
         }
+
         private async Task<IEnumerable<QLCLCoSoCheBienNLTSModel>> LoadCoSoCheBienNLTSData(string searchText)
         {
             return await LoadBlazorTypeaheadData(searchText, QLCLCoSoCheBienNLTSService);
         }
-        private async Task<IEnumerable<QLCLSanPhamSanXuatModel>> LoadSanPhamData(string searchText)
+
+        private async Task<List<QLCLSanPhamSanXuatModel>> FilterFunctionQLCLSanPhamSanXuatData(IEnumerable<QLCLSanPhamSanXuatModel> allItems, string filter,
+            CancellationToken token)
         {
-            return await LoadBlazorTypeaheadData(searchText, QLCLSanPhamSanXuatService);
+            QLCLSanPhamSanXuatItems = await LoadDataInTable(allItems, filter, token, QLCLSanPhamSanXuatService);
+            StateHasChanged();
+            return QLCLSanPhamSanXuatItems;
         }
 
         private void OpenDeleteModal(QLCLTinhHinhSXKDNLTSModel item)
@@ -191,6 +212,7 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
             openNguyenLieuDetailDeleteModal = false;
 
             if (!SelectedNguyenLieuItemsDetail.Any(c => c.deleted == null || c.deleted == false))
+            {
                 SelectedNguyenLieuItemsDetail.Add(new QLCLTinhHinhSXKDNLTSNguyenLieuModel()
                 {
                     tinh_hinh_san_xuat_kinh_doanh_nlts = SelectedItem,
@@ -199,6 +221,8 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
                     khoi_luong_tan = 0,
                     deleted = false,
                 });
+            }
+
             StateHasChanged();
         }
         private void CloseNguyenLieuDetailDeleteModal()
@@ -211,7 +235,9 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
         private void OnAddNguyenLieu()
         {
             if (SelectedNguyenLieuItemsDetail == null)
+            {
                 SelectedNguyenLieuItemsDetail = new List<QLCLTinhHinhSXKDNLTSNguyenLieuModel>();
+            }
 
             SelectedNguyenLieuItemsDetail.Add(new QLCLTinhHinhSXKDNLTSNguyenLieuModel
             {
@@ -223,7 +249,7 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
             });
         }
 
-      
+
 
         private void OpenSanPhamDetailDeleteModal(QLCLTinhHinhSXKDNLTSSanPhamModel item)
         {
@@ -252,6 +278,7 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
             openSanPhamDetailDeleteModal = false;
 
             if (!SelectedSanPhamItemsDetail.Any(c => c.deleted == null || c.deleted == false))
+            {
                 SelectedSanPhamItemsDetail.Add(new QLCLTinhHinhSXKDNLTSSanPhamModel()
                 {
                     tinh_hinh_san_xuat_kinh_doanh_nlts = SelectedItem,
@@ -260,6 +287,8 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
                     san_luong_tan = 0,
                     deleted = false,
                 });
+            }
+
             StateHasChanged();
         }
 
@@ -272,7 +301,9 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
         private void OnAddSanPham()
         {
             if (SelectedSanPhamItemsDetail == null)
+            {
                 SelectedSanPhamItemsDetail = new List<QLCLTinhHinhSXKDNLTSSanPhamModel>();
+            }
 
             SelectedSanPhamItemsDetail.Add(new QLCLTinhHinhSXKDNLTSSanPhamModel
             {
@@ -289,15 +320,16 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
             _titleAddOrUpdate = item != null ? "Sửa" : "Thêm mới";
             SelectedItem = item != null ? item.DeepClone() : new QLCLTinhHinhSXKDNLTSModel();
             SelectedNguyenLieuItemsDetail = new List<QLCLTinhHinhSXKDNLTSNguyenLieuModel>();
+            SelectedSanPhamItemsDetail = new List<QLCLTinhHinhSXKDNLTSSanPhamModel>();
 
             if (SelectedItem.id is not null && SelectedItem.id > 0)
             {
                 await LoadNguyenLieuDetailData();
                 await LoadSanPhamDetailData();
-            }else{
-                SelectedNguyenLieuItemsDetail = new List<QLCLTinhHinhSXKDNLTSNguyenLieuModel>();
-                SelectedSanPhamItemsDetail = new List<QLCLTinhHinhSXKDNLTSSanPhamModel>();
+            }
 
+            if (!SelectedNguyenLieuItemsDetail.Any())
+            {
                 SelectedNguyenLieuItemsDetail.Add(new QLCLTinhHinhSXKDNLTSNguyenLieuModel()
                 {
                     tinh_hinh_san_xuat_kinh_doanh_nlts = SelectedItem,
@@ -306,7 +338,10 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
                     khoi_luong_tan = 0,
                     deleted = false,
                 });
+            }
 
+            if (!SelectedSanPhamItemsDetail.Any())
+            {
                 SelectedSanPhamItemsDetail.Add(new QLCLTinhHinhSXKDNLTSSanPhamModel()
                 {
                     tinh_hinh_san_xuat_kinh_doanh_nlts = SelectedItem,
@@ -315,10 +350,8 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
                     san_luong_tan = 0,
                     deleted = false,
                 });
-
             }
 
-       
             openAddOrUpdateModal = true;
 
             // Wait for modal to render
@@ -331,181 +364,185 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
 
         private async Task OnValidSubmit()
         {
-            if(SelectedNguyenLieuItemsDetail.Count == 0)
+            var isValid = true;
+            if (SelectedNguyenLieuItemsDetail.Count == 0 || SelectedNguyenLieuItemsDetail.Any(c => c.nguyen_lieu == null))
             {
                 AlertService.ShowAlert("Vui lòng nhập nguyên liệu", "warning");
-                return;
+                isValid = false;
             }
 
-            if(SelectedSanPhamItemsDetail.Count == 0)
+            if (SelectedSanPhamItemsDetail.Count == 0 || SelectedSanPhamItemsDetail.Any(c => c.san_pham == null))
             {
                 AlertService.ShowAlert("Vui lòng nhập sản phẩm", "warning");
-                return;
+                isValid = false;
             }
 
-            if (SelectedItem.id is null || SelectedItem.id <= 0)
+            if (isValid)
             {
-                var result = await MainService.CreateAsync(SelectedItem);
-                if (result.IsSuccess)
+                if (SelectedItem.id is null || SelectedItem.id <= 0)
                 {
-                    var nguyenLieuChiTietList = SelectedNguyenLieuItemsDetail
-                        .Where(c => c.deleted == false || c.deleted == null)
-                        .Select(c =>
-                        {
-                            c.tinh_hinh_san_xuat_kinh_doanh_nlts = result.Data;
-                            return c;
-                        })
-                        .ToList();
-                    
-                    var sanPhamChiTietList = SelectedSanPhamItemsDetail
-                        .Where(c => c.deleted == false || c.deleted == null)
-                        .Select(c =>
-                        {
-                            c.tinh_hinh_san_xuat_kinh_doanh_nlts = result.Data;
-                            return c;
-                        })
-                        .ToList();
+                    var result = await MainService.CreateAsync(SelectedItem);
+                    if (result.IsSuccess)
+                    {
+                        var nguyenLieuChiTietList = SelectedNguyenLieuItemsDetail
+                            .Where(c => c.deleted == false || c.deleted == null)
+                            .Select(c =>
+                            {
+                                c.tinh_hinh_san_xuat_kinh_doanh_nlts = result.Data;
+                                return c;
+                            })
+                            .ToList();
 
-                    var nguyenLieuDetailResult = await NguyenLieuService.CreateAsync(nguyenLieuChiTietList);
-                    if (!nguyenLieuDetailResult.IsSuccess)
-                    {
-                        AlertService.ShowAlert(nguyenLieuDetailResult.Message ?? "Lỗi khi thêm mới chi tiết dữ liệu", "danger");
-                        return;
+                        var sanPhamChiTietList = SelectedSanPhamItemsDetail
+                            .Where(c => c.deleted == false || c.deleted == null)
+                            .Select(c =>
+                            {
+                                c.tinh_hinh_san_xuat_kinh_doanh_nlts = result.Data;
+                                return c;
+                            })
+                            .ToList();
+
+                        var nguyenLieuDetailResult = await NguyenLieuService.CreateAsync(nguyenLieuChiTietList);
+                        if (!nguyenLieuDetailResult.IsSuccess)
+                        {
+                            AlertService.ShowAlert(nguyenLieuDetailResult.Message ?? "Lỗi khi thêm mới chi tiết dữ liệu", "danger");
+                            return;
+                        }
+                        var sanPhamDetailResult = await SanPhamService.CreateAsync(sanPhamChiTietList);
+                        if (!sanPhamDetailResult.IsSuccess)
+                        {
+                            AlertService.ShowAlert(sanPhamDetailResult.Message ?? "Lỗi khi thêm mới chi tiết dữ liệu", "danger");
+                            return;
+                        }
+                        await LoadData();
+                        openAddOrUpdateModal = false;
+                        AlertService.ShowAlert("Thêm mới thành công!", "success");
                     }
-                    var sanPhamDetailResult = await SanPhamService.CreateAsync(sanPhamChiTietList);
-                    if (!sanPhamDetailResult.IsSuccess)
+                    else
                     {
-                        AlertService.ShowAlert(sanPhamDetailResult.Message ?? "Lỗi khi thêm mới chi tiết dữ liệu", "danger");
-                        return;
+                        AlertService.ShowAlert(result.Message ?? "Lỗi khi thêm mới dữ liệu", "danger");
                     }
-                    await LoadData();
-                    openAddOrUpdateModal = false;
-                    AlertService.ShowAlert("Thêm mới thành công!", "success");
                 }
                 else
                 {
-                    AlertService.ShowAlert(result.Message ?? "Lỗi khi thêm mới dữ liệu", "danger");
-                }
-            }
-            else
-            {
-                var result = await MainService.UpdateAsync(SelectedItem);
-                if (result.IsSuccess)
-                {
-                    var addNewNguyenLieuChiTietList = SelectedNguyenLieuItemsDetail
-                        .Where(c => (c.deleted == false || c.deleted == null) && c.id == 0)
-                        .Select(c =>
-                        {
-                            c.tinh_hinh_san_xuat_kinh_doanh_nlts = SelectedItem;
-                            return c;
-                        }).ToList();
-                    var removeNguyenLieuChiTietList = SelectedNguyenLieuItemsDetail
-                        .Where(c => c.deleted == true && c.id > 0)
-                        .Select(c =>
-                        {
-                            c.tinh_hinh_san_xuat_kinh_doanh_nlts = SelectedItem;
-                            c.deleted = true;
-                            return c;
-                        }).ToList();
-                    var updateNguyenLieuChiTietList = SelectedNguyenLieuItemsDetail
-                        .Where(c => (c.deleted == false || c.deleted == null) && c.id > 0)
-                        .Select(c =>
-                        {
-                            c.tinh_hinh_san_xuat_kinh_doanh_nlts = SelectedItem;
-                            return c;
-                        }).ToList();
-
-                    if (addNewNguyenLieuChiTietList.Any())
+                    var result = await MainService.UpdateAsync(SelectedItem);
+                    if (result.IsSuccess)
                     {
-                        var detailResult = await NguyenLieuService.CreateAsync(addNewNguyenLieuChiTietList);
-                        if (!detailResult.IsSuccess)
-                        {
-                            AlertService.ShowAlert(detailResult.Message ?? "Lỗi khi thêm mới chi tiết dữ liệu", "danger");
-                            return;
-                        }
-                    }
+                        var addNewNguyenLieuChiTietList = SelectedNguyenLieuItemsDetail
+                            .Where(c => (c.deleted == false || c.deleted == null) && (c.id ?? 0) == 0)
+                            .Select(c =>
+                            {
+                                c.tinh_hinh_san_xuat_kinh_doanh_nlts = SelectedItem;
+                                return c;
+                            }).ToList();
+                        var removeNguyenLieuChiTietList = SelectedNguyenLieuItemsDetail
+                            .Where(c => c.deleted == true && c.id > 0)
+                            .Select(c =>
+                            {
+                                c.tinh_hinh_san_xuat_kinh_doanh_nlts = SelectedItem;
+                                c.deleted = true;
+                                return c;
+                            }).ToList();
+                        var updateNguyenLieuChiTietList = SelectedNguyenLieuItemsDetail
+                            .Where(c => (c.deleted == false || c.deleted == null) && c.id > 0)
+                            .Select(c =>
+                            {
+                                c.tinh_hinh_san_xuat_kinh_doanh_nlts = SelectedItem;
+                                return c;
+                            }).ToList();
 
-                    if (removeNguyenLieuChiTietList.Any())
+                        if (addNewNguyenLieuChiTietList.Any())
+                        {
+                            var detailResult = await NguyenLieuService.CreateAsync(addNewNguyenLieuChiTietList);
+                            if (!detailResult.IsSuccess)
+                            {
+                                AlertService.ShowAlert(detailResult.Message ?? "Lỗi khi thêm mới chi tiết dữ liệu", "danger");
+                                return;
+                            }
+                        }
+
+                        if (removeNguyenLieuChiTietList.Any())
+                        {
+                            var detailResult = await NguyenLieuService.DeleteAsync(removeNguyenLieuChiTietList);
+                            if (!detailResult.IsSuccess)
+                            {
+                                AlertService.ShowAlert(detailResult.Message ?? "Lỗi khi xóa chi tiết dữ liệu", "danger");
+                                return;
+                            }
+                        }
+
+                        if (updateNguyenLieuChiTietList.Any())
+                        {
+                            var detailResult = await NguyenLieuService.UpdateAsync(updateNguyenLieuChiTietList);
+                            if (!detailResult.IsSuccess)
+                            {
+                                AlertService.ShowAlert(detailResult.Message ?? "Lỗi khi cập nhật chi tiết dữ liệu", "danger");
+                                return;
+                            }
+                        }
+
+
+                        var addNewSanPhamChiTietList = SelectedSanPhamItemsDetail
+                            .Where(c => (c.deleted == false || c.deleted == null) && (c.id ?? 0) == 0)
+                            .Select(c =>
+                            {
+                                c.tinh_hinh_san_xuat_kinh_doanh_nlts = SelectedItem;
+                                return c;
+                            }).ToList();
+                        var removeSanPhamChiTietList = SelectedSanPhamItemsDetail
+                            .Where(c => c.deleted == true && c.id > 0)
+                            .Select(c =>
+                            {
+                                c.tinh_hinh_san_xuat_kinh_doanh_nlts = SelectedItem;
+                                c.deleted = true;
+                                return c;
+                            }).ToList();
+                        var updateSanPhamChiTietList = SelectedSanPhamItemsDetail
+                            .Where(c => (c.deleted == false || c.deleted == null) && c.id > 0)
+                            .Select(c =>
+                            {
+                                c.tinh_hinh_san_xuat_kinh_doanh_nlts = SelectedItem;
+                                return c;
+                            }).ToList();
+
+                        if (addNewSanPhamChiTietList.Any())
+                        {
+                            var detailResult = await SanPhamService.CreateAsync(addNewSanPhamChiTietList);
+                            if (!detailResult.IsSuccess)
+                            {
+                                AlertService.ShowAlert(detailResult.Message ?? "Lỗi khi thêm mới chi tiết dữ liệu", "danger");
+                                return;
+                            }
+                        }
+
+                        if (removeSanPhamChiTietList.Any())
+                        {
+                            var detailResult = await SanPhamService.DeleteAsync(removeSanPhamChiTietList);
+                            if (!detailResult.IsSuccess)
+                            {
+                                AlertService.ShowAlert(detailResult.Message ?? "Lỗi khi xóa chi tiết dữ liệu", "danger");
+                                return;
+                            }
+                        }
+
+                        if (updateSanPhamChiTietList.Any())
+                        {
+                            var detailResult = await SanPhamService.UpdateAsync(updateSanPhamChiTietList);
+                            if (!detailResult.IsSuccess)
+                            {
+                                AlertService.ShowAlert(detailResult.Message ?? "Lỗi khi cập nhật chi tiết dữ liệu", "danger");
+                                return;
+                            }
+                        }
+
+                        await LoadData();
+                        openAddOrUpdateModal = false;
+                        AlertService.ShowAlert("Cập nhật thành công!", "success");
+                    }
+                    else
                     {
-                        var detailResult = await NguyenLieuService.DeleteAsync(removeNguyenLieuChiTietList);
-                        if (!detailResult.IsSuccess)
-                        {
-                            AlertService.ShowAlert(detailResult.Message ?? "Lỗi khi xóa chi tiết dữ liệu", "danger");
-                            return;
-                        }
+                        AlertService.ShowAlert(result.Message ?? "Lỗi khi cập nhật dữ liệu", "danger");
                     }
-
-                    if (updateNguyenLieuChiTietList.Any())
-                    {
-                        var detailResult = await NguyenLieuService.UpdateAsync(updateNguyenLieuChiTietList);
-                        if (!detailResult.IsSuccess)
-                        {
-                            AlertService.ShowAlert(detailResult.Message ?? "Lỗi khi cập nhật chi tiết dữ liệu", "danger");
-                            return;
-                        }
-                    }
-
-
-                    var addNewSanPhamChiTietList = SelectedSanPhamItemsDetail
-                        .Where(c => (c.deleted == false || c.deleted == null) && c.id == 0)
-                        .Select(c =>
-                        {
-                            c.tinh_hinh_san_xuat_kinh_doanh_nlts = SelectedItem;
-                            return c;
-                        }).ToList();
-                    var removeSanPhamChiTietList = SelectedSanPhamItemsDetail
-                        .Where(c => c.deleted == true && c.id > 0)
-                        .Select(c =>
-                        {
-                            c.tinh_hinh_san_xuat_kinh_doanh_nlts = SelectedItem;
-                            c.deleted = true;
-                            return c;
-                        }).ToList();
-                    var updateSanPhamChiTietList = SelectedSanPhamItemsDetail
-                        .Where(c => (c.deleted == false || c.deleted == null) && c.id > 0)
-                        .Select(c =>
-                        {
-                            c.tinh_hinh_san_xuat_kinh_doanh_nlts = SelectedItem;
-                            return c;
-                        }).ToList();
-
-                    if (addNewSanPhamChiTietList.Any())
-                    {
-                        var detailResult = await SanPhamService.CreateAsync(addNewSanPhamChiTietList);
-                        if (!detailResult.IsSuccess)
-                        {
-                            AlertService.ShowAlert(detailResult.Message ?? "Lỗi khi thêm mới chi tiết dữ liệu", "danger");
-                            return;
-                        }
-                    }
-
-                    if (removeSanPhamChiTietList.Any())
-                    {
-                        var detailResult = await SanPhamService.DeleteAsync(removeSanPhamChiTietList);
-                        if (!detailResult.IsSuccess)
-                        {
-                            AlertService.ShowAlert(detailResult.Message ?? "Lỗi khi xóa chi tiết dữ liệu", "danger");
-                            return;
-                        }
-                    }
-
-                    if (updateSanPhamChiTietList.Any())
-                    {
-                        var detailResult = await SanPhamService.UpdateAsync(updateSanPhamChiTietList);
-                        if (!detailResult.IsSuccess)
-                        {
-                            AlertService.ShowAlert(detailResult.Message ?? "Lỗi khi cập nhật chi tiết dữ liệu", "danger");
-                            return;
-                        }
-                    }
-
-                    await LoadData();
-                    openAddOrUpdateModal = false;
-                    AlertService.ShowAlert("Cập nhật thành công!", "success");
-                }
-                else
-                {
-                    AlertService.ShowAlert(result.Message ?? "Lỗi khi cập nhật dữ liệu", "danger");
                 }
             }
         }
@@ -515,74 +552,31 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
             SelectedItem = new QLCLTinhHinhSXKDNLTSModel();
             openAddOrUpdateModal = false;
         }
-        private async Task OnDateChanged(ChangeEventArgs e, string fieldName)
+        private async Task OnDateChanged(ChangeEventArgs e, string fieldName, bool isFilter = false)
         {
             try
             {
                 var dateStr = e.Value?.ToString();
                 if (string.IsNullOrEmpty(dateStr))
                 {
-                    switch (fieldName)
+                    ReflectionHelper.SetDateFieldValue(this, SelectedItem, fieldName, null);
+                }
+                else
+                {
+                    var parts = dateStr.Split('/');
+                    if (parts.Length == 3 &&
+                        int.TryParse(parts[0], out int day) &&
+                        int.TryParse(parts[1], out int month) &&
+                        int.TryParse(parts[2], out int year))
                     {
-                        case nameof(SelectedItem.ngay_ghi_nhan):
-                            SelectedItem.ngay_ghi_nhan = null;
-                            break;
-
-
-                        case nameof(SelectedItem.thoi_gian_bat_dau):
-                            SelectedItem.thoi_gian_bat_dau = null;
-                            break;
-
-                        case nameof(SelectedItem.thoi_gian_ket_thuc):
-                            SelectedItem.thoi_gian_ket_thuc = null;
-                            break;
-
-
-                        case "fromDate":
-                            _fromDate = null;
-                            await LoadData();
-                            break;
-
-                        case "toDate":
-                            _toDate = null;
-                            await LoadData();
-                            break;
+                        var date = new DateTime(year, month, day, 0, 0, 0, DateTimeKind.Local);
+                        ReflectionHelper.SetDateFieldValue(this, SelectedItem, fieldName, date);
                     }
-                    return;
                 }
 
-                var parts = dateStr.Split('/');
-                if (parts.Length == 3 &&
-                    int.TryParse(parts[0], out int day) &&
-                    int.TryParse(parts[1], out int month) &&
-                    int.TryParse(parts[2], out int year))
+                if (isFilter)
                 {
-                    var date = new DateTime(year, month, day);
-
-                    switch (fieldName)
-                    {
-                        case nameof(SelectedItem.ngay_ghi_nhan):
-                            SelectedItem.ngay_ghi_nhan = date;
-                            break;
-
-                        case nameof(SelectedItem.thoi_gian_bat_dau):
-                            SelectedItem.thoi_gian_bat_dau = date;
-                            break;
-
-                        case nameof(SelectedItem.thoi_gian_ket_thuc):
-                            SelectedItem.thoi_gian_ket_thuc = date;
-                            break;
-
-                        case "fromDate":
-                            _fromDate = date;
-                            await LoadData();
-                            break;
-
-                        case "toDate":
-                            _toDate = date;
-                            await LoadData();
-                            break;
-                    }
+                    await LoadData();
                 }
             }
             catch (Exception ex)
@@ -598,29 +592,35 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
 
         private async Task OnExportExcel()
         {
+            XaPhuongItems = await LoadDataInTable(new List<XaPhuongModel>(), "", CancellationToken.None, XaService);
+
             // Get all data for export
-            BuildPaginationQuery(Page, int.MaxValue);
-            int index =1;
+            BuildPaginationQuery(1, int.MaxValue);
+            int index = 1;
 
             BuilderQuery += "&filter[_and][0][deleted][_eq]=false";
             if (!string.IsNullOrEmpty(_searchString))
             {
+                index++;
                 BuilderQuery += $"&filter[_and][{index}][_or][0][su_co_an_toan][_contains]={_searchString}";
                 BuilderQuery += $"&filter[_and][{index}][_or][1][bien_phap_xu_ly_chat_thai][_contains]={_searchString}";
                 BuilderQuery += $"&filter[_and][{index}][_or][2][qlcl_co_so_che_bien_nlts][name][_contains]={_searchString}";
-                index++;
             }
-            if(_fromDate != null)
+            if (_fromDate != null)
             {
-                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_gte]={_fromDate.Value.ToString("yyyy-MM-dd")}";
                 index++;
+                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_gte]={_fromDate?.ToString("yyyy-MM-dd")}";
             }
 
-            if(_toDate != null)
+            if (_toDate != null)
             {
-                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_lte]={_toDate.Value.ToString("yyyy-MM-dd")}";
+                index++;
+                BuilderQuery += $"&filter[_and][{index}][ngay_ghi_nhan][_lte]={_toDate?.ToString("yyyy-MM-dd")}";
             }
-
+            
+            index++;
+            string xaFilterIds = string.Join(",", XaPhuongItems.Select(x => x.id).ToList());
+            BuilderQuery += $"&filter[_and][{index}][qlcl_co_so_che_bien_nlts][ward][_in]={xaFilterIds}";
 
             var result = await MainService.GetAllAsync(BuilderQuery);
             if (!result.IsSuccess || result.Data == null)
@@ -643,7 +643,7 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
             ws.Cells[1, 5].Value = "Thời gian kết thúc";
             ws.Cells[1, 6].Value = "Sản phẩm";
             ws.Cells[1, 7].Value = "Sự cố an toàn";
-            ws.Cells[1, 8].Value = "Biện pháp xử lý chất thải";
+            ws.Cells[1, 8].Value = "Biện pháp xử lý";
 
             // Style header
             using (var range = ws.Cells[1, 1, 1, 8])
@@ -659,11 +659,11 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
             foreach (var item in data)
             {
                 ws.Cells[row, 1].Value = stt;
-                ws.Cells[row, 2].Value = item.ngay_ghi_nhan;
+                ws.Cells[row, 2].Value = item.ngay_ghi_nhan?.ToString("dd/MM/yyyy");
                 ws.Cells[row, 3].Value = item.qlcl_co_so_che_bien_nlts?.name;
-                ws.Cells[row, 4].Value = item.thoi_gian_bat_dau;
-                ws.Cells[row, 5].Value = item.thoi_gian_ket_thuc;
-                // ws.Cells[row, 6].Value = item.qlcl_san_pham_san_xuat_nlts?.name;
+                ws.Cells[row, 4].Value = item.thoi_gian_bat_dau?.ToString("dd/MM/yyyy");
+                ws.Cells[row, 5].Value = item.thoi_gian_ket_thuc?.ToString("dd/MM/yyyy");
+                ws.Cells[row, 6].Value = string.Join("; ", item.san_pham?.Where(c => c.deleted == null || c.deleted == false).Select(c => c.san_pham?.name ?? string.Empty) ?? new List<string>());
                 ws.Cells[row, 7].Value = item.su_co_an_toan;
                 ws.Cells[row, 8].Value = item.bien_phap_xu_ly_chat_thai;
                 row++;
@@ -674,7 +674,7 @@ namespace CoreAdminWeb.Pages.QLCLTinhHinhSXKDNLTS
 
             // Export to browser
             var fileName = $"DanhSachTinhHinhSXKDNLTS_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
-            var fileBytes = package.GetAsByteArray();
+            var fileBytes = await package.GetAsByteArrayAsync();
             // Nếu chưa có hàm saveAsFile trong wwwroot/js, hãy thêm hàm này để hỗ trợ download file từ base64
             await JsRuntime.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(fileBytes));
         }
