@@ -6,26 +6,23 @@
 @inherits LayoutComponentBase
 
 <div style="background-color: #f9fbfd; color: black;
- background-image: url('assets/images/bg-shape.png');
-  background-size: cover; background-repeat: no-repeat; width:100%;">
+    background-image: url('assets/images/bg-shape.png');
+    background-size: cover; background-repeat: no-repeat; width:100%; min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: center;">
 
     <header>
         <nav class="px-4 lg:px-7 py-4 max-w-[1440px] mx-auto">
             <div class="flex flex-wrap items-center justify-between">
                 <a href="/" class="flex items-center">
-                    <img src= "@(Logo != null ? $"{Logo.filename_disk}" : "assets/images/logo-dark.svg")" class="mx-auto dark-logo h-7 dark:hidden" alt="logo">
-                    <img src="@(Logo != null ? $"{Logo.filename_disk}" : "assets/images/logo-light.svg")" class="hidden mx-auto light-logo h-7 dark:block" alt="logo">
+                   @*  <img src= "@(Logo != null ? $"{Logo.filename_disk}" : "assets/images/logo-dark.svg")" class="mx-auto dark-logo h-7 dark:hidden" alt="logo">
+                    <img src="@(Logo != null ? $"{Logo.filename_disk}" : "assets/images/logo-light.svg")" class="hidden mx-auto light-logo h-7 dark:block" alt="logo"> *@
                 </a>
             </div>
         </nav>
     </header> 
     @Body
     <footer class="py-5 text-center text-black dark:text-white/80 max-w-[1440px] mx-auto">
-        <div>
-            &copy;
-            <span> @FullYear</span>
-            Sở nông nghiệp và Môi trường Tỉnh Quảng Trị.
-        </div>
+        
     </footer>
 </div>
 
