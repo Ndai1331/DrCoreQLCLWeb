@@ -38,10 +38,7 @@
         }
 
     .subtitle {
-        font-size: 16px;
-        color: #f0fff5;
-        font-weight: 800;
-        text-shadow: 0 1px 4px rgba(0,0,0,1);
+        font-weight: 600;
         margin: 20px 0;
     }
 
@@ -113,12 +110,16 @@
             padding: 15px;
             margin: 10px;
         }
+
+        .text-2xl {
+            font-size: 16px;
+        }
     }
 </style>
 
 <div class="mx-auto login-container">
     <img src="assets/images/quoc_huy.png" alt="Logo">
-    <div class="subtitle">CƠ SỞ DỮ LIỆU QUẢN LÝ CHẤT LƯỢNG</div>
+    <div class="subtitle text-2xl">CƠ SỞ DỮ LIỆU QUẢN LÝ CHẤT LƯỢNG</div>
     <EditForm Model="this" OnValidSubmit="HandleGraphQLSignIn">
         <div class="form-group">
             <InputText @bind-Value="_email" placeholder="Địa chỉ email" class="form-input" />
