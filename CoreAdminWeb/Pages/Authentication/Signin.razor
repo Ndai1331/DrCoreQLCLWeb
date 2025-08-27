@@ -144,11 +144,7 @@
             Đăng nhập
         </button>
     </EditForm>
-    <div class="mt-3">
-        &copy;
-        <span> @FullYear</span>
-        Sở nông nghiệp và Môi trường Tỉnh Quảng Trị.
-    </div>
+    <Footer IsCenter=true></Footer>
 </div>
 
 <script>
@@ -176,8 +172,6 @@
     private bool isLoading = false;
     private DotNetObjectReference<Signin>? _dotNetRef;
     private IJSObjectReference? _jsListener;
-
-    private string FullYear { get; set; } = DateTime.Now.Year.ToString();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
