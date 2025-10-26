@@ -122,7 +122,8 @@
                             <th>STT</th>
                             <th>Mã cơ sở</th>
                             <th>Tên cơ sở</th>
-                            <th>Ngày vi phạm</th>
+                            <th>Số QĐ xử phạt</th>
+                            <th>Ngày xử phạt</th>
                             <th>Địa chỉ</th>
                             <th>Sản phẩm</th>
                             <th>Hành vi vi phạm</th>
@@ -139,6 +140,7 @@
                                 {
                                     <td>@item.Data.co_so_che_bien_nlts?.code</td>
                                     <td>@item.Data.co_so_che_bien_nlts?.name</td>
+                                    <td>@item.Data.so_qd_xu_phat</td>
                                     <td>@item.Data.ngay_ghi_nhan?.ToString("dd/MM/yyyy")</td>
                                     <td>@item.Data.co_so_che_bien_nlts?.dia_chi</td>
                                 }
@@ -146,6 +148,7 @@
                                 {
                                     <td>@item.Data.co_so_nlts_du_dieu_kien_attp?.code</td>
                                     <td>@item.Data.co_so_nlts_du_dieu_kien_attp?.name</td>
+                                    <td>@item.Data.so_qd_xu_phat</td>
                                     <td>@item.Data.ngay_ghi_nhan?.ToString("dd/MM/yyyy")</td>
                                     <td>@item.Data.co_so_nlts_du_dieu_kien_attp?.dia_chi</td>
                                 }
