@@ -9,6 +9,7 @@ namespace CoreAdminWeb.Model
         public DateTime? ngay_ghi_nhan { get; set; }
         public DateTime? ngay_xu_ly { get; set; }
         public string? co_quan_xu_ly { get; set; }
+        public string? so_qd_xu_phat { get; set; }
         public LoaiCoSoNLTS? loai_co_so { get; set; } = LoaiCoSoNLTS.CoSoCheBien;
         public QLCLCoSoCheBienNLTSModel? co_so_che_bien_nlts { get; set; }
         public QLCLCoSoNLTSDuDieuKienATTPModel? co_so_nlts_du_dieu_kien_attp { get; set; }
@@ -50,5 +51,6 @@ namespace CoreAdminWeb.Model
         public LoaiCoSoNLTS? loai_co_so { get; set; } = LoaiCoSoNLTS.CoSoCheBien;
         public bool? da_cong_bo { get; set; } = false;
         public string? user_cong_bo { get; set; }
+        public string? so_qd_xu_phat { get; set; }
     }
 }

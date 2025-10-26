@@ -122,10 +122,13 @@
                             <th>STT</th>
                             <th>Mã cơ sở</th>
                             <th>Tên cơ sở</th>
+                            <th>Đia chỉ</th>
+                            <th>Loại hình kinh doanh</th>
                             <th>Số GCN</th>
                             <th>Ngày cấp</th>
                             <th>Ngày hết hạn</th>
                             <th>Cơ quan cấp</th>
+                            <th>Sản phẩm</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -136,10 +139,13 @@
                                 <td>@(((Page - 1) * PageSize) + item.Index + 1)</td>
                                 <td>@item.Data.code</td>
                                 <td>@item.Data.name</td>
+                                <td>@(item.Data.province?.name + ", " + item.Data.ward?.name + ", " + item.Data.dia_chi ?? string.Empty)</td>
+                                <td>@item.Data.loai_hinh_kinh_doanh?.name</td>
                                 <td>@item.Data.so_giay_chung_nhan</td>
                                 <td>@item.Data.ngay_cap?.ToString("dd/MM/yyyy")</td>
                                 <td>@item.Data.ngay_het_hieu_luc?.ToString("dd/MM/yyyy")</td>
                                 <td>@item.Data.co_quan_cap</td>
+                                <td>@string.Join(", ", item.Data.chi_tiets?.Select(c => c.san_pham?.name))</td>
                             </tr>
                         }
                     </tbody>

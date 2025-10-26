@@ -58,7 +58,8 @@ namespace CoreAdminWeb.Services
                 co_quan_xu_ly = model.co_quan_xu_ly,
                 loai_co_so = model.loai_co_so,
                 da_cong_bo = model.da_cong_bo,
-                user_cong_bo = model.user_cong_bo?.id
+                user_cong_bo = model.user_cong_bo?.id,
+                so_qd_xu_phat= model.so_qd_xu_phat
             };
         }
 

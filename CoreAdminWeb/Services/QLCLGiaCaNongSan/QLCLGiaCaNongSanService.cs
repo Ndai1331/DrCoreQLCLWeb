@@ -12,7 +12,7 @@ namespace CoreAdminWeb.Services
         private const string Fields = "*,user_created.last_name,user_created.first_name,user_updated.last_name,user_updated.first_name"
             + ",province.id,province.name"
             + ",ward.id,ward.name"
-            + ",san_pham_san_xuat.id,san_pham_san_xuat.name"
+            + ",san_pham_san_xuat.id,san_pham_san_xuat.name,san_pham_san_xuat.code"
             + ",don_vi_tinh.id,don_vi_tinh.name";
 
         /// <summary>

@@ -130,7 +130,8 @@
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
                             <th>STT</th>
-                            <th>Ngày ghi nhận</th>
+                            <th>Số QĐ xử phạt</th>
+                            <th>Ngày xử phạt</th>
                             <th>Tên cơ sở</th>
                             <th>Hành vi vi phạm</th>
                             <th>Hướng xử lý</th>
@@ -147,6 +148,7 @@
                             var currentIndex = i;
                             <tr>
                                 <td>@(((Page - 1) * PageSize) + i + 1)</td>
+                                <td>@MainModels[i].so_qd_xu_phat</td>
                                 <td>@MainModels[i].ngay_ghi_nhan?.ToString("dd/MM/yyyy")</td>
                                 @if (MainModels[i].loai_co_so == LoaiCoSoNLTS.CoSoCheBien)
                                 {
@@ -224,7 +226,7 @@
                     <EditForm Model="@SelectedItem" OnValidSubmit="OnValidSubmit">
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-2 py-2">
                             <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
-                                <label>Ngày ghi nhận<span class="text-danger">*</span></label>
+                                <label>Ngày xử phạt<span class="text-danger">*</span></label>
                                 <input type="text"
                                        class="form-input date-picker"
                                        placeholder="Chọn ngày cấp"
@@ -239,7 +241,11 @@
                                        value="@(SelectedItem.ngay_xu_ly?.ToString("dd/MM/yyyy"))"
                                        @onchange="@(e => OnDateChanged(e, "ngay_xu_ly"))" />
                             </div>
-                            <div class="space-y-2 xs:col-span-2 sm:col-span-2 md:col-span-2 xl:col-span-2">
+                            <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
+                                <label>Số QĐ xử phạt</label>
+                                <input type="text" class="form-input" @bind-value="@SelectedItem.so_qd_xu_phat" />
+                            </div>
+                            <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
                                 <label>Cơ quan xử lý<span class="text-danger">*</span></label>
                                 <input type="text" class="form-input" @bind-value="@SelectedItem.co_quan_xu_ly" required />
                             </div>

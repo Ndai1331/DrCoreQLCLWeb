@@ -117,12 +117,13 @@
                         <tr>
                             <th>STT</th>
                             <th>Ngày ghi nhận</th>
+                            <th>Mã nông sản</th>
                             <th>Tên nông sản</th>
                             <th>Nhà cung cấp</th>
                             <th>Địa chỉ khảo sát</th>
                             <th>Đơn vị tính</th>
-                            <th>Giá mua vào (VNĐ)</th>
-                            <th>Giá bán ra (VNĐ)</th>
+                            <th>Giá kỳ này (VNĐ)</th>
+                            <th>Giá kỳ trước (VNĐ)</th>
                             <th>Ghi chú</th>
                             <th>Tác vụ</th>
                         </tr>
@@ -134,6 +135,7 @@
                             <tr>
                                 <td>@(((Page - 1) * PageSize) + i + 1)</td>
                                 <td>@MainModels[i].ngay_ghi_nhan?.ToString("dd/MM/yyyy")</td>
+                                <td>@MainModels[i].san_pham_san_xuat?.code</td>
                                 <td>@MainModels[i].san_pham_san_xuat?.name</td>
                                 <td>@MainModels[i].nha_cung_cap</td>
                                 <td>@MainModels[i].province?.name/@MainModels[i].ward?.name</td>
@@ -310,11 +312,11 @@
                                 </BlazoredTypeahead>
                             </div>
                             <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
-                                <label>Giá mua vào (VNĐ)</label>
+                                <label>Giá kỳ này (VNĐ)</label>
                                 <input type="number" class="form-input" @bind-value="@SelectedItem.gia_mua_vao" />
                             </div>
                             <div class="space-y-2 xs:col-span-2 sm:col-span-1 md:col-span-1 xl:col-span-1">
-                                <label>Giá bán ra (VNĐ)</label>
+                                <label>Giá kỳ trước (VNĐ)</label>
                                 <input type="number" class="form-input" @bind-value="@SelectedItem.gia_ban_ra" />
                             </div>
                             <div class="space-y-2 xs:col-span-2 sm:col-span-2 md:col-span-2 xl:col-span-2">

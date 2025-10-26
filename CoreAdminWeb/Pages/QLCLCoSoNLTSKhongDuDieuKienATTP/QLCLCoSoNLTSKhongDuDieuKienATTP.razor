@@ -130,12 +130,9 @@
                             <th>STT</th>
                             <th>MS doanh nghiệp</th>
                             <th>Tên cơ sở</th>
+                            <th>Địa chỉ</th>
                             <th>Tuân thủ quy định</th>
                             <th>Kiểm tra việc tuân thủ</th>
-                            <th>Quy mô</th>
-                            <th>Địa chỉ</th>
-                            <th>Số giấy phép hoạt động</th>
-                            <th>Ngày cấp</th>
                             <th>Trạng thái</th>
                             <th class="flex items-center gap-2">Tác vụ</th>
                         </tr>
@@ -148,12 +145,9 @@
                                 <td>@(((Page - 1) * PageSize) + item.Index + 1)</td>
                                 <td>@item.Data.code</td>
                                 <td>@item.Data.name</td>
+                                <td>@item.Data.dia_chi</td>
                                 <td>@item.Data.tuan_thu_quy_dinh?.GetDescription()</td>
                                 <td>@item.Data.kiem_tra_tuan_thu?.GetDescription()</td>
-                                <td>@item.Data.quy_mo?.GetDescription()</td>
-                                <td>@item.Data.dia_chi</td>
-                                <td>@item.Data.so_giay_phep_hoat_dong</td>
-                                <td>@item.Data.ngay_cap_giay_phep_hoat_dong?.ToString("dd/MM/yyyy")</td>
                                 <td>@((MarkupString)item.Data.status.GetTrangThai())</td>
                                 <td class="flex items-center gap-2">
                                     <MudButton Class="transition-all duration-300 border btn-crud rounded-md btn text-purple border-purple hover:bg-purple hover:text-white"

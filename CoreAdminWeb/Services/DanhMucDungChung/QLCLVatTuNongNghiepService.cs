@@ -10,7 +10,7 @@ namespace CoreAdminWeb.Services.DanhMucDungChung
     {
         private readonly string _collection = "QLCL_VatTuNongNghiep";
         private const string Fields = "*,user_created.last_name,user_created.first_name,user_updated.last_name,user_updated.first_name"
-            + ",loai_vat_tu.id,loai_vat_tu.name"
+            + ",loai_vat_tu.id,loai_vat_tu.name,loai_vat_tu.code"
             + ",don_vi_tinh.id,don_vi_tinh.name";
 
         /// <summary>
